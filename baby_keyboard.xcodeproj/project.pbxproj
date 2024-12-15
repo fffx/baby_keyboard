@@ -1,0 +1,546 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		20141CBA2D0F52E700D0ED5D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 20141CA02D0F52E500D0ED5D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 20141CA72D0F52E500D0ED5D;
+			remoteInfo = baby_keyboard;
+		};
+		20141CC42D0F52E700D0ED5D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 20141CA02D0F52E500D0ED5D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 20141CA72D0F52E500D0ED5D;
+			remoteInfo = baby_keyboard;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		20141CA82D0F52E500D0ED5D /* baby_keyboard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = baby_keyboard.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		20141CB92D0F52E700D0ED5D /* baby_keyboardTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = baby_keyboardTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		20141CC32D0F52E700D0ED5D /* baby_keyboardUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = baby_keyboardUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		20141CAA2D0F52E500D0ED5D /* baby_keyboard */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = baby_keyboard;
+			sourceTree = "<group>";
+		};
+		20141CBC2D0F52E700D0ED5D /* baby_keyboardTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = baby_keyboardTests;
+			sourceTree = "<group>";
+		};
+		20141CC62D0F52E700D0ED5D /* baby_keyboardUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = baby_keyboardUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		20141CA52D0F52E500D0ED5D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		20141CB62D0F52E700D0ED5D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		20141CC02D0F52E700D0ED5D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		20141C9F2D0F52E500D0ED5D = {
+			isa = PBXGroup;
+			children = (
+				20141CAA2D0F52E500D0ED5D /* baby_keyboard */,
+				20141CBC2D0F52E700D0ED5D /* baby_keyboardTests */,
+				20141CC62D0F52E700D0ED5D /* baby_keyboardUITests */,
+				20141CA92D0F52E500D0ED5D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		20141CA92D0F52E500D0ED5D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				20141CA82D0F52E500D0ED5D /* baby_keyboard.app */,
+				20141CB92D0F52E700D0ED5D /* baby_keyboardTests.xctest */,
+				20141CC32D0F52E700D0ED5D /* baby_keyboardUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		20141CA72D0F52E500D0ED5D /* baby_keyboard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 20141CCD2D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "baby_keyboard" */;
+			buildPhases = (
+				20141CA42D0F52E500D0ED5D /* Sources */,
+				20141CA52D0F52E500D0ED5D /* Frameworks */,
+				20141CA62D0F52E500D0ED5D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				20141CAA2D0F52E500D0ED5D /* baby_keyboard */,
+			);
+			name = baby_keyboard;
+			packageProductDependencies = (
+			);
+			productName = baby_keyboard;
+			productReference = 20141CA82D0F52E500D0ED5D /* baby_keyboard.app */;
+			productType = "com.apple.product-type.application";
+		};
+		20141CB82D0F52E700D0ED5D /* baby_keyboardTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 20141CD02D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "baby_keyboardTests" */;
+			buildPhases = (
+				20141CB52D0F52E700D0ED5D /* Sources */,
+				20141CB62D0F52E700D0ED5D /* Frameworks */,
+				20141CB72D0F52E700D0ED5D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				20141CBB2D0F52E700D0ED5D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				20141CBC2D0F52E700D0ED5D /* baby_keyboardTests */,
+			);
+			name = baby_keyboardTests;
+			packageProductDependencies = (
+			);
+			productName = baby_keyboardTests;
+			productReference = 20141CB92D0F52E700D0ED5D /* baby_keyboardTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		20141CC22D0F52E700D0ED5D /* baby_keyboardUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 20141CD32D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "baby_keyboardUITests" */;
+			buildPhases = (
+				20141CBF2D0F52E700D0ED5D /* Sources */,
+				20141CC02D0F52E700D0ED5D /* Frameworks */,
+				20141CC12D0F52E700D0ED5D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				20141CC52D0F52E700D0ED5D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				20141CC62D0F52E700D0ED5D /* baby_keyboardUITests */,
+			);
+			name = baby_keyboardUITests;
+			packageProductDependencies = (
+			);
+			productName = baby_keyboardUITests;
+			productReference = 20141CC32D0F52E700D0ED5D /* baby_keyboardUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		20141CA02D0F52E500D0ED5D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					20141CA72D0F52E500D0ED5D = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					20141CB82D0F52E700D0ED5D = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 20141CA72D0F52E500D0ED5D;
+					};
+					20141CC22D0F52E700D0ED5D = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 20141CA72D0F52E500D0ED5D;
+					};
+				};
+			};
+			buildConfigurationList = 20141CA32D0F52E500D0ED5D /* Build configuration list for PBXProject "baby_keyboard" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 20141C9F2D0F52E500D0ED5D;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 20141CA92D0F52E500D0ED5D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				20141CA72D0F52E500D0ED5D /* baby_keyboard */,
+				20141CB82D0F52E700D0ED5D /* baby_keyboardTests */,
+				20141CC22D0F52E700D0ED5D /* baby_keyboardUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		20141CA62D0F52E500D0ED5D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		20141CB72D0F52E700D0ED5D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		20141CC12D0F52E700D0ED5D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		20141CA42D0F52E500D0ED5D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		20141CB52D0F52E700D0ED5D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		20141CBF2D0F52E700D0ED5D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		20141CBB2D0F52E700D0ED5D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 20141CA72D0F52E500D0ED5D /* baby_keyboard */;
+			targetProxy = 20141CBA2D0F52E700D0ED5D /* PBXContainerItemProxy */;
+		};
+		20141CC52D0F52E700D0ED5D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 20141CA72D0F52E500D0ED5D /* baby_keyboard */;
+			targetProxy = 20141CC42D0F52E700D0ED5D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		20141CCB2D0F52E700D0ED5D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		20141CCC2D0F52E700D0ED5D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		20141CCE2D0F52E700D0ED5D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = baby_keyboard/baby_keyboard.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"baby_keyboard/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.fangxing.baby-keyboard";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		20141CCF2D0F52E700D0ED5D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = baby_keyboard/baby_keyboard.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"baby_keyboard/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.fangxing.baby-keyboard";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		20141CD12D0F52E700D0ED5D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.fangxing.baby-keyboardTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/baby_keyboard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/baby_keyboard";
+			};
+			name = Debug;
+		};
+		20141CD22D0F52E700D0ED5D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.fangxing.baby-keyboardTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/baby_keyboard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/baby_keyboard";
+			};
+			name = Release;
+		};
+		20141CD42D0F52E700D0ED5D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.fangxing.baby-keyboardUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = baby_keyboard;
+			};
+			name = Debug;
+		};
+		20141CD52D0F52E700D0ED5D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.fangxing.baby-keyboardUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = baby_keyboard;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		20141CA32D0F52E500D0ED5D /* Build configuration list for PBXProject "baby_keyboard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				20141CCB2D0F52E700D0ED5D /* Debug */,
+				20141CCC2D0F52E700D0ED5D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		20141CCD2D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "baby_keyboard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				20141CCE2D0F52E700D0ED5D /* Debug */,
+				20141CCF2D0F52E700D0ED5D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		20141CD02D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "baby_keyboardTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				20141CD12D0F52E700D0ED5D /* Debug */,
+				20141CD22D0F52E700D0ED5D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		20141CD32D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "baby_keyboardUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				20141CD42D0F52E700D0ED5D /* Debug */,
+				20141CD52D0F52E700D0ED5D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 20141CA02D0F52E500D0ED5D /* Project object */;
+}
