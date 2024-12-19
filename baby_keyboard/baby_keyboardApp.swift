@@ -14,4 +14,14 @@ struct baby_keyboardApp: App {
             ContentView()
         }
     }
+    
+    var debug = true
+    var timer = 100
+    init() {
+        // todo request accessiblity permission
+        let eventHandler = EventHandler(debug: debug)
+        eventHandler.scheduleTimer(duration: timer)
+        eventHandler.run()
+    }
 }
+
