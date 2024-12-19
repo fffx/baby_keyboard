@@ -19,9 +19,9 @@ struct baby_keyboardApp: App {
     var timer = 100
     init() {
         // todo request accessiblity permission
-        let eventHandler = EventHandler(debug: debug)
-        eventHandler.scheduleTimer(duration: timer)
-        eventHandler.run()
+        // let eventHandler = EventHandler()
+        //eventHandler.scheduleTimer(duration: timer)
+        //eventHandler.run()
     }
 }
 

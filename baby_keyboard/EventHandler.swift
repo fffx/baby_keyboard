@@ -9,19 +9,24 @@ enum KeyCode: CGKeyCode {
 }
 
 class EventHandler {
-    var debug: Bool
     var isLocked = true
-    
-    init(debug: Bool) {
-        self.debug = debug
-    }
+    #if DEBUG
+    let debug = true
+    #else
+    let debug = false
+    #endif
     
     func debugLog(_ message: String) {
         if debug {
             print(message)
         }
     }
-    
+    func update(newLockState: Bool){
+        debugLog("isLocked  --- \(isLocked) new \(newLockState)")
+        isLocked = newLockState
+        CFRunLoopStop(CFRunLoopGetCurrent())
+    }
+
     func scheduleTimer(duration: Int?) {
         guard let duration = duration else { return }
         let timer = Timer(timeInterval: TimeInterval(duration),
@@ -50,8 +55,11 @@ class EventHandler {
     private func setupEventTap() {
         let eventMask = CGEventMask(
             (1 << CGEventType.keyDown.rawValue) |
-            (1 << CGEventType.keyUp.rawValue)
+            (1 << CGEventType.keyUp.rawValue) |
+            (1 << CGEventType.leftMouseDragged.rawValue) |
+            (1 << 14)
         )
+
         guard let eventTap = CGEvent.tapCreate(
             tap: .cghidEventTap,
             place: .headInsertEventTap,
