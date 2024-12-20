@@ -1,0 +1,15 @@
+{
+  "originHash" : "44e329143bf60e2a841c99ef832809109fde2f8ba263c168bf9d27a4fb51ce0d",
+  "pins" : [
+    {
+      "identity" : "sauce",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Clipy/Sauce",
+      "state" : {
+        "branch" : "master",
+        "revision" : "9ed4ca442cdd4be20449479b4e8f157ea96e7542"
+      }
+    }
+  ],
+  "version" : 3
+}

@@ -8,13 +8,16 @@ enum KeyCode: CGKeyCode {
     case u = 0x20
 }
 
-class EventHandler {
-    var isLocked = true
+class EventHandler: ObservableObject {
+    @Published var isLocked = true
     #if DEBUG
     let debug = true
     #else
     let debug = false
     #endif
+    
+    let eventEffectHandler = EventEffectHandler()
+    
     
     func debugLog(_ message: String) {
         if debug {
@@ -26,7 +29,7 @@ class EventHandler {
         isLocked = newLockState
         CFRunLoopStop(CFRunLoopGetCurrent())
     }
-
+    
     func scheduleTimer(duration: Int?) {
         guard let duration = duration else { return }
         let timer = Timer(timeInterval: TimeInterval(duration),
@@ -98,9 +101,16 @@ class EventHandler {
         // Checking if control+u is pressed
         if controlFlag && keyCode == KeyCode.u.rawValue && type == .keyDown {
             debugLog("Keyboard unlocked")
+            isLocked = false
             CFRunLoopStop(CFRunLoopGetCurrent())
         }
-        return isLocked ? nil : Unmanaged.passRetained(event)
+       
+        if isLocked {
+            eventEffectHandler.handle(event: event, eventType: type)
+            return nil
+        } else {
+            return Unmanaged.passRetained(event)
+        }
     }
     
     func requestAccessibilityPermissions() -> Bool {

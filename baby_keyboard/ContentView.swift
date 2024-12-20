@@ -62,33 +62,25 @@ class WindowManager: NSObject, ObservableObject {
 
 struct ContentView: View {
     @StateObject var windowManager = WindowManager()
-    let eventHandler = EventHandler()
-    @State private var isLocked = false
+    @ObservedObject var eventHandler = EventHandler()
     init() {
         eventHandler.run()
     }
     
     var body: some View {
         VStack {
-            LockSwitcher(isLocked: $isLocked, label: "Lock Keyboard")
-            
-            // Text("System is \(isSystemLocked ? "Locked" : "Unlocked")")
+            LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock Keyboard")
         }
         .padding() // Add padding around the LockView itself
         .onAppear {
             if let window = NSApplication.shared.windows.first {
-                windowManager.configureWindow(for: window, isLocked: isLocked)
+                windowManager.configureWindow(for: window, isLocked: eventHandler.isLocked)
                 DispatchQueue.main.async { // Crucial: Dispatch to the main queue
                     window.setContentSize(NSSize(width: window.contentView!.fittingSize.width, height: window.contentView!.fittingSize.height))
                     window.center()
                 }
             }
         }
-        .onChange(of: isLocked){
-            eventHandler.update(newLockState: isLocked)
-        }
-
-        
     }
 }
 
