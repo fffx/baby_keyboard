@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import AVFoundation
 
 //class FireworkWindow: NSWindow {
 //    init() {
@@ -24,8 +25,40 @@ import Combine
 //    }
 //}
 
+struct FullscreenTransparentWindow: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(FullscreenTransparentWindowBackground())
+    }
+}
+
+private struct FullscreenTransparentWindowBackground: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            guard let window = view.window else { return }
+
+            window.isOpaque = false
+            window.backgroundColor = .clear
+            window.ignoresMouseEvents = true
+            window.level = .screenSaver
+            window.collectionBehavior = [.fullScreenAuxiliary]
+            window.setFrame(.init(origin: .zero, size: NSScreen.main!.frame.size), display: true)
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
+}
+
+extension View {
+    func fullscreenTransparentWindow() -> some View {
+        modifier(FullscreenTransparentWindow())
+    }
+}
 
 struct FireworkView: View {
+    @State private var windowSize: CGSize = .zero
     @StateObject private var fireworkController = FireworkController()
     @EnvironmentObject var eventHandler: EventHandler
     var body: some View {
@@ -41,12 +74,19 @@ struct FireworkView: View {
                         .opacity(particle.opacity)
                 }
             }
+            .onAppear {
+                windowSize = geometry.size
+            }
         }
+        .fullscreenTransparentWindow()
         .onReceive(eventHandler.$lastKeyString){ _ in
+            if eventHandler.lastKeyString == "" || eventHandler.lastKeyString.count > 1 {
+                return
+            }
             fireworkController.createFirework(
                 at: CGPoint(
-                    x: Int.random(in: 0...800),
-                    y: Int.random(in: 0...800)
+                    x: Int.random(in: 0...Int(windowSize.width)),
+                    y: Int.random(in: 0...Int(windowSize.height))
                 )
             )
         }
@@ -72,7 +112,7 @@ class FireworkController: ObservableObject {
         
         for _ in 0..<particleCount {
             let angle = Double.random(in: 0...(2 * .pi))
-            let speed = Double.random(in: 5...15)
+            let speed = Double.random(in: 1...10)
             let velocity = CGPoint(
                 x: cos(angle) * speed,
                 y: sin(angle) * speed
@@ -92,12 +132,13 @@ class FireworkController: ObservableObject {
     }
     
     private func animate() {
+        playFireworkSound()
         Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { [weak self] timer in
             guard let self = self else {
                 timer.invalidate()
                 return
             }
-            
+
             var shouldContinue = false
             
             self.particles = self.particles.compactMap { particle in
@@ -123,6 +164,22 @@ class FireworkController: ObservableObject {
             if !shouldContinue {
                 timer.invalidate()
             }
+        }
+    }
+    
+    func playFireworkSound() {
+        // let launchDelay = Double.random(in: 0.5...1.5)
+        // let explosionDelay = launchDelay + Double.random(in: 0.5...1.5)
+        // let volume = Float.random(in: 0.5...1.0)
+        // let pitch = Float.random(in: 0.8...1.2)
+
+        // SoundManager.shared.audioPlayer?.volume = volume
+        // SoundManager.shared.audioPlayer?.rate = pitch
+
+        DispatchQueue.main.async {
+            SoundManager.shared.playSound(soundName: "cannon1", soundExtension: "wav")
+            // SoundManager.shared.audioPlayer?.volume = volume
+            // SoundManager.shared.audioPlayer?.rate = pitch
         }
     }
 }

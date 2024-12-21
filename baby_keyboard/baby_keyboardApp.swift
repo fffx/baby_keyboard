@@ -8,6 +8,14 @@
 import SwiftUI
 let FireworkWindowID = "fireworkTransparentWindow"
 
+class WindowDelegate: NSObject, NSWindowDelegate {
+    func windowWillClose(_ notification: Notification) {
+        for window in NSApplication.shared.windows {
+            window.close()
+        }
+        NSApplication.shared.terminate(self)
+    }
+}
 
 @main
 struct baby_keyboardApp: App {
