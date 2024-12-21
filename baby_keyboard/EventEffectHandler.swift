@@ -11,37 +11,53 @@ import Foundation
 import CoreGraphics
 import Sauce
 
+extension CGEventFlags {
+    var toNSEventModifierFlags: NSEvent.ModifierFlags {
+        var nsFlags = NSEvent.ModifierFlags()
+        
+        if contains(.maskShift) {
+            nsFlags.insert(.shift)
+        }
+        if contains(.maskControl) {
+            nsFlags.insert(.control)
+        }
+        if contains(.maskAlternate) {
+            nsFlags.insert(.option)
+        }
+        if contains(.maskCommand) {
+            nsFlags.insert(.command)
+        }
+        if contains(.maskNumericPad) {
+            nsFlags.insert(.numericPad)
+        }
+        if contains(.maskSecondaryFn) {
+            nsFlags.insert(.function)
+        }
+        if contains(.maskAlphaShift) {
+            nsFlags.insert(.capsLock)
+        }
+        
+        return nsFlags
+    }
+}
+
 class EventEffectHandler {
     let synth = AVSpeechSynthesizer()
     func handle(event: CGEvent, eventType: CGEventType) {
         guard eventType == .keyUp else { return }
+        guard let str = getString(event: event, eventType: eventType),
+              str.isEmpty else { return }
         
-        
-        let string = Sauce.shared.character(for: Int(event.getIntegerValueField(.keyboardEventKeycode)), cocoaModifiers: [.shift])
-        
-        guard string != nil else { return }
-        
-        let utterance = AVSpeechUtterance(string: string!)
+        let utterance = AVSpeechUtterance(string: str)
         utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
 
         synth.speak(utterance)
     }
-
-    func string(from keyCode: CGKeyCode, with eventFlags: NSEvent.ModifierFlags) -> String? {
-        let currentKeyboard = TISCopyCurrentKeyboardInputSource().takeRetainedValue()
-        // let layoutData = TISGetInputSourceProperty(currentKeyboard, kTISPropertyUnicodeKeyLayoutData)?.takeUnretainedValue() as? Data
-
-//        guard let keyboardLayout = layoutData?.withUnsafeBytes({ $0.bindMemory(to: UCKeyboardLayout.self).baseAddress }) else {
-//            print("Could not get keyboard layout")
-//            return nil
-//        }
-
-//        var deadKeyState: UInt32 = 0
-//        let maxStringLength = 4
-//        var actualStringLength = 0
-//        var unicodeString: [UniChar] = Array(repeating: 0, count: maxStringLength)
-
-
-        return ""
+    
+    func getString(event: CGEvent, eventType: CGEventType) -> String? {
+        return Sauce.shared.character(
+            for: Int(event.getIntegerValueField(.keyboardEventKeycode)),
+            cocoaModifiers: event.flags.toNSEventModifierFlags
+        )
     }
 }

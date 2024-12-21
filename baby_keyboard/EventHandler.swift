@@ -9,25 +9,21 @@ enum KeyCode: CGKeyCode {
 }
 
 class EventHandler: ObservableObject {
-    @Published var isLocked = true
     #if DEBUG
     let debug = true
     #else
     let debug = false
     #endif
-    
+
     let eventEffectHandler = EventEffectHandler()
-    
+    @Published var isLocked = true
+    @Published var lastKeyString: String = ""
+
     
     func debugLog(_ message: String) {
         if debug {
             print(message)
         }
-    }
-    func update(newLockState: Bool){
-        debugLog("isLocked  --- \(isLocked) new \(newLockState)")
-        isLocked = newLockState
-        CFRunLoopStop(CFRunLoopGetCurrent())
     }
     
     func scheduleTimer(duration: Int?) {
@@ -39,20 +35,27 @@ class EventHandler: ObservableObject {
                 FileHandle.standardError.write(data)
             }
             
+            self.isLocked = false
             CFRunLoopStop(CFRunLoopGetCurrent())
         }
         RunLoop.current.add(timer, forMode: .common)
     }
-    
-    
+
     func run() {
         if requestAccessibilityPermissions() {
             setupEventTap() // Setup event tap to capture key events
-            CFRunLoopRun()  // Start the run loop to handle events
+            DispatchQueue.global(qos: .background).async {
+                CFRunLoopRun()  // Start the run loop to handle events in a background thread
+            }
         } else {
             print("Please grant accessibility permissions in System Preferences")
             // exit(EXIT_SUCCESS)
         }
+    }
+    
+    func stop(){
+        self.isLocked = false
+        CFRunLoopStop(CFRunLoopGetCurrent())
     }
     
     private func setupEventTap() {
@@ -62,7 +65,7 @@ class EventHandler: ObservableObject {
             (1 << CGEventType.leftMouseDragged.rawValue) |
             (1 << 14)
         )
-
+        
         guard let eventTap = CGEvent.tapCreate(
             tap: .cghidEventTap,
             place: .headInsertEventTap,
@@ -100,12 +103,16 @@ class EventHandler: ObservableObject {
                  "Event Type: (\(type.rawValue)) \(eventType)")
         // Checking if control+u is pressed
         if controlFlag && keyCode == KeyCode.u.rawValue && type == .keyDown {
-            debugLog("Keyboard unlocked")
-            isLocked = false
+            debugLog("Keyboard locked: \(isLocked)")
+            self.isLocked = isLocked ? false : true
             CFRunLoopStop(CFRunLoopGetCurrent())
+            
+            return nil
         }
+        
        
         if isLocked {
+            self.lastKeyString = eventEffectHandler.getString(event: event, eventType: type) ?? ""
             eventEffectHandler.handle(event: event, eventType: type)
             return nil
         } else {

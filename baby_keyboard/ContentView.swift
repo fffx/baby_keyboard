@@ -23,7 +23,7 @@ struct LockSwitcher: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 30, height: 30)
-                    .foregroundColor(isLocked ? .gray : .blue)
+                    .foregroundColor(isLocked ? .blue : .gray)
                 
                 Text(isLocked ? "Locked" : "Unlocked")
                     .font(.callout)
@@ -54,7 +54,7 @@ class WindowManager: NSObject, ObservableObject {
     func configureWindow(for window: NSWindow, isLocked: Bool) { // Add isLocked parameter
         self.window = window
         window.styleMask = [.titled, .closable, .miniaturizable, .fullSizeContentView]
-        window.title = "Lock Control"
+        // window.title = "Lock Control"
         window.level = .floating
         // window.level = isLocked ? .floating : .normal // Set window level based on lock state
     }
@@ -62,16 +62,12 @@ class WindowManager: NSObject, ObservableObject {
 
 struct ContentView: View {
     @StateObject var windowManager = WindowManager()
-    @ObservedObject var eventHandler = EventHandler()
-    init() {
-        eventHandler.run()
-    }
-    
+    @EnvironmentObject var eventHandler: EventHandler
     var body: some View {
         VStack {
-            LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock Keyboard")
+            LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock/Unlock Keyboard")
         }
-        .padding() // Add padding around the LockView itself
+        .padding()
         .onAppear {
             if let window = NSApplication.shared.windows.first {
                 windowManager.configureWindow(for: window, isLocked: eventHandler.isLocked)
