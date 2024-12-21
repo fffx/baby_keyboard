@@ -8,6 +8,45 @@
 import SwiftUI
 import AppKit
 
+struct PinWindow: ViewModifier {
+    let isPinned: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .background(PinWindowBackground(isPinned: isPinned))
+    }
+}
+
+private struct PinWindowBackground: NSViewRepresentable {
+    let isPinned: Bool
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            guard let window = view.window else { return }
+            updateWindowLevel(window)
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async {
+            guard let window = nsView.window else { return }
+            updateWindowLevel(window)
+        }
+    }
+
+    private func updateWindowLevel(_ window: NSWindow) {
+        window.level = isPinned ? .floating : .normal
+    }
+}
+
+extension View {
+    func pinWindow(isPinned: Bool) -> some View {
+        modifier(PinWindow(isPinned: isPinned))
+    }
+}
+
 struct LockSwitcher: View {
     @Binding var isLocked: Bool
     @State private var isHovering = false // Track hover state
@@ -69,6 +108,7 @@ struct ContentView: View {
             LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock/Unlock Keyboard")
         }
         .padding()
+        .pinWindow(isPinned: eventHandler.isLocked)
         .onChange(of: eventHandler.isLocked){ _, newVal in
             if newVal{
                 openWindow(id: FireworkWindowID)

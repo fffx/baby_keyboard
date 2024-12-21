@@ -77,19 +77,19 @@ struct FireworkView: View {
             .onAppear {
                 windowSize = geometry.size
             }
+            .onChange(of: eventHandler.lastKeyString) { _, newVal in
+                guard let letter = eventHandler.lastKeyString.first else { return }
+                if !letter.isLetter { return }
+                
+                fireworkController.createFirework(
+                    at: CGPoint(
+                        x: Int.random(in: 0...Int(windowSize.width)),
+                        y: Int.random(in: 0...Int(windowSize.height))
+                    )
+                )
+            }
         }
         .fullscreenTransparentWindow()
-        .onReceive(eventHandler.$lastKeyString){ _ in
-            if eventHandler.lastKeyString == "" || eventHandler.lastKeyString.count > 1 {
-                return
-            }
-            fireworkController.createFirework(
-                at: CGPoint(
-                    x: Int.random(in: 0...Int(windowSize.width)),
-                    y: Int.random(in: 0...Int(windowSize.height))
-                )
-            )
-        }
     }
 }
 

@@ -113,8 +113,8 @@ class EventHandler: ObservableObject {
        
         if isLocked {
             if(type != .keyUp){ return nil }
-            
             self.lastKeyString = eventEffectHandler.getString(event: event, eventType: type) ?? ""
+            print("keyup------- \(lastKeyString)")
             eventEffectHandler.handle(event: event, eventType: type)
             return nil
         } else {
