@@ -61,6 +61,7 @@ class WindowManager: NSObject, ObservableObject {
 }
 
 struct ContentView: View {
+    @Environment(\.openWindow) private var openWindow
     @StateObject var windowManager = WindowManager()
     @EnvironmentObject var eventHandler: EventHandler
     var body: some View {
@@ -75,6 +76,19 @@ struct ContentView: View {
                     window.setContentSize(NSSize(width: window.contentView!.fittingSize.width, height: window.contentView!.fittingSize.height))
                     window.center()
                 }
+            }
+        }
+        .onChange(of: eventHandler.isLocked){ _, newVal in
+            if newVal{
+                openWindow(id: FireworkWindowID)
+            } else {
+                NSApp.windows.first(where: { $0.identifier?.rawValue == FireworkWindowID })?.close()
+            }
+        }
+        .onAppear {
+            // Open the other windows here if needed
+            if eventHandler.isLocked {
+                openWindow(id: FireworkWindowID)
             }
         }
     }

@@ -6,29 +6,22 @@
 //
 
 import SwiftUI
+let FireworkWindowID = "fireworkTransparentWindow"
+
 
 @main
 struct baby_keyboardApp: App {
-    private let fireworkWindowID = "fireworkTransparentWindow"
-    @Environment(\.openWindow) private var openWindow
     @ObservedObject var eventHandler = EventHandler()
     // var letterView: LetterView!
-    
-    
     var body: some Scene {
         Window("Main Window", id: "main") {
             ContentView()
-                .onAppear {
-                    // Open the other windows here if needed
-                    if eventHandler.isLocked {
-                        openWindow(id: fireworkWindowID)
-                    }
-                }   
         }
         .environmentObject(eventHandler)
         .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentSize)
         
-        Window("Firework window", id: fireworkWindowID) {
+        Window("Firework window", id: FireworkWindowID) {
             FireworkView().frame(maxWidth: .infinity, maxHeight: .infinity)
             Color.clear
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -36,7 +29,7 @@ struct baby_keyboardApp: App {
                 // .disabled(true)
                 .onAppear {
                     // Make the window transparen
-                    guard let window =  NSApp.windows.first(where: { $0.identifier?.rawValue == fireworkWindowID }) else { return }
+                    guard let window =  NSApp.windows.first(where: { $0.identifier?.rawValue == FireworkWindowID }) else { return }
                     print(window.identifier!.rawValue)
                     window.isOpaque = false
                     // window.backgroundColor = NSColor.clear
@@ -46,7 +39,8 @@ struct baby_keyboardApp: App {
                 }
         }
         .environmentObject(eventHandler)
-        
+        .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentSize)
     }
     
     init() {
