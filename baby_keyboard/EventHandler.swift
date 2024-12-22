@@ -154,7 +154,7 @@ class EventHandler: ObservableObject {
         let controlFlag = event.flags.contains(.maskControl)
         let optionFlag = event.flags.contains(.maskAlternate)
         let eventType = type == .keyDown ? "pressed" : "released"
-        debugLog("Key Code: \(String(keyCode, radix: 16)),\t" +
+        debugLog("Key Code: \0x(String(keyCode, radix: 16)),\t" +
                  "Control Flag: \(controlFlag),\t" +
                  "Event Type: (\(type.rawValue)) \(eventType)")
         // Toggle with Ctrl + Option + U
