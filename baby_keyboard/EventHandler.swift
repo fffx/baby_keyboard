@@ -70,9 +70,10 @@ class EventHandler: ObservableObject {
         }
         DispatchQueue.global(qos: .background).async {
           // Schedule the next check
-          DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-              self.checkAccessibilityPermission()
-          }
+            let delay = processTrusted ? DispatchTimeInterval.seconds(30) : DispatchTimeInterval.seconds(3)
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                self.checkAccessibilityPermission()
+            }
         }
     }
     
