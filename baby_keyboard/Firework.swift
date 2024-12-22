@@ -58,6 +58,7 @@ extension View {
 }
 
 struct FireworkView: View {
+    @State private var initialized = false
     @State private var windowSize: CGSize = .zero
     @StateObject private var fireworkController = FireworkController()
     @EnvironmentObject var eventHandler: EventHandler
@@ -78,9 +79,20 @@ struct FireworkView: View {
                 windowSize = geometry.size
             }
             .onChange(of: eventHandler.lastKeyString) { _, newVal in
-                guard let letter = eventHandler.lastKeyString.first else { return }
-                if !letter.isLetter { return }
-                
+//                guard let letter = eventHandler.lastKeyString.first else { return }
+//                if !letter.isLetter { return }
+//                
+//                fireworkController.createFirework(
+//                    at: CGPoint(
+//                        x: Int.random(in: 0...Int(windowSize.width)),
+//                        y: Int.random(in: 0...Int(windowSize.height))
+//                    )
+//                )
+            }.onReceive(eventHandler.$lastKeyString) { _ in
+                if !initialized {
+                    self.initialized = true
+                    return
+                }
                 fireworkController.createFirework(
                     at: CGPoint(
                         x: Int.random(in: 0...Int(windowSize.width)),
@@ -176,10 +188,15 @@ class FireworkController: ObservableObject {
         // SoundManager.shared.audioPlayer?.volume = volume
         // SoundManager.shared.audioPlayer?.rate = pitch
 
-        DispatchQueue.main.async {
-            SoundManager.shared.playSound(soundName: "cannon1", soundExtension: "wav")
+        // DispatchQueue.main.async as {
+            //SoundManager.shared.playSound(soundName: "cannon1", soundExtension: "wav")
             // SoundManager.shared.audioPlayer?.volume = volume
             // SoundManager.shared.audioPlayer?.rate = pitch
-        }
+            guard let nsSound = NSSound(named: "confetti-cannon") else { return }
+            
+            (nsSound.copy() as! NSSound).play()
+        // }
+       
+        
     }
 }
