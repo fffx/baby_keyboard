@@ -19,7 +19,7 @@ class EventHandler: ObservableObject {
     private var eventLoopStarted = false
     @Published var isLocked = true {
         didSet {
-            if (isLocked) { startEventLoop() }
+            if (isLocked && accessibilityPermissionGranted) { startEventLoop() }
         }
     }
     @Published var accessibilityPermissionGranted = false
@@ -58,20 +58,21 @@ class EventHandler: ObservableObject {
 
     func checkAccessibilityPermission(){
         debugLog("------ Checking Accessibility Permission ------")
+        let processTrusted = AXIsProcessTrusted()
+        if !processTrusted && self.accessibilityPermissionGranted {
+            self.stop()
+            // Handle permission loss (display alert, disable features, etc.)
+            self.accessibilityPermissionGranted = false
+            NSApplication.shared.terminate(self)
+        }
+        if processTrusted {
+            self.accessibilityPermissionGranted = true
+        }
         DispatchQueue.global(qos: .background).async {
-              if !AXIsProcessTrusted() && self.accessibilityPermissionGranted {
-                  self.stop()
-                  
-                  // Handle permission loss (display alert, disable features, etc.)
-                  self.accessibilityPermissionGranted = false
-                  NSApplication.shared.terminate(self)
-              } else {
-                  self.accessibilityPermissionGranted = true
-                  // Schedule the next check
-                  DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                      self.checkAccessibilityPermission()
-                  }
-              }
+          // Schedule the next check
+          DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+              self.checkAccessibilityPermission()
+          }
         }
     }
     
@@ -89,7 +90,7 @@ class EventHandler: ObservableObject {
     }
     
     func stop(){
-        self.isLocked = false
+        isLocked = false
         CFRunLoopStop(CFRunLoopGetCurrent())
     }
     
