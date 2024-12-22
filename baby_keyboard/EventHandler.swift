@@ -6,6 +6,14 @@ import CoreData
 
 enum KeyCode: CGKeyCode {
     case u = 0x20
+    case delete = 0x33
+    case up = 0x7e
+    case left = 0x7b
+    case right = 0x7c
+    case down = 0x7d
+    case escape = 0x35
+    case tab = 0x30
+    case enter = 0x24
 }
 
 class EventHandler: ObservableObject {
@@ -23,10 +31,10 @@ class EventHandler: ObservableObject {
         }
     }
     @Published var accessibilityPermissionGranted = false
-    @Published var lastKeyString: String = ""
+    @Published var lastKeyString: String = "a" // fix onReceive won't work as expected for first key press
 
     
-    init(isLocked: Bool = true, lastKeyString: String = "") {
+    init(isLocked: Bool = true) {
         self.isLocked = isLocked
         self.accessibilityPermissionGranted = requestAccessibilityPermissions()
         if !self.accessibilityPermissionGranted {
@@ -144,24 +152,31 @@ class EventHandler: ObservableObject {
         }
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
         let controlFlag = event.flags.contains(.maskControl)
+        let optionFlag = event.flags.contains(.maskAlternate)
         let eventType = type == .keyDown ? "pressed" : "released"
-        debugLog("Key Code: \(keyCode),\t" +
+        debugLog("Key Code: \(String(keyCode, radix: 16)),\t" +
                  "Control Flag: \(controlFlag),\t" +
                  "Event Type: (\(type.rawValue)) \(eventType)")
-        // Checking if control+u is pressed
-        if controlFlag && keyCode == KeyCode.u.rawValue && type == .keyDown {
+        // Toggle with Ctrl + Option + U
+        if optionFlag && controlFlag && keyCode == KeyCode.u.rawValue && type == .keyDown {
             debugLog("Keyboard locked: \(isLocked)")
             self.isLocked = isLocked ? false : true
             CFRunLoopStop(CFRunLoopGetCurrent())
             
             return nil
         }
-        
+
        
         if isLocked {
-            if(type != .keyUp){ return nil }
+            if shouldAllowEvent(proxy: proxy, type: type, event: event) {
+                return Unmanaged.passRetained(event)
+            }
+            
+            if type != .keyUp {
+                return nil
+            }
             self.lastKeyString = eventEffectHandler.getString(event: event, eventType: type) ?? ""
-            print("keyup------- \(lastKeyString)")
+            debugLog("keyup------- \(lastKeyString)")
             eventEffectHandler.handle(event: event, eventType: type)
             return nil
         } else {
@@ -179,6 +194,45 @@ class EventHandler: ObservableObject {
         }
         return trusted
     }
+    
+    func shouldAllowEvent(
+        proxy: CGEventTapProxy,
+        type: CGEventType,
+        event: CGEvent) -> Bool {
+            debugLog("Ignoring event --  \(event.flags.contains(.maskCommand))")
+            let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+            
+            if keyCode == KeyCode.delete.rawValue || keyCode == KeyCode.enter.rawValue {
+                return false
+            }
+            
+            if keyCode == KeyCode.tab.rawValue ||
+                keyCode == KeyCode.up.rawValue ||
+                keyCode == KeyCode.down.rawValue ||
+                keyCode == KeyCode.left.rawValue ||
+                keyCode == KeyCode.right.rawValue
+            {
+                return true
+            }
+            
+            if event.flags.contains(.maskShift) &&
+                !(event.flags.contains(.maskCommand) || event.flags.contains(.maskAlternate) || event.flags.contains(.maskControl))
+            {
+                return false
+            }
+           
+            if  event.flags.contains(.maskCommand) ||
+                event.flags.contains(.maskShift) ||
+                event.flags.contains(.maskAlternate) ||
+                event.flags.contains(.maskControl)
+            {
+                return true
+            }
+            
+            return false
+            
+    }
+    
 
 }
 func globalKeyEventHandler(

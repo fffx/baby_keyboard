@@ -61,9 +61,15 @@ struct FireworkView: View {
                 }
                 .background(.clear)
                 .buttonStyle(PlainButtonStyle())
-                .confettiCannon(counter: $counter)
+                .confettiCannon(
+                    counter: $counter,
+                    num: Int.random(in: 15...30),
+                    confettiSize: 12.0,
+                    rainHeight: geometry.size.height
+                )
                 .position(x: buttonPosition.x, y: buttonPosition.y)
             }
+            .padding()
             .onAppear {
                 windowSize = geometry.size
             }
