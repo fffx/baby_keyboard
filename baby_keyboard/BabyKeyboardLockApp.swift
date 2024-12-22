@@ -38,7 +38,7 @@ struct baby_keyboardApp: App {
                 .onAppear {
                     // Make the window transparen
                     guard let window =  NSApp.windows.first(where: { $0.identifier?.rawValue == FireworkWindowID }) else { return }
-                    print(window.identifier!.rawValue)
+                    // print(window.identifier!.rawValue)
                     window.isOpaque = false
                     // window.backgroundColor = NSColor.clear
                     window.level = .floating

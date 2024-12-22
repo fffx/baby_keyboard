@@ -16,12 +16,22 @@ class EventHandler: ObservableObject {
     #endif
 
     let eventEffectHandler = EventEffectHandler()
-    @Published var isLocked = true
+    private var eventLoopStarted = false
+    @Published var isLocked = true {
+        didSet {
+            if (isLocked) { startEventLoop() }
+        }
+    }
+    @Published var accessibilityPermissionGranted = false
     @Published var lastKeyString: String = ""
 
     
     init(isLocked: Bool = true, lastKeyString: String = "") {
         self.isLocked = isLocked
+        self.accessibilityPermissionGranted = requestAccessibilityPermissions()
+        if !self.accessibilityPermissionGranted {
+            self.isLocked = false
+        }
         self.lastKeyString = lastKeyString
     }
     
@@ -46,14 +56,34 @@ class EventHandler: ObservableObject {
         RunLoop.current.add(timer, forMode: .common)
     }
 
+    func checkAccessibilityPermission(){
+        debugLog("------ Checking Accessibility Permission ------")
+        DispatchQueue.global(qos: .background).async {
+              if !AXIsProcessTrusted() && self.accessibilityPermissionGranted {
+                  self.stop()
+                  
+                  // Handle permission loss (display alert, disable features, etc.)
+                  self.accessibilityPermissionGranted = false
+                  NSApplication.shared.terminate(self)
+              } else {
+                  self.accessibilityPermissionGranted = true
+                  // Schedule the next check
+                  DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                      self.checkAccessibilityPermission()
+                  }
+              }
+        }
+    }
+    
     func run() {
+        checkAccessibilityPermission()
+        
         if requestAccessibilityPermissions() {
-            setupEventTap() // Setup event tap to capture key events
-            DispatchQueue.global(qos: .background).async {
-                CFRunLoopRun()  // Start the run loop to handle events in a background thread
-            }
+            startEventLoop()
         } else {
-            print("Please grant accessibility permissions in System Preferences")
+            self.accessibilityPermissionGranted = false
+            self.isLocked = false
+            debugLog("Please grant accessibility permissions in System Preferences")
             // exit(EXIT_SUCCESS)
         }
     }
@@ -61,6 +91,16 @@ class EventHandler: ObservableObject {
     func stop(){
         self.isLocked = false
         CFRunLoopStop(CFRunLoopGetCurrent())
+    }
+    
+    func startEventLoop() {
+        if(eventLoopStarted) { return }
+        
+        setupEventTap() // Setup event tap to capture key events
+        DispatchQueue.global(qos: .background).async {
+            self.eventLoopStarted = true
+            CFRunLoopRun()  // Start the run loop to handle events in a background thread
+        }
     }
     
     private func setupEventTap() {

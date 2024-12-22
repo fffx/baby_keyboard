@@ -55,6 +55,10 @@ struct ContentView: View {
             // LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock/Unlock Keyboard")
             Toggle("Lock Keyboard", isOn: $eventHandler.isLocked)
                 .toggleStyle(SwitchToggleStyle(tint: .red))
+                .disabled(!eventHandler.accessibilityPermissionGranted)
+            Text("Please grant accessibility permissions in System Settings > Secuerity & Privacy > Accessibility")
+                .opacity(eventHandler.accessibilityPermissionGranted ? 0 : 1)
+                
         }
         .padding()
         .pinWindow(isPinned: eventHandler.isLocked)
@@ -66,6 +70,7 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            print("appeared ------------ ")
             // Open the other windows here if needed
             if eventHandler.isLocked {
                 openWindow(id: FireworkWindowID)
