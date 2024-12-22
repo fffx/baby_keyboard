@@ -20,6 +20,11 @@ class EventHandler: ObservableObject {
     @Published var lastKeyString: String = ""
 
     
+    init(isLocked: Bool = true, lastKeyString: String = "") {
+        self.isLocked = isLocked
+        self.lastKeyString = lastKeyString
+    }
+    
     func debugLog(_ message: String) {
         if debug {
             print(message)

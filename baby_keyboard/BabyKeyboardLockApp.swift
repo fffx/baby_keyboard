@@ -22,12 +22,12 @@ struct baby_keyboardApp: App {
     @ObservedObject var eventHandler = EventHandler()
     // var letterView: LetterView!
     var body: some Scene {
-        Window("Main Window", id: "main") {
+        Window("Baby Keyboard Lock", id: "main") {
             ContentView()
         }
         .environmentObject(eventHandler)
-        .windowStyle(.hiddenTitleBar)
-        .windowResizability(.contentSize)
+        //.windowStyle(.hiddenTitleBar)
+        // .windowResizability(.contentSize)
         
         Window("Firework window", id: FireworkWindowID) {
             FireworkView().frame(maxWidth: .infinity, maxHeight: .infinity)

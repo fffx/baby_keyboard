@@ -22,7 +22,7 @@ private struct FullscreenTransparentWindowBackground: NSViewRepresentable {
         let view = NSView()
         DispatchQueue.main.async {
             guard let window = view.window else { return }
-
+            
             window.isOpaque = false
             window.backgroundColor = .clear
             window.ignoresMouseEvents = true
@@ -32,7 +32,7 @@ private struct FullscreenTransparentWindowBackground: NSViewRepresentable {
         }
         return view
     }
-
+    
     func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
@@ -54,7 +54,7 @@ struct FireworkView: View {
             ZStack {
                 Color.clear
                 Button("") {
-                   counter += 1
+                    counter += 1
                 }
                 .background(.clear)
                 .buttonStyle(PlainButtonStyle())
@@ -69,16 +69,17 @@ struct FireworkView: View {
                     self.initialized = true
                     return
                 }
+                if(!eventHandler.isLocked) { return }
                 
                 guard let letter = eventHandler.lastKeyString.first, letter.isLetter || letter.isNumber else { return }
-
+                
                 counter += 1
                 
-              let randomX = CGFloat.random(in: 0...geometry.size.width)
-              let randomY = CGFloat.random(in: 0...geometry.size.height)
-              
-              // Update the button's position
-              buttonPosition = CGPoint(x: randomX, y: randomY)
+                let randomX = CGFloat.random(in: 0...geometry.size.width)
+                let randomY = CGFloat.random(in: 0...geometry.size.height)
+                
+                // Update the button's position
+                buttonPosition = CGPoint(x: randomX, y: randomY)
                 
                 guard let nsSound = NSSound(named: "confetti-cannon") else { return }
                 (nsSound.copy() as! NSSound).play()
