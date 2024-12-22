@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		20D3EC8E2D17EDB70096279E /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 20D3EC8D2D17EDB70096279E /* ConfettiSwiftUI */; };
 		20F6F4C22D154FCE006FEC81 /* Sauce in Frameworks */ = {isa = PBXBuildFile; productRef = 20F6F4C12D154FCE006FEC81 /* Sauce */; };
 /* End PBXBuildFile section */
 
@@ -56,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				20D3EC8E2D17EDB70096279E /* ConfettiSwiftUI in Frameworks */,
 				20F6F4C22D154FCE006FEC81 /* Sauce in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -118,6 +120,7 @@
 			name = baby_keyboard;
 			packageProductDependencies = (
 				20F6F4C12D154FCE006FEC81 /* Sauce */,
+				20D3EC8D2D17EDB70096279E /* ConfettiSwiftUI */,
 			);
 			productName = baby_keyboard;
 			productReference = 20141CA82D0F52E500D0ED5D /* baby_keyboard.app */;
@@ -203,6 +206,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				20F6F4C02D154FCE006FEC81 /* XCRemoteSwiftPackageReference "Sauce" */,
+				20D3EC8C2D17EDB70096279E /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 20141CA92D0F52E500D0ED5D /* Products */;
@@ -570,6 +574,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		20D3EC8C2D17EDB70096279E /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/simibac/ConfettiSwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
 		20F6F4C02D154FCE006FEC81 /* XCRemoteSwiftPackageReference "Sauce" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Clipy/Sauce";
@@ -581,6 +593,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		20D3EC8D2D17EDB70096279E /* ConfettiSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 20D3EC8C2D17EDB70096279E /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */;
+			productName = ConfettiSwiftUI;
+		};
 		20F6F4C12D154FCE006FEC81 /* Sauce */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 20F6F4C02D154FCE006FEC81 /* XCRemoteSwiftPackageReference "Sauce" */;
