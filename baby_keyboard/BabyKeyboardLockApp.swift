@@ -19,6 +19,7 @@ class WindowDelegate: NSObject, NSWindowDelegate {
 
 @main
 struct baby_keyboardApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @ObservedObject var eventHandler = EventHandler()
     // var letterView: LetterView!
     var body: some Scene {
@@ -63,3 +64,9 @@ struct baby_keyboardApp: App {
     }
 }
 
+class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApplication.shared.setActivationPolicy(.regular)
+        NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+}
