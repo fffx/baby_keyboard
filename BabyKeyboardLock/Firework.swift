@@ -70,6 +70,7 @@ struct FireworkView: View {
                 .position(x: buttonPosition.x, y: buttonPosition.y)
             }
             .padding()
+            .presentedWindowStyle(.hiddenTitleBar)
             .onAppear {
                 windowSize = geometry.size
             }

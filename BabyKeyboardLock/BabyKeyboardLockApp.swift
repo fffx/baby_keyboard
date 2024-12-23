@@ -34,6 +34,7 @@ struct BabyKeyboardLockApp: App {
             ContentView()
         }
         .environmentObject(eventHandler)
+        .windowStyle(.hiddenTitleBar)
         //.windowStyle(.hiddenTitleBar)
         // .windowResizability(.contentSize)
     

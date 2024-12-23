@@ -10,7 +10,7 @@ import AppKit
 
 struct PinWindow: ViewModifier {
     let isPinned: Bool
-
+    
     func body(content: Content) -> some View {
         content
             .background(PinWindowBackground(isPinned: isPinned))
@@ -19,7 +19,7 @@ struct PinWindow: ViewModifier {
 
 private struct PinWindowBackground: NSViewRepresentable {
     let isPinned: Bool
-
+    
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         DispatchQueue.main.async {
@@ -28,14 +28,14 @@ private struct PinWindowBackground: NSViewRepresentable {
         }
         return view
     }
-
+    
     func updateNSView(_ nsView: NSView, context: Context) {
         DispatchQueue.main.async {
             guard let window = nsView.window else { return }
             updateWindowLevel(window)
         }
     }
-
+    
     private func updateWindowLevel(_ window: NSWindow) {
         window.level = isPinned ? .floating : .normal
     }
@@ -51,16 +51,29 @@ struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
     @EnvironmentObject var eventHandler: EventHandler
     var body: some View {
+        ZStack(alignment: .topLeading) {
+            Button("x", action: {
+                let app = NSApplication.shared
+                let window = app.windows.first { $0.identifier?.rawValue == "main" }
+                window?.performClose(nil)
+                eventHandler.stop()
+            })
+        }
         VStack {
             // LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock/Unlock Keyboard")
             Toggle("Lock Keyboard", isOn: $eventHandler.isLocked)
                 .toggleStyle(SwitchToggleStyle(tint: .red))
+                .scaledToFill()
                 .disabled(!eventHandler.accessibilityPermissionGranted)
             Text("Please grant accessibility permissions in System Settings > Secuerity & Privacy > Accessibility")
                 .opacity(eventHandler.accessibilityPermissionGranted ? 0 : 1)
-                
+                .padding()
+                .font(.callout)
+                .bold()
+            
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .pinWindow(isPinned: eventHandler.isLocked)
         .onChange(of: eventHandler.isLocked){ _, newVal in
             if newVal{
