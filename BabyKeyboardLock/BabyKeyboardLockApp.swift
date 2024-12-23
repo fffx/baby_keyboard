@@ -1,6 +1,6 @@
 //
-//  baby_keyboardApp.swift
-//  baby_keyboard
+//  BabyKeyboardLockApp.swift
+//  BabyKeyboardLock
 //
 //  Created by Fangxing Xiong on 15.12.2024.
 //
@@ -18,7 +18,7 @@ class WindowDelegate: NSObject, NSWindowDelegate {
 }
 
 @main
-struct baby_keyboardApp: App {
+struct BabyKeyboardLockApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @ObservedObject var eventHandler = EventHandler()
     // var letterView: LetterView!

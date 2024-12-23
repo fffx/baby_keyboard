@@ -1,13 +1,13 @@
 //
-//  baby_keyboardUITestsLaunchTests.swift
-//  baby_keyboardUITests
+//  BabyKeyboardLockUITestsLaunchTests.swift
+//  BabyKeyboardLockUITests
 //
 //  Created by Fangxing Xiong on 15.12.2024.
 //
 
 import XCTest
 
-final class baby_keyboardUITestsLaunchTests: XCTestCase {
+final class BabyKeyboardLockUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

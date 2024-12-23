@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  baby_keyboard
+//  BabyKeyboardLock
 //
 //  Created by Fangxing Xiong on 15.12.2024.
 //

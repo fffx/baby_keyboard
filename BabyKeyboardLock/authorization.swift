@@ -1,6 +1,6 @@
 //
 //  authorization.swift
-//  baby_keyboard
+//  BabyKeyboardLock
 //
 //  Created by Fangxing Xiong on 19.12.2024.
 //

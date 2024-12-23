@@ -1,6 +1,6 @@
 //
 //  SoundManager.swift
-//  baby_keyboard
+//  BabyKeyboardLock
 //
 //  Created by Fangxing Xiong on 21.12.2024.
 //

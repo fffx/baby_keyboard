@@ -1,14 +1,14 @@
 //
-//  baby_keyboardTests.swift
-//  baby_keyboardTests
+//  BabyKeyboardLockTests.swift
+//  BabyKeyboardLockTests
 //
 //  Created by Fangxing Xiong on 15.12.2024.
 //
 
 import Testing
-@testable import baby_keyboard
+@testable import BabyKeyboardLock
 
-struct baby_keyboardTests {
+struct BabyKeyboardLockTests {
 
     @Test func example() async throws {
         // Write your test here and use APIs like `#expect(...)` to check expected conditions.
