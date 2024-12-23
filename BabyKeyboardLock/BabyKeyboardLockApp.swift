@@ -17,18 +17,26 @@ class WindowDelegate: NSObject, NSWindowDelegate {
     }
 }
 
+// https://stackoverflow.com/a/77297913/5615038
+//extension Task where Success == Void, Failure == Never {
+//    static func waitTillCancel() async {
+//        let asyncStream = AsyncStream<Int> { _ in }
+//        for await _ in asyncStream { }
+//    }
+//}
+
 @main
 struct BabyKeyboardLockApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @ObservedObject var eventHandler = EventHandler()
-    // var letterView: LetterView!
+    @ObservedObject var eventHandler = EventHandler()    // var letterView: LetterView!
     var body: some Scene {
-        Window("Baby Keyboard Lock", id: "main") {
+        Window("BabyKeyboardLock", id: "main") {
             ContentView()
         }
         .environmentObject(eventHandler)
         //.windowStyle(.hiddenTitleBar)
         // .windowResizability(.contentSize)
+    
         
         Window("Firework window", id: FireworkWindowID) {
             FireworkView().frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -54,13 +62,14 @@ struct BabyKeyboardLockApp: App {
     
     init() {
         eventHandler.run()
-        // Show the firework window
-        // fireworkController.showWindow(nil)
-        
-        // Configure your main window if needed
-        //if let window = NSApp.windows.first {
-        // Your main window configuration here
-        //}
+        let _self = self
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.willTerminateNotification,
+            object: nil, queue: .main) { _ in
+                debugPrint("------ willTerminateNotification  received------")
+                _self.eventHandler.stop()
+        }
+
     }
 }
 
@@ -72,5 +81,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return true
+    }
+    
+    func applicationWillTerminate(_ aNotification: Notification) {
+        debugPrint("-------- applicationWillTerminate --------")
     }
 }

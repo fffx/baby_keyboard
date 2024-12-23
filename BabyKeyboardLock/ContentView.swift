@@ -70,11 +70,17 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            print("appeared ------------ ")
+            debugPrint("appeared ------------ ")
             // Open the other windows here if needed
             if eventHandler.isLocked {
                 openWindow(id: FireworkWindowID)
             }
+            
+            let app = NSApplication.shared
+            let mainWindow = app.windows.first { $0.identifier?.rawValue == "main" }
+            mainWindow?.standardWindowButton(.closeButton)?.isHidden = true
+            mainWindow?.standardWindowButton(.miniaturizeButton)?.isHidden = true
+            mainWindow?.standardWindowButton(.zoomButton)?.isHidden = true
         }
     }
 }
