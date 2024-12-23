@@ -29,9 +29,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		20141CA82D0F52E500D0ED5D /* baby_keyboard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = baby_keyboard.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		20141CB92D0F52E700D0ED5D /* baby_keyboardTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = baby_keyboardTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		20141CC32D0F52E700D0ED5D /* baby_keyboardUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = baby_keyboardUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		20141CA82D0F52E500D0ED5D /* BabyKeyboardLock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabyKeyboardLock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		20141CB92D0F52E700D0ED5D /* BabyKeyboardLockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BabyKeyboardLockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		20141CC32D0F52E700D0ED5D /* BabyKeyboardLockUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BabyKeyboardLockUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -92,9 +92,9 @@
 		20141CA92D0F52E500D0ED5D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				20141CA82D0F52E500D0ED5D /* baby_keyboard.app */,
-				20141CB92D0F52E700D0ED5D /* baby_keyboardTests.xctest */,
-				20141CC32D0F52E700D0ED5D /* baby_keyboardUITests.xctest */,
+				20141CA82D0F52E500D0ED5D /* BabyKeyboardLock.app */,
+				20141CB92D0F52E700D0ED5D /* BabyKeyboardLockTests.xctest */,
+				20141CC32D0F52E700D0ED5D /* BabyKeyboardLockUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,9 +102,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		20141CA72D0F52E500D0ED5D /* baby_keyboard */ = {
+		20141CA72D0F52E500D0ED5D /* BabyKeyboardLock */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 20141CCD2D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "baby_keyboard" */;
+			buildConfigurationList = 20141CCD2D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "BabyKeyboardLock" */;
 			buildPhases = (
 				20141CA42D0F52E500D0ED5D /* Sources */,
 				20141CA52D0F52E500D0ED5D /* Frameworks */,
@@ -117,18 +117,18 @@
 			fileSystemSynchronizedGroups = (
 				20141CAA2D0F52E500D0ED5D /* baby_keyboard */,
 			);
-			name = baby_keyboard;
+			name = BabyKeyboardLock;
 			packageProductDependencies = (
 				20F6F4C12D154FCE006FEC81 /* Sauce */,
 				20D3EC8D2D17EDB70096279E /* ConfettiSwiftUI */,
 			);
 			productName = baby_keyboard;
-			productReference = 20141CA82D0F52E500D0ED5D /* baby_keyboard.app */;
+			productReference = 20141CA82D0F52E500D0ED5D /* BabyKeyboardLock.app */;
 			productType = "com.apple.product-type.application";
 		};
-		20141CB82D0F52E700D0ED5D /* baby_keyboardTests */ = {
+		20141CB82D0F52E700D0ED5D /* BabyKeyboardLockTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 20141CD02D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "baby_keyboardTests" */;
+			buildConfigurationList = 20141CD02D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "BabyKeyboardLockTests" */;
 			buildPhases = (
 				20141CB52D0F52E700D0ED5D /* Sources */,
 				20141CB62D0F52E700D0ED5D /* Frameworks */,
@@ -142,16 +142,16 @@
 			fileSystemSynchronizedGroups = (
 				20141CBC2D0F52E700D0ED5D /* baby_keyboardTests */,
 			);
-			name = baby_keyboardTests;
+			name = BabyKeyboardLockTests;
 			packageProductDependencies = (
 			);
 			productName = baby_keyboardTests;
-			productReference = 20141CB92D0F52E700D0ED5D /* baby_keyboardTests.xctest */;
+			productReference = 20141CB92D0F52E700D0ED5D /* BabyKeyboardLockTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		20141CC22D0F52E700D0ED5D /* baby_keyboardUITests */ = {
+		20141CC22D0F52E700D0ED5D /* BabyKeyboardLockUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 20141CD32D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "baby_keyboardUITests" */;
+			buildConfigurationList = 20141CD32D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "BabyKeyboardLockUITests" */;
 			buildPhases = (
 				20141CBF2D0F52E700D0ED5D /* Sources */,
 				20141CC02D0F52E700D0ED5D /* Frameworks */,
@@ -165,11 +165,11 @@
 			fileSystemSynchronizedGroups = (
 				20141CC62D0F52E700D0ED5D /* baby_keyboardUITests */,
 			);
-			name = baby_keyboardUITests;
+			name = BabyKeyboardLockUITests;
 			packageProductDependencies = (
 			);
 			productName = baby_keyboardUITests;
-			productReference = 20141CC32D0F52E700D0ED5D /* baby_keyboardUITests.xctest */;
+			productReference = 20141CC32D0F52E700D0ED5D /* BabyKeyboardLockUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -195,7 +195,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 20141CA32D0F52E500D0ED5D /* Build configuration list for PBXProject "baby_keyboard" */;
+			buildConfigurationList = 20141CA32D0F52E500D0ED5D /* Build configuration list for PBXProject "BabyKeyboardLock" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -213,9 +213,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				20141CA72D0F52E500D0ED5D /* baby_keyboard */,
-				20141CB82D0F52E700D0ED5D /* baby_keyboardTests */,
-				20141CC22D0F52E700D0ED5D /* baby_keyboardUITests */,
+				20141CA72D0F52E500D0ED5D /* BabyKeyboardLock */,
+				20141CB82D0F52E700D0ED5D /* BabyKeyboardLockTests */,
+				20141CC22D0F52E700D0ED5D /* BabyKeyboardLockUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -271,12 +271,12 @@
 /* Begin PBXTargetDependency section */
 		20141CBB2D0F52E700D0ED5D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 20141CA72D0F52E500D0ED5D /* baby_keyboard */;
+			target = 20141CA72D0F52E500D0ED5D /* BabyKeyboardLock */;
 			targetProxy = 20141CBA2D0F52E700D0ED5D /* PBXContainerItemProxy */;
 		};
 		20141CC52D0F52E700D0ED5D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 20141CA72D0F52E500D0ED5D /* baby_keyboard */;
+			target = 20141CA72D0F52E500D0ED5D /* BabyKeyboardLock */;
 			targetProxy = 20141CC42D0F52E700D0ED5D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -484,7 +484,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/baby_keyboard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/baby_keyboard";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BabyKeyboardLock.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BabyKeyboardLock";
 			};
 			name = Debug;
 		};
@@ -502,7 +502,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/baby_keyboard.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/baby_keyboard";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BabyKeyboardLock.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BabyKeyboardLock";
 			};
 			name = Release;
 		};
@@ -539,7 +539,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		20141CA32D0F52E500D0ED5D /* Build configuration list for PBXProject "baby_keyboard" */ = {
+		20141CA32D0F52E500D0ED5D /* Build configuration list for PBXProject "BabyKeyboardLock" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				20141CCB2D0F52E700D0ED5D /* Debug */,
@@ -548,7 +548,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		20141CCD2D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "baby_keyboard" */ = {
+		20141CCD2D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "BabyKeyboardLock" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				20141CCE2D0F52E700D0ED5D /* Debug */,
@@ -557,7 +557,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		20141CD02D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "baby_keyboardTests" */ = {
+		20141CD02D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "BabyKeyboardLockTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				20141CD12D0F52E700D0ED5D /* Debug */,
@@ -566,7 +566,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		20141CD32D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "baby_keyboardUITests" */ = {
+		20141CD32D0F52E700D0ED5D /* Build configuration list for PBXNativeTarget "BabyKeyboardLockUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				20141CD42D0F52E700D0ED5D /* Debug */,
