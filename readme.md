@@ -9,3 +9,17 @@
 
 ## swiftUI
 https://developer.apple.com/design/human-interface-guidelines/layout-and-organization
+
+
+
+
+
+
+## Test
+
+* on first start should request for accessibility
+    -  the toggle should be disabled
+    - after permissions is granted, the text hinter should be hidden
+    -  the toggle should be enabled
+* When keyboard is blocked, after quitting, the lock should be released
+* toggle lock should work properly

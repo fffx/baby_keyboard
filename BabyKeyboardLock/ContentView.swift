@@ -51,14 +51,21 @@ struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
     @EnvironmentObject var eventHandler: EventHandler
     var body: some View {
-        ZStack(alignment: .topLeading) {
+        HStack(spacing: 0) {
             Button("x", action: {
                 let app = NSApplication.shared
                 let window = app.windows.first { $0.identifier?.rawValue == "main" }
                 window?.performClose(nil)
                 eventHandler.stop()
             })
+            .offset(y: -15)
+            .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0))
+            .frame(alignment: .topLeading)
+            
+            Spacer()
+            // ...existing code...
         }
+        //.border(Color.red)
         VStack {
             // LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock/Unlock Keyboard")
             Toggle("Lock Keyboard", isOn: $eventHandler.isLocked)
@@ -73,6 +80,7 @@ struct ContentView: View {
             
         }
         .padding()
+        // .border(Color.red)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .pinWindow(isPinned: eventHandler.isLocked)
         .onChange(of: eventHandler.isLocked){ _, newVal in
@@ -94,6 +102,7 @@ struct ContentView: View {
             mainWindow?.standardWindowButton(.closeButton)?.isHidden = true
             mainWindow?.standardWindowButton(.miniaturizeButton)?.isHidden = true
             mainWindow?.standardWindowButton(.zoomButton)?.isHidden = true
+
         }
     }
 }

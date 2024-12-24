@@ -199,6 +199,7 @@ class EventHandler: ObservableObject {
         proxy: CGEventTapProxy,
         type: CGEventType,
         event: CGEvent) -> Bool {
+            return false
             debugLog("Ignoring event --  \(event.flags.contains(.maskCommand))")
             let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
             

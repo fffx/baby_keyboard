@@ -84,7 +84,7 @@ struct FireworkView: View {
                 guard let letter = eventHandler.lastKeyString.first, letter.isLetter || letter.isNumber else { return }
                 
                 counter += 1
-                
+                debugPrint("counter increase -------- \(counter)")
                 let randomX = CGFloat.random(in: 0...geometry.size.width)
                 let randomY = CGFloat.random(in: 0...geometry.size.height)
                 
