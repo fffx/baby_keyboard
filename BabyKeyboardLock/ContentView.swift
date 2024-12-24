@@ -50,6 +50,9 @@ extension View {
 struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
     @EnvironmentObject var eventHandler: EventHandler
+    @AppStorage("selectedLockEffect") private var selectedLockEffect: LockEffect = .none
+    @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
+
     var body: some View {
         HStack(spacing: 0) {
             Button("x", action: {
@@ -72,11 +75,25 @@ struct ContentView: View {
                 .toggleStyle(SwitchToggleStyle(tint: .red))
                 .scaledToFill()
                 .disabled(!eventHandler.accessibilityPermissionGranted)
-            Text("Please grant accessibility permissions in System Settings > Secuerity & Privacy > Accessibility")
-                .opacity(eventHandler.accessibilityPermissionGranted ? 0 : 1)
-                .padding()
-                .font(.callout)
-                .bold()
+            if !eventHandler.accessibilityPermissionGranted {
+                Text("Please grant accessibility permissions in System Settings > Secuerity & Privacy > Accessibility")
+                    .opacity(eventHandler.accessibilityPermissionGranted ? 0 : 1)
+                    .padding()
+                    .font(.callout)
+                    .bold()
+            }
+            Picker("Effect", selection: $selectedLockEffect) {
+                ForEach(LockEffect.allCases) { effect in
+                    Text(effect.rawValue)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Toggle(isOn: $lockKeyboardOnLaunch) {
+                Text("Lock keyboard on launch")
+            }
+            .toggleStyle(CheckboxToggleStyle())
+            .frame(maxWidth: .infinity, alignment: .leading)
             
         }
         .padding()

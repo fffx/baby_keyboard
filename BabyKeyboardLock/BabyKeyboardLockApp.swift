@@ -28,7 +28,10 @@ class WindowDelegate: NSObject, NSWindowDelegate {
 @main
 struct BabyKeyboardLockApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @ObservedObject var eventHandler = EventHandler()    // var letterView: LetterView!
+    @AppStorage("lockKeyboardOnLaunch") var lockKeyboardOnLaunch = false
+    @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
+    @ObservedObject var eventHandler = EventHandler()
+    // var letterView: LetterView!
     var body: some Scene {
         Window("BabyKeyboardLock", id: "main") {
             ContentView()
@@ -62,7 +65,10 @@ struct BabyKeyboardLockApp: App {
     }
     
     init() {
+        eventHandler.isLocked = lockKeyboardOnLaunch
+        eventHandler.selectedLockEffect = selectedLockEffect
         eventHandler.run()
+        
         let _self = self
         NotificationCenter.default.addObserver(
             forName: NSApplication.willTerminateNotification,

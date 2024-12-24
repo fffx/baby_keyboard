@@ -25,6 +25,7 @@ class EventHandler: ObservableObject {
 
     let eventEffectHandler = EventEffectHandler()
     private var eventLoopStarted = false
+    var selectedLockEffect = LockEffect.none
     @Published var isLocked = true {
         didSet {
             if (isLocked && accessibilityPermissionGranted) { startEventLoop() }
@@ -33,6 +34,19 @@ class EventHandler: ObservableObject {
     @Published var accessibilityPermissionGranted = false
     @Published var lastKeyString: String = "a" // fix onReceive won't work as expected for first key press
 
+    private var lastEventTime: Date = Date()
+    private let throttleInterval: TimeInterval = 0.5 // seconds
+    private func isThrottled() -> Bool {
+        let now = Date()
+        let timeSinceLastEvent = now.timeIntervalSince(lastEventTime)
+      
+        if timeSinceLastEvent >= throttleInterval {
+            lastEventTime = now
+            return false
+        }
+        debugPrint("Throttled >>>>> timeSinceLastEvent: \(timeSinceLastEvent)")
+        return true
+    }
     
     init(isLocked: Bool = true) {
         self.isLocked = isLocked
@@ -41,12 +55,6 @@ class EventHandler: ObservableObject {
             self.isLocked = false
         }
         self.lastKeyString = lastKeyString
-    }
-    
-    func debugLog(_ message: String) {
-        if debug {
-            print(message)
-        }
     }
     
     func scheduleTimer(duration: Int?) {
@@ -65,7 +73,7 @@ class EventHandler: ObservableObject {
     }
 
     func checkAccessibilityPermission(){
-        debugLog("------ Checking Accessibility Permission ------")
+        debugPrint("------ Checking Accessibility Permission ------")
         let processTrusted = AXIsProcessTrusted()
         if !processTrusted && self.accessibilityPermissionGranted {
             self.stop()
@@ -93,7 +101,7 @@ class EventHandler: ObservableObject {
         } else {
             self.accessibilityPermissionGranted = false
             self.isLocked = false
-            debugLog("Please grant accessibility permissions in System Preferences")
+            debugPrint("Please grant accessibility permissions in System Preferences")
             // exit(EXIT_SUCCESS)
         }
     }
@@ -154,12 +162,12 @@ class EventHandler: ObservableObject {
         let controlFlag = event.flags.contains(.maskControl)
         let optionFlag = event.flags.contains(.maskAlternate)
         let eventType = type == .keyDown ? "pressed" : "released"
-        debugLog("Key Code: \0x(String(keyCode, radix: 16)),\t" +
+        debugPrint("Key Code: \0x(String(keyCode, radix: 16)),\t" +
                  "Control Flag: \(controlFlag),\t" +
                  "Event Type: (\(type.rawValue)) \(eventType)")
         // Toggle with Ctrl + Option + U
         if optionFlag && controlFlag && keyCode == KeyCode.u.rawValue && type == .keyDown {
-            debugLog("Keyboard locked: \(isLocked)")
+            debugPrint("Keyboard locked: \(isLocked)")
             self.isLocked = isLocked ? false : true
             CFRunLoopStop(CFRunLoopGetCurrent())
             
@@ -172,12 +180,13 @@ class EventHandler: ObservableObject {
                 return Unmanaged.passRetained(event)
             }
             
-            if type != .keyUp {
-                return nil
-            }
+            if type != .keyUp { return nil }
+            
+            if isThrottled() { return nil }
             self.lastKeyString = eventEffectHandler.getString(event: event, eventType: type) ?? ""
-            debugLog("keyup------- \(lastKeyString)")
-            eventEffectHandler.handle(event: event, eventType: type)
+            debugPrint("keyup------- \(lastKeyString)")
+            
+            eventEffectHandler.handle(event: event, eventType: type, selectedLockEffect: selectedLockEffect)
             return nil
         } else {
             return Unmanaged.passRetained(event)
@@ -200,37 +209,37 @@ class EventHandler: ObservableObject {
         type: CGEventType,
         event: CGEvent) -> Bool {
             return false
-            debugLog("Ignoring event --  \(event.flags.contains(.maskCommand))")
-            let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+          //  debugPrint("Ignoring event --  \(event.flags.contains(.maskCommand))")
+        // let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
             
-            if keyCode == KeyCode.delete.rawValue || keyCode == KeyCode.enter.rawValue {
-                return false
-            }
-            
-            if keyCode == KeyCode.tab.rawValue ||
-                keyCode == KeyCode.up.rawValue ||
-                keyCode == KeyCode.down.rawValue ||
-                keyCode == KeyCode.left.rawValue ||
-                keyCode == KeyCode.right.rawValue
-            {
-                return true
-            }
-            
-            if event.flags.contains(.maskShift) &&
-                !(event.flags.contains(.maskCommand) || event.flags.contains(.maskAlternate) || event.flags.contains(.maskControl))
-            {
-                return false
-            }
-           
-            if  event.flags.contains(.maskCommand) ||
-                event.flags.contains(.maskShift) ||
-                event.flags.contains(.maskAlternate) ||
-                event.flags.contains(.maskControl)
-            {
-                return true
-            }
-            
-            return false
+//            if keyCode == KeyCode.delete.rawValue || keyCode == KeyCode.enter.rawValue {
+//                return false
+//            }
+//            
+//            if keyCode == KeyCode.tab.rawValue ||
+//                keyCode == KeyCode.up.rawValue ||
+//                keyCode == KeyCode.down.rawValue ||
+//                keyCode == KeyCode.left.rawValue ||
+//                keyCode == KeyCode.right.rawValue
+//            {
+//                return true
+//            }
+//            
+//            if event.flags.contains(.maskShift) &&
+//                !(event.flags.contains(.maskCommand) || event.flags.contains(.maskAlternate) || event.flags.contains(.maskControl))
+//            {
+//                return false
+//            }
+//           
+//            if  event.flags.contains(.maskCommand) ||
+//                event.flags.contains(.maskShift) ||
+//                event.flags.contains(.maskAlternate) ||
+//                event.flags.contains(.maskControl)
+//            {
+//                return true
+//            }
+//            
+//            return false
             
     }
     

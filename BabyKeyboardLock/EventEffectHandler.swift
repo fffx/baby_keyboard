@@ -43,15 +43,26 @@ extension CGEventFlags {
 
 class EventEffectHandler {
     let synth = AVSpeechSynthesizer()
-    func handle(event: CGEvent, eventType: CGEventType) {
-        guard eventType == .keyUp else { return }
-        guard let str = getString(event: event, eventType: eventType),
-              str.isEmpty else { return }
-        
+    func handle(event: CGEvent, eventType: CGEventType, selectedLockEffect: LockEffect) {
+        debugPrint("speaking handle ------- \(selectedLockEffect)")
+        // guard eventType == .keyUp else { return }
+        guard let str = getString(event: event, eventType: eventType) else { return }
+        debugPrint("speaking ------- \(str)")
         let utterance = AVSpeechUtterance(string: str)
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-
-        synth.speak(utterance)
+        let language =  Locale.preferredLanguages[0]
+        utterance.voice = AVSpeechSynthesisVoice(language: language)
+        
+        debugPrint("speaking ------- \(language)")
+        
+        switch selectedLockEffect {
+        case .speakTheKey:
+            synth.speak(utterance)
+        case .speakAKeyWord:
+            synth.speak(AVSpeechUtterance(string: getRandomWord(forKey: str)))
+        default:
+            break
+        }
+        
     }
     
     func getString(event: CGEvent, eventType: CGEventType) -> String? {
@@ -60,4 +71,31 @@ class EventEffectHandler {
             cocoaModifiers: event.flags.toNSEventModifierFlags
         )
     }
+    
+    private let wordCache: [String: [String]] = {
+           let wordPath = "/usr/share/dict/words"
+           guard let contents = try? String(contentsOfFile: wordPath) else { return [:] }
+           
+           var cache: [String: [String]] = [:]
+           let words = contents.components(separatedBy: .newlines)
+           
+           for word in words {
+               guard let first = word.first?.lowercased() else { continue }
+               let key = String(first)
+               cache[key, default: []].append(word)
+           }
+           return cache
+       }()
+       
+    func getRandomWord(forKey key: String) -> String {
+        let key = key.lowercased()
+        // debugPrint("getWord ------- \(key) -- \(wordCache[key])")
+        guard let words = wordCache[key],
+              let randomWord = words.randomElement() else {
+            return key
+        }
+        
+        return randomWord
+    }
+          
 }
