@@ -52,8 +52,6 @@ struct FireworkView: View {
     
     @State private var windowSize: CGSize = .zero
     @EnvironmentObject var eventHandler: EventHandler
-    
-    @AppStorage("selectedLockEffect") private var selectedLockEffect: LockEffect = .none
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -84,7 +82,7 @@ struct FireworkView: View {
                 if(!eventHandler.isLocked) { return }
                 
                 // ##### Confetti handler
-                if selectedLockEffect != .confettiConnon { return }
+                if eventHandler.selectedLockEffect != .confettiConnon { return }
                 
                 guard let letter = eventHandler.lastKeyString.first, letter.isLetter || letter.isNumber else { return }
                 

@@ -50,8 +50,8 @@ extension View {
 struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
     @EnvironmentObject var eventHandler: EventHandler
-    @AppStorage("selectedLockEffect") private var selectedLockEffect: LockEffect = .none
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
+    @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
 
     var body: some View {
         HStack(spacing: 0) {
@@ -82,12 +82,16 @@ struct ContentView: View {
                     .font(.callout)
                     .bold()
             }
-            Picker("Effect", selection: $selectedLockEffect) {
+            Picker("Effect", selection: $eventHandler.selectedLockEffect) {
                 ForEach(LockEffect.allCases) { effect in
                     Text(effect.rawValue)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            .onChange(of: eventHandler.selectedLockEffect) { _, newVal in
+                selectedLockEffect = newVal
+            }
+                
             
             Toggle(isOn: $lockKeyboardOnLaunch) {
                 Text("Lock keyboard on launch")

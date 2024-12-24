@@ -3,6 +3,7 @@ import CoreGraphics
 import AppKit
 import ApplicationServices
 import CoreData
+import SwiftData
 
 enum KeyCode: CGKeyCode {
     case u = 0x20
@@ -25,7 +26,8 @@ class EventHandler: ObservableObject {
 
     let eventEffectHandler = EventEffectHandler()
     private var eventLoopStarted = false
-    var selectedLockEffect = LockEffect.none
+    
+    @Published var selectedLockEffect: LockEffect = .none
     @Published var isLocked = true {
         didSet {
             if (isLocked && accessibilityPermissionGranted) { startEventLoop() }
