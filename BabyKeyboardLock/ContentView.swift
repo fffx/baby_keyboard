@@ -82,6 +82,17 @@ struct ContentView: View {
                 .scaledToFill()
                 .disabled(!eventHandler.accessibilityPermissionGranted)
                 .padding(.bottom, 30)
+                .onChange(of: eventHandler.isLocked) { _, newVal in
+                    if newVal {
+                        NSSound(named: "Glass")?.play()
+                    } else {
+                        NSSound(named: "Bottle")?.play()
+                    }
+                }.onAppear(){
+                    if eventHandler.isLocked {
+                        NSSound(named: "Glass")?.play()
+                    }
+                }
                     
                 if !eventHandler.accessibilityPermissionGranted {
                     Text("Please grant accessibility permissions in System Settings > Secuerity & Privacy > Accessibility")
