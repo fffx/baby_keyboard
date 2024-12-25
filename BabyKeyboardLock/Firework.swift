@@ -65,7 +65,7 @@ struct FireworkView: View {
                     counter: $counter,
                     num: Int.random(in: 15...40),
                     confettiSize: 15,
-                    rainHeight: geometry.size.height,
+                    rainHeight: 800,
                     radius: 500
                 )
                 .position(x: buttonPosition.x, y: buttonPosition.y)
@@ -75,6 +75,11 @@ struct FireworkView: View {
             .onAppear {
                 windowSize = geometry.size
                 debugPrint("-------- windowSize: \(windowSize)")
+            }
+            .onChange(of: eventHandler.isLocked) { _, newVal in
+                if !newVal {
+                    initialized = false // avoild confetti on toggle lock
+                }
             }
             .onReceive(eventHandler.$lastKeyString) { _ in
                 if !initialized {

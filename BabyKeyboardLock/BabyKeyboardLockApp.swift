@@ -6,57 +6,25 @@
 //
 
 import SwiftUI
+import MenuBarExtraAccess
 let FireworkWindowID = "fireworkTransparentWindow"
 let MainWindowID = "main"
-
-class WindowDelegate: NSObject, NSWindowDelegate {
-    func windowWillClose(_ notification: Notification) {
-        for window in NSApplication.shared.windows {
-            window.close()
-        }
-        NSApplication.shared.terminate(self)
-    }
-}
-
-// https://stackoverflow.com/a/77297913/5615038
-//extension Task where Success == Void, Failure == Never {
-//    static func waitTillCancel() async {
-//        let asyncStream = AsyncStream<Int> { _ in }
-//        for await _ in asyncStream { }
-//    }
-//}
 
 @main
 struct BabyKeyboardLockApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var isLaunched: Bool = false
+    @State var menuBarViewIsPresented: Bool = false
+    
     @AppStorage("lockKeyboardOnLaunch") var lockKeyboardOnLaunch = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
+    @AppStorage("showMenuBarExtra") private var showMenuBarExtra = true
     @ObservedObject var eventHandler = EventHandler()
     
     @State var mainWindow: NSWindow? = nil
     // var letterView: LetterView!
     var body: some Scene {
-        Window("BabyKeyboardLock", id: MainWindowID) {
-            ContentView()
-//            .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeMainNotification), perform: { newValue in
-//                debugPrint("Focused = true", newValue.hashValue)
-//                mainWindow?.animator().alphaValue = 1
-//            })
-//            .onReceive(NotificationCenter.default.publisher(for: NSWindow.didResignKeyNotification), perform: { newValue in
-//                debugPrint("Focused = false", newValue.hashValue)
-//                
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//                    mainWindow?.animator().alphaValue = 0.7 // Adjust opacity as needed
-//                }
-//            }).onAppear(){
-//                mainWindow = NSApp.windows.first(where: { $0.identifier?.rawValue == MainWindowID })
-//            }
-        }
-        .environmentObject(eventHandler)
-        .windowStyle(.hiddenTitleBar)
-        // .windowResizability(.contentSize)
-    
-        
         Window("Firework window", id: FireworkWindowID) {
             FireworkView().frame(maxWidth: .infinity, maxHeight: .infinity)
             Color.clear
@@ -77,6 +45,35 @@ struct BabyKeyboardLockApp: App {
         .environmentObject(eventHandler)
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
+        
+        MenuBarExtra(
+            "BabyKeyboardLock",
+            systemImage: eventHandler.isLocked ? "lock.fill" : "lock.open.fill",
+            isInserted: $showMenuBarExtra
+        ) {
+            VStack {
+                ContentView()
+                .environmentObject(eventHandler)
+             }
+             .frame(width: 300, height: 300)
+             .background(.windowBackground)
+        }
+        .menuBarExtraStyle(.window)
+        .menuBarExtraAccess(isPresented: $menuBarViewIsPresented)
+        .onChange(of: scenePhase, initial: true) { _, newValue in
+            debugPrint("scenePhase: \(newValue)")
+            switch newValue {
+            case .active:
+                if !isLaunched {
+                    isLaunched = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        menuBarViewIsPresented = true
+                    }
+                }
+            default: break
+            }
+        }
+        
     }
     
     init() {
@@ -102,7 +99,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        return true
+        return false
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {

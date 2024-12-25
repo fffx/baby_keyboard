@@ -55,24 +55,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            HStack(spacing: 0) {
-                Button("x", action: {
-                    let app = NSApplication.shared
-                    let window = app.windows.first { $0.identifier?.rawValue == "main" }
-                    window?.performClose(nil)
-                    eventHandler.stop()
-                })
-                .offset(y: -15)
-                .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0))
-                .frame(alignment: .topLeading)
-                
-                Spacer()
-            }
-            
-            //.border(Color.red)
-            //.background(Color.white)
-            
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 20) {
                 // LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock/Unlock Keyboard")
                 Toggle(isOn: $eventHandler.isLocked)
                 {
@@ -81,7 +64,7 @@ struct ContentView: View {
                 .toggleStyle(SwitchToggleStyle(tint: .red))
                 .scaledToFill()
                 .disabled(!eventHandler.accessibilityPermissionGranted)
-                .padding(.bottom, 30)
+                .padding(.bottom, 20)
                 .onChange(of: eventHandler.isLocked) { _, newVal in
                     if newVal {
                         NSSound(named: "Glass")?.play()
@@ -119,13 +102,15 @@ struct ContentView: View {
                 // .frame(maxWidth: .infinity, alignment: .leading)
                 
                 Spacer()
-                
+                Text("You can use shortcut Ctrl + Option + U to toggle keyboard lock")
+                    .font(.footnote)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding()
 //            .border(Color.red)
 //            .background(Color.white)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .pinWindow(isPinned: eventHandler.isLocked)
+            // .pinWindow(isPinned: eventHandler.isLocked)
             .onChange(of: eventHandler.isLocked){ _, newVal in
                 if newVal{
                     openWindow(id: FireworkWindowID)
