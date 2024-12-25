@@ -54,77 +54,89 @@ struct ContentView: View {
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
 
     var body: some View {
-        HStack(spacing: 0) {
-            Button("x", action: {
-                let app = NSApplication.shared
-                let window = app.windows.first { $0.identifier?.rawValue == "main" }
-                window?.performClose(nil)
-                eventHandler.stop()
-            })
-            .offset(y: -15)
-            .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0))
-            .frame(alignment: .topLeading)
+        VStack(alignment: .leading) {
+            HStack(spacing: 0) {
+                Button("x", action: {
+                    let app = NSApplication.shared
+                    let window = app.windows.first { $0.identifier?.rawValue == "main" }
+                    window?.performClose(nil)
+                    eventHandler.stop()
+                })
+                .offset(y: -15)
+                .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0))
+                .frame(alignment: .topLeading)
+                
+                Spacer()
+            }
             
-            Spacer()
-            // ...existing code...
-        }
-        //.border(Color.red)
-        VStack {
-            // LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock/Unlock Keyboard")
-            Toggle("Lock Keyboard", isOn: $eventHandler.isLocked)
+            //.border(Color.red)
+            //.background(Color.white)
+            
+            VStack(alignment: .leading, spacing: 10) {
+                // LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock/Unlock Keyboard")
+                Toggle(isOn: $eventHandler.isLocked)
+                {
+                    Label("Lock Keyboard", systemImage: "keyboard").bold()
+                }
                 .toggleStyle(SwitchToggleStyle(tint: .red))
                 .scaledToFill()
                 .disabled(!eventHandler.accessibilityPermissionGranted)
-            if !eventHandler.accessibilityPermissionGranted {
-                Text("Please grant accessibility permissions in System Settings > Secuerity & Privacy > Accessibility")
-                    .opacity(eventHandler.accessibilityPermissionGranted ? 0 : 1)
-                    .padding()
-                    .font(.callout)
-                    .bold()
+                .padding(.bottom, 30)
+                    
+                if !eventHandler.accessibilityPermissionGranted {
+                    Text("Please grant accessibility permissions in System Settings > Secuerity & Privacy > Accessibility")
+                        .opacity(eventHandler.accessibilityPermissionGranted ? 0 : 1)
+                        .padding()
+                        .font(.callout)
+                        .bold()
+                }
+                Picker("Effect", selection: $eventHandler.selectedLockEffect) {
+                    ForEach(LockEffect.allCases) { effect in
+                        Text(effect.rawValue)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .onChange(of: eventHandler.selectedLockEffect) { _, newVal in
+                    selectedLockEffect = newVal
+                }
+                
+                
+                Toggle(isOn: $lockKeyboardOnLaunch) {
+                    Text("Lock keyboard on launch")
+                }
+                .toggleStyle(CheckboxToggleStyle())
+                // .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Spacer()
+                
             }
-            Picker("Effect", selection: $eventHandler.selectedLockEffect) {
-                ForEach(LockEffect.allCases) { effect in
-                    Text(effect.rawValue)
+            .padding()
+//            .border(Color.red)
+//            .background(Color.white)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .pinWindow(isPinned: eventHandler.isLocked)
+            .onChange(of: eventHandler.isLocked){ _, newVal in
+                if newVal{
+                    openWindow(id: FireworkWindowID)
+                } else {
+                    NSApp.windows.first(where: { $0.identifier?.rawValue == FireworkWindowID })?.close()
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .onChange(of: eventHandler.selectedLockEffect) { _, newVal in
-                selectedLockEffect = newVal
-            }
+            .onAppear {
+                debugPrint("appeared ------------ ")
+                // Open the other windows here if needed
+                if eventHandler.isLocked {
+                    openWindow(id: FireworkWindowID)
+                }
                 
-            
-            Toggle(isOn: $lockKeyboardOnLaunch) {
-                Text("Lock keyboard on launch")
+                let app = NSApplication.shared
+                let mainWindow = app.windows.first { $0.identifier?.rawValue == "main" }
+                mainWindow?.standardWindowButton(.closeButton)?.isHidden = true
+                mainWindow?.standardWindowButton(.miniaturizeButton)?.isHidden = true
+                mainWindow?.standardWindowButton(.zoomButton)?.isHidden = true
+                
             }
-            .toggleStyle(CheckboxToggleStyle())
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-        }
-        .padding()
-        // .border(Color.red)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .pinWindow(isPinned: eventHandler.isLocked)
-        .onChange(of: eventHandler.isLocked){ _, newVal in
-            if newVal{
-                openWindow(id: FireworkWindowID)
-            } else {
-                NSApp.windows.first(where: { $0.identifier?.rawValue == FireworkWindowID })?.close()
-            }
-        }
-        .onAppear {
-            debugPrint("appeared ------------ ")
-            // Open the other windows here if needed
-            if eventHandler.isLocked {
-                openWindow(id: FireworkWindowID)
-            }
-            
-            let app = NSApplication.shared
-            let mainWindow = app.windows.first { $0.identifier?.rawValue == "main" }
-            mainWindow?.standardWindowButton(.closeButton)?.isHidden = true
-            mainWindow?.standardWindowButton(.miniaturizeButton)?.isHidden = true
-            mainWindow?.standardWindowButton(.zoomButton)?.isHidden = true
-
-        }
+        }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 
