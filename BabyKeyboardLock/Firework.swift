@@ -63,9 +63,10 @@ struct FireworkView: View {
                 .buttonStyle(PlainButtonStyle())
                 .confettiCannon(
                     counter: $counter,
-                    num: Int.random(in: 15...30),
-                    confettiSize: 12.0,
-                    rainHeight: geometry.size.height
+                    num: Int.random(in: 15...40),
+                    confettiSize: 15,
+                    rainHeight: geometry.size.height,
+                    radius: 500
                 )
                 .position(x: buttonPosition.x, y: buttonPosition.y)
             }
@@ -73,6 +74,7 @@ struct FireworkView: View {
             .presentedWindowStyle(.hiddenTitleBar)
             .onAppear {
                 windowSize = geometry.size
+                debugPrint("-------- windowSize: \(windowSize)")
             }
             .onReceive(eventHandler.$lastKeyString) { _ in
                 if !initialized {

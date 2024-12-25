@@ -76,7 +76,7 @@ struct ContentView: View {
                 // LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock/Unlock Keyboard")
                 Toggle(isOn: $eventHandler.isLocked)
                 {
-                    Label("Lock Keyboard", systemImage: "keyboard").bold()
+                    Label("Lock Keyboard", systemImage: "keyboard").bold().font(.title)
                 }
                 .toggleStyle(SwitchToggleStyle(tint: .red))
                 .scaledToFill()

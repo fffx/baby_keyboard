@@ -7,6 +7,7 @@
 
 import SwiftUI
 let FireworkWindowID = "fireworkTransparentWindow"
+let MainWindowID = "main"
 
 class WindowDelegate: NSObject, NSWindowDelegate {
     func windowWillClose(_ notification: Notification) {
@@ -31,14 +32,28 @@ struct BabyKeyboardLockApp: App {
     @AppStorage("lockKeyboardOnLaunch") var lockKeyboardOnLaunch = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
     @ObservedObject var eventHandler = EventHandler()
+    
+    @State var mainWindow: NSWindow? = nil
     // var letterView: LetterView!
     var body: some Scene {
-        Window("BabyKeyboardLock", id: "main") {
+        Window("BabyKeyboardLock", id: MainWindowID) {
             ContentView()
+//            .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeMainNotification), perform: { newValue in
+//                debugPrint("Focused = true", newValue.hashValue)
+//                mainWindow?.animator().alphaValue = 1
+//            })
+//            .onReceive(NotificationCenter.default.publisher(for: NSWindow.didResignKeyNotification), perform: { newValue in
+//                debugPrint("Focused = false", newValue.hashValue)
+//                
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//                    mainWindow?.animator().alphaValue = 0.7 // Adjust opacity as needed
+//                }
+//            }).onAppear(){
+//                mainWindow = NSApp.windows.first(where: { $0.identifier?.rawValue == MainWindowID })
+//            }
         }
         .environmentObject(eventHandler)
         .windowStyle(.hiddenTitleBar)
-        //.windowStyle(.hiddenTitleBar)
         // .windowResizability(.contentSize)
     
         
@@ -49,8 +64,8 @@ struct BabyKeyboardLockApp: App {
                 .edgesIgnoringSafeArea(.all)
                 // .disabled(true)
                 .onAppear {
-                    // Make the window transparen
-                    guard let window =  NSApp.windows.first(where: { $0.identifier?.rawValue == FireworkWindowID }) else { return }
+                    // Make the window transparent
+                    guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == FireworkWindowID }) else { return }
                     // print(window.identifier!.rawValue)
                     window.isOpaque = false
                     // window.backgroundColor = NSColor.clear
