@@ -7,7 +7,17 @@
 
 import SwiftUI
 import AppKit
+extension Bundle {
+    class var applicationName: String {
 
+        if let displayName: String = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String {
+            return displayName
+        } else if let name: String = Bundle.main.infoDictionary?["CFBundleName"] as? String {
+            return name
+        }
+        return "App Name"
+    }
+}
 struct PinWindow: ViewModifier {
     let isPinned: Bool
     
@@ -64,12 +74,13 @@ struct ContentView: View {
                         image: eventHandler.isLocked ? "keyboard.locked" : "keyboard.unlocked"
                     )
                     .bold().font(.title)
+                    .foregroundColor(eventHandler.accessibilityPermissionGranted ? .primary : .gray)
                 }
                 .toggleStyle(SwitchToggleStyle(tint: .red))
                 .scaledToFill()
                 .disabled(!eventHandler.accessibilityPermissionGranted)
-                .padding(.bottom, 20)
-                .padding(.top, 20)
+                .padding(.bottom, eventHandler.accessibilityPermissionGranted ? 20 : 5)
+                .padding(.top, 15)
                 .onChange(of: eventHandler.isLocked) { _, newVal in
                     if newVal {
                         NSSound(named: "Glass")?.play()
@@ -83,11 +94,16 @@ struct ContentView: View {
                 }
                     
                 if !eventHandler.accessibilityPermissionGranted {
-                    Text("Please grant accessibility permissions in System Settings > Secuerity & Privacy > Accessibility")
+                    Text("""
+                         Please grant accessibility permissions to [\(Bundle.applicationName)] in:
+                         [System Settings]
+                             > [Secuerity & Privacy] 
+                                 > [Accessibility] (scroll down)
+                         """)
                         .opacity(eventHandler.accessibilityPermissionGranted ? 0 : 1)
-                        .padding()
                         .font(.callout)
                         .bold()
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 Picker("Effect", selection: $eventHandler.selectedLockEffect) {
                     ForEach(LockEffect.allCases) { effect in
@@ -130,11 +146,11 @@ struct ContentView: View {
                     openWindow(id: FireworkWindowID)
                 }
                 
-                let app = NSApplication.shared
-                let mainWindow = app.windows.first { $0.identifier?.rawValue == "main" }
-                mainWindow?.standardWindowButton(.closeButton)?.isHidden = true
-                mainWindow?.standardWindowButton(.miniaturizeButton)?.isHidden = true
-                mainWindow?.standardWindowButton(.zoomButton)?.isHidden = true
+//                let app = NSApplication.shared
+//                let mainWindow = app.windows.first { $0.identifier?.rawValue == "main" }
+//                mainWindow?.standardWindowButton(.closeButton)?.isHidden = true
+//                mainWindow?.standardWindowButton(.miniaturizeButton)?.isHidden = true
+//                mainWindow?.standardWindowButton(.zoomButton)?.isHidden = true
                 
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

@@ -55,8 +55,12 @@ struct BabyKeyboardLockApp: App {
                 ContentView()
                 .environmentObject(eventHandler)
              }
-             .frame(width: 300, height: 300)
+             .frame(minWidth: 300, minHeight: 300)
              .background(.windowBackground)
+             .introspectMenuBarExtraWindow() { window in
+                 window.isOpaque = false
+                 window.level = .floating
+             }
         }
         // .defaultLaunchBehavior(.presented) Mcos 15.0
         .menuBarExtraStyle(.window)
