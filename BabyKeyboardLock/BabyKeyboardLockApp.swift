@@ -93,10 +93,13 @@ struct BabyKeyboardLockApp: App {
     }
 }
 
+// hide from dock
+// https://stackoverflow.com/questions/70697737/hide-app-icon-from-macos-menubar-on-launch
+// https://stackoverflow.com/questions/68884499/make-swiftui-app-appear-in-the-macos-dock
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApplication.shared.setActivationPolicy(.regular)
-        NSApplication.shared.activate(ignoringOtherApps: true)
+//        NSApplication.shared.setActivationPolicy(.regular)
+//        NSApplication.shared.activate(ignoringOtherApps: true)
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
