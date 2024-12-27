@@ -59,12 +59,17 @@ struct ContentView: View {
                 // LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock/Unlock Keyboard")
                 Toggle(isOn: $eventHandler.isLocked)
                 {
-                    Label("Lock Keyboard", systemImage: "keyboard").bold().font(.title)
+                    Label(
+                        "Lock Keyboard",
+                        image: eventHandler.isLocked ? "keyboard.locked" : "keyboard.unlocked"
+                    )
+                    .bold().font(.title)
                 }
                 .toggleStyle(SwitchToggleStyle(tint: .red))
                 .scaledToFill()
                 .disabled(!eventHandler.accessibilityPermissionGranted)
                 .padding(.bottom, 20)
+                .padding(.top, 20)
                 .onChange(of: eventHandler.isLocked) { _, newVal in
                     if newVal {
                         NSSound(named: "Glass")?.play()

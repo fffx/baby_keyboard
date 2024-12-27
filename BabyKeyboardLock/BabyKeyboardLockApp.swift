@@ -47,8 +47,8 @@ struct BabyKeyboardLockApp: App {
         .windowResizability(.contentSize)
         
         MenuBarExtra(
-            "BabyKeyboardLock",
-            systemImage: eventHandler.isLocked ? "lock.fill" : "lock.open.fill",
+            "Lock",
+            image: eventHandler.isLocked ? "keyboard.locked" : "keyboard.unlocked",
             isInserted: $showMenuBarExtra
         ) {
             VStack {
@@ -58,6 +58,7 @@ struct BabyKeyboardLockApp: App {
              .frame(width: 300, height: 300)
              .background(.windowBackground)
         }
+        // .defaultLaunchBehavior(.presented) Mcos 15.0
         .menuBarExtraStyle(.window)
         .menuBarExtraAccess(isPresented: $menuBarViewIsPresented)
         .onChange(of: scenePhase, initial: true) { _, newValue in

@@ -2,7 +2,9 @@
 - https://github.com/lwouis/alt-tab-macos/blob/8a4aa7908fb5f4ff417bdaadce7cf70605095600/src/experimentations/README.md
 - https://github.com/libusb/hidapi
 
-
+- show window on launch
+- hide docker icon, only need menu bar
+- https://developer.apple.com/documentation/uikit/creating-custom-symbol-images-for-your-app
 
 
 
