@@ -28,6 +28,7 @@ final class BabyKeyboardLockUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
+        app.firstMatch
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
 
