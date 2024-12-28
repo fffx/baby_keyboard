@@ -53,6 +53,11 @@ struct BabyKeyboardLockApp: App {
         ) {
             VStack {
                 ContentView(eventHandler: eventHandler)
+                    // https://stackoverflow.com/questions/63825005/handling-close-and-terminate-app-events-swiftui
+                    .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: { output in
+                        debugPrint("-------- stop with eventhandler.stop() --------")
+                        eventHandler.stop()
+                    })
              }
              .frame(minWidth: 300, minHeight: 300)
              .background(Color(.windowBackgroundColor))
@@ -85,13 +90,6 @@ struct BabyKeyboardLockApp: App {
     }
     
     init() {
-        let _self = self
-        NotificationCenter.default.addObserver(
-            forName: NSApplication.willTerminateNotification,
-            object: nil, queue: .main) { _ in
-                debugPrint("------ willTerminateNotification  received------")
-                _self.eventHandler.stop()
-        }
 
     }
 }

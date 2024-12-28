@@ -57,6 +57,26 @@ extension View {
     }
 }
 
+struct HoverableMenuStyle: MenuStyle {
+    @State private var isHovered = false
+    
+    func makeBody(configuration: Configuration) -> some View {
+        Menu(configuration)
+            .padding(5)
+            .background(
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(isHovered ? Color.gray.opacity(0.2) : Color.clear)
+            )
+            .onHover { hovering in
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isHovered = hovering
+                }
+            }
+    }
+}
+
+
+
 struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
     @ObservedObject var eventHandler: EventHandler
@@ -64,10 +84,31 @@ struct ContentView: View {
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
 
+    @State var hoveringMoreButton: Bool = false
     var body: some View {
         VStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: 20) {
-                // LockSwitcher(isLocked: $eventHandler.isLocked, label: "Lock/Unlock Keyboard")
+                HStack{
+                    Spacer() // push the button to right
+                    Menu {
+                        Button("Quit \(Bundle.applicationName)") {
+                              NSApp.terminate(nil)
+                          }
+                    } label: {
+                        Label("", systemImage: "ellipsis").font(.callout)
+                            .onHover { _ in
+                                // TODO
+                            }
+                    }
+                    .menuStyle(HoverableMenuStyle())
+                    .menuStyle(BorderlessButtonMenuStyle())
+                    .menuIndicator(.hidden)
+                    .fixedSize()
+                    .onHover { _ in
+                        hoveringMoreButton = true
+                    }
+                }
+                
                 Toggle(isOn: $eventHandler.isLocked)
                 {
                     Label(
@@ -81,7 +122,6 @@ struct ContentView: View {
                 .scaledToFill()
                 .disabled(!eventHandler.accessibilityPermissionGranted)
                 .padding(.bottom, eventHandler.accessibilityPermissionGranted ? 20 : 5)
-                .padding(.top, 15)
                 .onChange(of: eventHandler.isLocked) { newVal in
                     if newVal {
                         NSSound(named: "Glass")?.play()
