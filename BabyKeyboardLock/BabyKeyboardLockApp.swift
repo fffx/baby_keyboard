@@ -14,6 +14,7 @@ let MainWindowID = "main"
 struct BabyKeyboardLockApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.openWindow) private var openWindow
     @State private var isLaunched: Bool = false
     @State var menuBarViewIsPresented: Bool = false
     
@@ -58,34 +59,32 @@ struct BabyKeyboardLockApp: App {
              .introspectMenuBarExtraWindow() { window in
                  window.isOpaque = false
                  window.level = .floating
-             }.onAppear {
-                 eventHandler.isLocked = lockKeyboardOnLaunch
-                 eventHandler.selectedLockEffect = selectedLockEffect
-                 eventHandler.run()
              }
              
         }
-        // .defaultLaunchBehavior(.presented) Mcos 15.0
         .menuBarExtraStyle(.window)
         .menuBarExtraAccess(isPresented: $menuBarViewIsPresented)
-        .onChange(of: scenePhase) { newValue in
-            debugPrint("scenePhase: \(newValue)")
-            switch newValue {
-            case .active:
-                if !isLaunched {
-                    isLaunched = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        menuBarViewIsPresented = true
+        .commands {
+            CommandGroup(after: .appInfo) {
+                Color.clear
+                    .onAppear {
+                        eventHandler.isLocked = lockKeyboardOnLaunch
+                        eventHandler.selectedLockEffect = selectedLockEffect
+                        eventHandler.run()
+                        
+                        if !isLaunched {
+                            isLaunched = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                menuBarViewIsPresented = true
+                            }
+                        }
                     }
-                }
-            default: break
             }
         }
+
     }
     
     init() {
-
-        
         let _self = self
         NotificationCenter.default.addObserver(
             forName: NSApplication.willTerminateNotification,
