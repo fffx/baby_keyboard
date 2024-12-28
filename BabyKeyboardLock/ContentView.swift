@@ -59,7 +59,8 @@ extension View {
 
 struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
-    @EnvironmentObject var eventHandler: EventHandler
+    @ObservedObject var eventHandler: EventHandler
+    
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
 
@@ -81,7 +82,7 @@ struct ContentView: View {
                 .disabled(!eventHandler.accessibilityPermissionGranted)
                 .padding(.bottom, eventHandler.accessibilityPermissionGranted ? 20 : 5)
                 .padding(.top, 15)
-                .onChange(of: eventHandler.isLocked) { _, newVal in
+                .onChange(of: eventHandler.isLocked) { newVal in
                     if newVal {
                         NSSound(named: "Glass")?.play()
                     } else {
@@ -111,7 +112,7 @@ struct ContentView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .onChange(of: eventHandler.selectedLockEffect) { _, newVal in
+                .onChange(of: eventHandler.selectedLockEffect) { newVal in
                     selectedLockEffect = newVal
                 }
                 
@@ -132,7 +133,7 @@ struct ContentView: View {
 //            .background(Color.white)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             // .pinWindow(isPinned: eventHandler.isLocked)
-            .onChange(of: eventHandler.isLocked){ _, newVal in
+            .onChange(of: eventHandler.isLocked){ newVal in
                 if newVal{
                     openWindow(id: FireworkWindowID)
                 } else {
@@ -158,6 +159,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
-        .environmentObject(EventHandler(isLocked: false))
+    ContentView(eventHandler: EventHandler(isLocked: false))
 }

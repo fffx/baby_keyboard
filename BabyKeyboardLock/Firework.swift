@@ -51,7 +51,7 @@ struct FireworkView: View {
     @State private var buttonPosition: CGPoint = .zero
     
     @State private var windowSize: CGSize = .zero
-    @EnvironmentObject var eventHandler: EventHandler
+    @ObservedObject var eventHandler: EventHandler
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -76,7 +76,7 @@ struct FireworkView: View {
                 windowSize = geometry.size
                 debugPrint("-------- windowSize: \(windowSize)")
             }
-            .onChange(of: eventHandler.isLocked) { _, newVal in
+            .onChange(of: eventHandler.isLocked) { newVal in
                 if !newVal {
                     initialized = false // avoild confetti on toggle lock
                 }

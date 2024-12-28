@@ -20,13 +20,13 @@ struct BabyKeyboardLockApp: App {
     @AppStorage("lockKeyboardOnLaunch") var lockKeyboardOnLaunch = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
     @AppStorage("showMenuBarExtra") private var showMenuBarExtra = true
-    @ObservedObject var eventHandler = EventHandler()
+    @StateObject var eventHandler: EventHandler = EventHandler()
     
     @State var mainWindow: NSWindow? = nil
     // var letterView: LetterView!
     var body: some Scene {
         Window("Firework window", id: FireworkWindowID) {
-            FireworkView().frame(maxWidth: .infinity, maxHeight: .infinity)
+            FireworkView(eventHandler: eventHandler).frame(maxWidth: .infinity, maxHeight: .infinity)
             Color.clear
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .edgesIgnoringSafeArea(.all)
@@ -42,7 +42,6 @@ struct BabyKeyboardLockApp: App {
                     // window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
                 }
         }
-        .environmentObject(eventHandler)
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
         
@@ -52,20 +51,24 @@ struct BabyKeyboardLockApp: App {
             isInserted: $showMenuBarExtra
         ) {
             VStack {
-                ContentView()
-                .environmentObject(eventHandler)
+                ContentView(eventHandler: eventHandler)
              }
              .frame(minWidth: 300, minHeight: 300)
-             .background(.windowBackground)
+             .background(Color(.windowBackgroundColor))
              .introspectMenuBarExtraWindow() { window in
                  window.isOpaque = false
                  window.level = .floating
+             }.onAppear {
+                 eventHandler.isLocked = lockKeyboardOnLaunch
+                 eventHandler.selectedLockEffect = selectedLockEffect
+                 eventHandler.run()
              }
+             
         }
         // .defaultLaunchBehavior(.presented) Mcos 15.0
         .menuBarExtraStyle(.window)
         .menuBarExtraAccess(isPresented: $menuBarViewIsPresented)
-        .onChange(of: scenePhase, initial: true) { _, newValue in
+        .onChange(of: scenePhase) { newValue in
             debugPrint("scenePhase: \(newValue)")
             switch newValue {
             case .active:
@@ -78,13 +81,10 @@ struct BabyKeyboardLockApp: App {
             default: break
             }
         }
-        
     }
     
     init() {
-        eventHandler.isLocked = lockKeyboardOnLaunch
-        eventHandler.selectedLockEffect = selectedLockEffect
-        eventHandler.run()
+
         
         let _self = self
         NotificationCenter.default.addObserver(
