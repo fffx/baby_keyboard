@@ -76,22 +76,20 @@ class EventEffectHandler {
         // guard eventType == .keyUp else { return }
         guard let str = getString(event: event, eventType: eventType) else { return nil }
         debugPrint("speaking ------- \(str)")
-        let utterance = AVSpeechUtterance(string: str)
-        let language =  Locale.preferredLanguages[0]
-        
-        // https://stackoverflow.com/questions/37512621/avspeechsynthesizer-change-voice
-        utterance.voice = AVSpeechSynthesisVoice(language: language)
-        
-        debugPrint("speaking ------- \(language)")
-        
+ 
+       
         switch selectedLockEffect {
         case .speakTheKey:
             DispatchQueue.global(qos: .background).async {
-                self.synth.speak(utterance)
+                self.synth.speak(self.createUtterance(for: str))
             }
         case .speakAKeyWord:
             let randomword = getRandomWord(forKey: str)
-            synth.speak(AVSpeechUtterance(string: randomword))
+            DispatchQueue.global(qos: .background).async {
+                self.synth.speak(
+                    self.createUtterance(for: randomword)
+                )
+            }
             return randomword
         default:
             break
@@ -117,6 +115,23 @@ class EventEffectHandler {
         
         debugPrint("getWord ------- \(key) -- \(randomWord)")
         return randomWord
+    }
+    
+    private func createUtterance(for str: String) -> AVSpeechUtterance {
+        let utterance = AVSpeechUtterance(string: str)
+        // utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.1
+        
+        let language =  Locale.preferredLanguages[0]
+        
+        // https://stackoverflow.com/questions/37512621/avspeechsynthesizer-change-voice
+        let allVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
+            guard language == voice.language else { return false}
+            debugPrint("speaking ------- \(voice.identifier)")
+            return true
+        }
+        utterance.voice = allVoices.first {voice in voice.identifier.contains("siri") } ?? allVoices.first
+        
+        return utterance
     }
           
 }

@@ -186,9 +186,9 @@ class EventHandler: ObservableObject {
             
             if isThrottled() { return nil }
             self.lastKeyString = eventEffectHandler.getString(event: event, eventType: type) ?? ""
-            debugPrint("keyup------- \(lastKeyString)")
             
-            eventEffectHandler.handle(event: event, eventType: type, selectedLockEffect: selectedLockEffect)
+            let result = eventEffectHandler.handle(event: event, eventType: type, selectedLockEffect: selectedLockEffect)
+            debugPrint("keyup------- \(lastKeyString), str \(result ?? "")")
             return nil
         } else {
             return Unmanaged.passRetained(event)
