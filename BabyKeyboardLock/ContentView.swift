@@ -135,12 +135,7 @@ struct ContentView: View {
                 }
                     
                 if !eventHandler.accessibilityPermissionGranted {
-                    Text("""
-                         Please grant accessibility permissions to [\(Bundle.applicationName)] in:
-                         [System Settings]
-                             > [Secuerity & Privacy] 
-                                 > [Accessibility] (scroll down)
-                         """)
+                    Text("accessibility_permission_grant_hint \(Bundle.applicationName)")
                         .opacity(eventHandler.accessibilityPermissionGranted ? 0 : 1)
                         .font(.callout)
                         .bold()
@@ -148,7 +143,7 @@ struct ContentView: View {
                 }
                 Picker("Effect", selection: $eventHandler.selectedLockEffect) {
                     ForEach(LockEffect.allCases) { effect in
-                        Text(effect.rawValue)
+                        Text(effect.localizedString)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -164,7 +159,7 @@ struct ContentView: View {
                 // .frame(maxWidth: .infinity, alignment: .leading)
                 
                 Spacer()
-                Text("You can use shortcut Ctrl + Option + U to toggle keyboard lock")
+                Text("unlock_shortcut_hint")
                     .font(.footnote)
                     .fixedSize(horizontal: false, vertical: true)
             }

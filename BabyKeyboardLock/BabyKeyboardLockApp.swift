@@ -60,6 +60,7 @@ struct BabyKeyboardLockApp: App {
                     })
              }
              .frame(minWidth: 300, minHeight: 300)
+             .padding()
              .background(Color(.windowBackgroundColor))
              .introspectMenuBarExtraWindow() { window in
                  window.isOpaque = false
