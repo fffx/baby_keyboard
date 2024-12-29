@@ -22,12 +22,6 @@ enum KeyCode: CGKeyCode, CaseIterable, Identifiable {
 }
 
 class EventHandler: ObservableObject {
-    #if DEBUG
-    let debug = true
-    #else
-    let debug = false
-    #endif
-
     let eventEffectHandler = EventEffectHandler()
     private var eventLoopStarted = false
     
@@ -61,21 +55,6 @@ class EventHandler: ObservableObject {
             self.isLocked = false
         }
         self.lastKeyString = lastKeyString
-    }
-    
-    func scheduleTimer(duration: Int?) {
-        guard let duration = duration else { return }
-        let timer = Timer(timeInterval: TimeInterval(duration),
-                          repeats: false) { _ in
-            let message = "Timer expired ⏱️\n"
-            if let data = message.data(using: .utf8) {
-                FileHandle.standardError.write(data)
-            }
-            
-            self.isLocked = false
-            CFRunLoopStop(CFRunLoopGetCurrent())
-        }
-        RunLoop.current.add(timer, forMode: .common)
     }
 
     func checkAccessibilityPermission(){
@@ -121,7 +100,7 @@ class EventHandler: ObservableObject {
         if(eventLoopStarted) { return }
         
         setupEventTap() // Setup event tap to capture key events
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.main.async {
             self.eventLoopStarted = true
             CFRunLoopRun()  // Start the run loop to handle events in a background thread
         }

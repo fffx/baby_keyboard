@@ -50,6 +50,8 @@ struct FireworkView: View {
     @State private var initialized = false
     @State private var buttonPosition: CGPoint = .zero
     
+    @State private var soundPool: [NSSound] = []
+    @State private var sound: NSSound? = NSSound(named: "confetti-cannon")
     @State private var windowSize: CGSize = .zero
     @ObservedObject var eventHandler: EventHandler
     var body: some View {
@@ -100,11 +102,18 @@ struct FireworkView: View {
                 
                 // Update the button's position
                 buttonPosition = CGPoint(x: randomX, y: randomY)
-                
-                guard let nsSound = NSSound(named: "confetti-cannon") else { return }
-                (nsSound.copy() as! NSSound).play()
+                playSound()
             }
         }
         .fullscreenTransparentWindow()
     }
+    
+    private func playSound() {
+        if sound != nil && soundPool.isEmpty {
+            soundPool = Array(repeating: sound!, count: 5).map { $0.copy() as! NSSound }
+        }
+        guard let availableSound = soundPool.first(where: { !$0.isPlaying }) else { return }
+        availableSound.play()
+    }
+
 }
