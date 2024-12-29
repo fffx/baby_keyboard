@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AppKit
+
 extension Bundle {
     class var applicationName: String {
 
@@ -123,12 +124,10 @@ struct ContentView: View {
                 .disabled(!eventHandler.accessibilityPermissionGranted)
                 .padding(.bottom, eventHandler.accessibilityPermissionGranted ? 20 : 5)
                 .onChange(of: eventHandler.isLocked) { newVal in
-                    if newVal {
-                        NSSound(named: "light-switch")?.play()
-                    }
+                    playLockSound(isLocked: newVal)
                 }.onAppear(){
                     if eventHandler.isLocked {
-                        NSSound(named: "light-switch")?.play()
+                        playLockSound(isLocked: true)
                     }
                 }
                     
@@ -189,6 +188,17 @@ struct ContentView: View {
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
+    
+    private func playLockSound(isLocked: Bool) {
+        if isLocked {
+            NSSound(named: "light-switch-on")?.play()
+        } else {
+            guard let nsSound = NSSound(named: "light-switch-off") else { return }
+            
+            nsSound.play()
+        }
+    }
+
 }
 
 #Preview {
