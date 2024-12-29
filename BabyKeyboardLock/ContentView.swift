@@ -124,13 +124,11 @@ struct ContentView: View {
                 .padding(.bottom, eventHandler.accessibilityPermissionGranted ? 20 : 5)
                 .onChange(of: eventHandler.isLocked) { newVal in
                     if newVal {
-                        NSSound(named: "Glass")?.play()
-                    } else {
-                        NSSound(named: "Bottle")?.play()
+                        NSSound(named: "light-switch")?.play()
                     }
                 }.onAppear(){
                     if eventHandler.isLocked {
-                        NSSound(named: "Glass")?.play()
+                        NSSound(named: "light-switch")?.play()
                     }
                 }
                     

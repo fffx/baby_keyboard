@@ -13,6 +13,12 @@
     },
     "accessibility_permission_grant_hint %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte erteilen Sie [%@] Zugriffsberechtigungen unter:\n[Systemeinstellungen]\n    > [Sicherheit & Datenschutz]\n        > [Barrierefreiheit] (nach unten scrollen)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -29,6 +35,12 @@
     },
     "Effect" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effekt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -45,6 +57,12 @@
     },
     "Firework window" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feuerwerksfenster"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -61,6 +79,12 @@
     },
     "Lock" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -77,6 +101,12 @@
     },
     "Lock Keyboard" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastatur sperren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -94,6 +124,12 @@
     "Lock keyboard on launch" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastatur beim Start sperren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -111,6 +147,12 @@
     "LockEffect.confettiCannon" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfetti"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -128,6 +170,12 @@
     "LockEffect.none" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -145,6 +193,12 @@
     "LockEffect.speakAKeyWord" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Wort sprechen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -162,6 +216,12 @@
     "LockEffect.speakTheKey" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die gedrückte Taste sprechen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -178,6 +238,12 @@
     },
     "Quit %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ beenden\n"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -195,6 +261,12 @@
     "unlock_shortcut_hint" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können die Tastenkombination Strg + Wahltaste + U verwenden, um die Tastatursperre umzuschalten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
