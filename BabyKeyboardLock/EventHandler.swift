@@ -5,7 +5,7 @@ import ApplicationServices
 import CoreData
 import SwiftData
 
-enum KeyCode: CGKeyCode {
+enum KeyCode: CGKeyCode, CaseIterable, Identifiable {
     case u = 0x20
     case delete = 0x33
     case up = 0x7e
@@ -15,6 +15,10 @@ enum KeyCode: CGKeyCode {
     case escape = 0x35
     case tab = 0x30
     case enter = 0x24
+    
+    var id: Self {
+        return self
+    }
 }
 
 class EventHandler: ObservableObject {
@@ -127,8 +131,7 @@ class EventHandler: ObservableObject {
         let eventMask = CGEventMask(
             (1 << CGEventType.keyDown.rawValue) |
             (1 << CGEventType.keyUp.rawValue) |
-            (1 << CGEventType.leftMouseDragged.rawValue) |
-            (1 << 14)
+            (1 << 14) // seacrh and voice key
         )
         
         guard let eventTap = CGEvent.tapCreate(
@@ -164,7 +167,7 @@ class EventHandler: ObservableObject {
         let controlFlag = event.flags.contains(.maskControl)
         let optionFlag = event.flags.contains(.maskAlternate)
         let eventType = type == .keyDown ? "pressed" : "released"
-        debugPrint("Key Code: \0x(String(keyCode, radix: 16)),\t" +
+        debugPrint("Key Code: \0x\(String(keyCode, radix: 16)),\t" +
                  "Control Flag: \(controlFlag),\t" +
                  "Event Type: (\(type.rawValue)) \(eventType)")
         // Toggle with Ctrl + Option + U
@@ -176,7 +179,6 @@ class EventHandler: ObservableObject {
             return nil
         }
 
-       
         if isLocked {
             if shouldAllowEvent(proxy: proxy, type: type, event: event) {
                 return Unmanaged.passRetained(event)
@@ -185,10 +187,11 @@ class EventHandler: ObservableObject {
             if type != .keyUp { return nil }
             
             if isThrottled() { return nil }
-            self.lastKeyString = eventEffectHandler.getString(event: event, eventType: type) ?? ""
             
-            let result = eventEffectHandler.handle(event: event, eventType: type, selectedLockEffect: selectedLockEffect)
-            debugPrint("keyup------- \(lastKeyString), str \(result ?? "")")
+            self.lastKeyString = eventEffectHandler.handle(
+                event: event, eventType: type, selectedLockEffect: selectedLockEffect
+            )
+            debugPrint("keyup------- \(lastKeyString), str: \(lastKeyString)")
             return nil
         } else {
             return Unmanaged.passRetained(event)

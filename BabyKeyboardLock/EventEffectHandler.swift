@@ -70,12 +70,13 @@ class EventEffectHandler {
         "y": ["yak", "yes", "yarn", "yell", "yet", "yum", "you", "young"],
         "z": ["zebra", "zip", "zap", "zig", "zoo", "zen", "zero", "zone"]
     ]
+    
     let synth = AVSpeechSynthesizer()
-    func handle(event: CGEvent, eventType: CGEventType, selectedLockEffect: LockEffect) -> String? {
+    func handle(event: CGEvent, eventType: CGEventType, selectedLockEffect: LockEffect) -> String {
         debugPrint("speaking handle ------- \(selectedLockEffect)")
         // guard eventType == .keyUp else { return }
-        guard let str = getString(event: event, eventType: eventType) else { return nil }
-        debugPrint("speaking ------- \(str)")
+        guard let str = getString(event: event, eventType: eventType) else { return "" }
+        debugPrint("get key name ------- \(str)")
  
        
         switch selectedLockEffect {
@@ -99,6 +100,11 @@ class EventEffectHandler {
     }
     
     func getString(event: CGEvent, eventType: CGEventType) -> String? {
+        let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+        if KeyCode.allCases.contains(where: { $0.rawValue == keyCode }) {
+            return String(describing: KeyCode(rawValue: CGKeyCode(keyCode))!)
+        }
+        
         return Sauce.shared.character(
             for: Int(event.getIntegerValueField(.keyboardEventKeycode)),
             cocoaModifiers: event.flags.toNSEventModifierFlags
@@ -126,7 +132,7 @@ class EventEffectHandler {
         // https://stackoverflow.com/questions/37512621/avspeechsynthesizer-change-voice
         let allVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
             guard language == voice.language else { return false}
-            debugPrint("speaking ------- \(voice.identifier)")
+            // debugPrint("speaking ------- \(voice.identifier)")
             return true
         }
         utterance.voice = allVoices.first {voice in voice.identifier.contains("siri") } ?? allVoices.first
