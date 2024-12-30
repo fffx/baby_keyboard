@@ -24,6 +24,7 @@ enum KeyCode: CGKeyCode, CaseIterable, Identifiable {
 class EventHandler: ObservableObject {
     let eventEffectHandler = EventEffectHandler()
     private var eventLoopStarted = false
+    private var eventTap : CFMachPort?
     
     @Published var selectedLockEffect: LockEffect = .none
     @Published var isLocked = true {
@@ -59,6 +60,10 @@ class EventHandler: ObservableObject {
 
     func checkAccessibilityPermission(){
         debugPrint("------ Checking Accessibility Permission ------")
+        if eventTap != nil && !CGEvent.tapIsEnabled(tap: eventTap!) {
+                print("Event tap disabled, attempting restart...")
+                setupEventTap()
+        }
         let processTrusted = AXIsProcessTrusted()
         if !processTrusted && self.accessibilityPermissionGranted {
             self.stop()
@@ -71,7 +76,7 @@ class EventHandler: ObservableObject {
         }
         DispatchQueue.global(qos: .background).async {
           // Schedule the next check
-            let delay = processTrusted ? DispatchTimeInterval.seconds(30) : DispatchTimeInterval.seconds(3)
+            let delay = DispatchTimeInterval.seconds(3)
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 self.checkAccessibilityPermission()
             }
@@ -113,7 +118,7 @@ class EventHandler: ObservableObject {
             (1 << 14) // seacrh and voice key
         )
         
-        guard let eventTap = CGEvent.tapCreate(
+        eventTap = CGEvent.tapCreate(
             tap: .cghidEventTap,
             place: .headInsertEventTap,
             options: .defaultTap,
@@ -122,16 +127,19 @@ class EventHandler: ObservableObject {
             userInfo: UnsafeMutableRawPointer(Unmanaged
                 .passUnretained(self)
                 .toOpaque())
-        ) else {
+        )
+        
+        guard eventTap != nil else {
             fatalError("Failed to create event tap")
         }
         
         let runLoopSource = CFMachPortCreateRunLoopSource(
             kCFAllocatorDefault,
             eventTap,
-            0)
+            0
+        )
         CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
-        CGEvent.tapEnable(tap: eventTap, enable: true)
+        CGEvent.tapEnable(tap: eventTap!, enable: true)
     }
     
     func handleKeyEvent(
