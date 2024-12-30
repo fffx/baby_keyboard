@@ -159,9 +159,6 @@ class EventHandler: ObservableObject {
         }
 
         if isLocked {
-            if shouldAllowEvent(proxy: proxy, type: type, event: event) {
-                return Unmanaged.passRetained(event)
-            }
             
             if type != .keyUp { return nil }
             
@@ -187,46 +184,6 @@ class EventHandler: ObservableObject {
         }
         return trusted
     }
-    
-    func shouldAllowEvent(
-        proxy: CGEventTapProxy,
-        type: CGEventType,
-        event: CGEvent) -> Bool {
-            return false
-          //  debugPrint("Ignoring event --  \(event.flags.contains(.maskCommand))")
-        // let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
-            
-//            if keyCode == KeyCode.delete.rawValue || keyCode == KeyCode.enter.rawValue {
-//                return false
-//            }
-//            
-//            if keyCode == KeyCode.tab.rawValue ||
-//                keyCode == KeyCode.up.rawValue ||
-//                keyCode == KeyCode.down.rawValue ||
-//                keyCode == KeyCode.left.rawValue ||
-//                keyCode == KeyCode.right.rawValue
-//            {
-//                return true
-//            }
-//            
-//            if event.flags.contains(.maskShift) &&
-//                !(event.flags.contains(.maskCommand) || event.flags.contains(.maskAlternate) || event.flags.contains(.maskControl))
-//            {
-//                return false
-//            }
-//           
-//            if  event.flags.contains(.maskCommand) ||
-//                event.flags.contains(.maskShift) ||
-//                event.flags.contains(.maskAlternate) ||
-//                event.flags.contains(.maskControl)
-//            {
-//                return true
-//            }
-//            
-//            return false
-            
-    }
-    
 
 }
 func globalKeyEventHandler(
