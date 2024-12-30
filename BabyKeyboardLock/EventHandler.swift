@@ -157,17 +157,15 @@ class EventHandler: ObservableObject {
             return Unmanaged.passRetained(event)
         }
         
-       
-        // debugPrint("--- \(type), keyboardEventKeyboardType: \(event.getIntegerValueField(.keyboardEventKeyboardType))")
+        debugPrint("--- keyup/down: \(type == .keyDown || type == .keyUp), keyboardEventKeyboardType: \(event.getIntegerValueField(.keyboardEventKeyboardType))")
         // disable media keys, power button
-        if event.getIntegerValueField(.keyboardEventKeyboardType) == 0 {
+        if isLocked && event.getIntegerValueField(.keyboardEventKeyboardType) == 0 {
             return nil
         }
-        
-        
         guard type == .keyDown || type == .keyUp else {
             return Unmanaged.passRetained(event)
         }
+        
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
         let controlFlag = event.flags.contains(.maskControl)
         let optionFlag = event.flags.contains(.maskAlternate)
