@@ -147,6 +147,24 @@ class EventHandler: ObservableObject {
         type: CGEventType,
         event: CGEvent
     ) -> Unmanaged<CGEvent>?{
+
+        // Handle tap disable events first
+        if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+            debugPrint("Event tap disabled, attempting to re-enable...")
+            if let tap = eventTap {
+                CGEvent.tapEnable(tap: tap, enable: true)
+            }
+            return Unmanaged.passRetained(event)
+        }
+        
+       
+        // debugPrint("--- \(type), keyboardEventKeyboardType: \(event.getIntegerValueField(.keyboardEventKeyboardType))")
+        // disable media keys, power button
+        if event.getIntegerValueField(.keyboardEventKeyboardType) == 0 {
+            return nil
+        }
+        
+        
         guard type == .keyDown || type == .keyUp else {
             return Unmanaged.passRetained(event)
         }
