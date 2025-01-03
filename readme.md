@@ -6,6 +6,7 @@
 - ~~hide docker icon, only need menu bar~~
 - ~~https://developer.apple.com/documentation/uikit/creating-custom-symbol-images-for-your-app~~
 - only block user selected keyboard
+    - https://github.com/phracker/MacOSX-SDKs/blob/master/MacOSX11.3.sdk/System/Library/Frameworks/CoreGraphics.framework/Versions/A/Headers/CGEventTypes.h
 - whitelist by keys
 - blacklist by keys
 - temporary lock by holding Fn
@@ -29,6 +30,8 @@ https://developer.apple.com/design/human-interface-guidelines/layout-and-organiz
 
 
 ## translation prommpt
+https://github.com/midday-ai/languine
+
 I have these strings from an macos keyboard app
 Please translate these strings to German, each string is separated by a blank line:
 ```
