@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		201966D52D1C942300B7CEEC /* MenuBarExtraAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 201966D42D1C942300B7CEEC /* MenuBarExtraAccess */; };
 		20D3EC8E2D17EDB70096279E /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 20D3EC8D2D17EDB70096279E /* ConfettiSwiftUI */; };
 		20F6F4C22D154FCE006FEC81 /* Sauce in Frameworks */ = {isa = PBXBuildFile; productRef = 20F6F4C12D154FCE006FEC81 /* Sauce */; };
 /* End PBXBuildFile section */
@@ -59,7 +58,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				20D3EC8E2D17EDB70096279E /* ConfettiSwiftUI in Frameworks */,
-				201966D52D1C942300B7CEEC /* MenuBarExtraAccess in Frameworks */,
 				20F6F4C22D154FCE006FEC81 /* Sauce in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -123,7 +121,6 @@
 			packageProductDependencies = (
 				20F6F4C12D154FCE006FEC81 /* Sauce */,
 				20D3EC8D2D17EDB70096279E /* ConfettiSwiftUI */,
-				201966D42D1C942300B7CEEC /* MenuBarExtraAccess */,
 			);
 			productName = BabyKeyboardLock;
 			productReference = 20141CA82D0F52E500D0ED5D /* BabyKeyboardLock.app */;
@@ -212,7 +209,6 @@
 			packageReferences = (
 				20F6F4C02D154FCE006FEC81 /* XCRemoteSwiftPackageReference "Sauce" */,
 				20D3EC8C2D17EDB70096279E /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
-				20C316502D1C920D0064C2FD /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 20141CA92D0F52E500D0ED5D /* Products */;
@@ -419,7 +415,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = BabyKeyboardLock/BabyKeyboardLock.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 0.1;
@@ -491,6 +487,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = SQ5HJJDHG9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "BabyKeyboardLockTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
@@ -598,14 +595,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		20C316502D1C920D0064C2FD /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/orchetect/MenuBarExtraAccess";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.1;
-			};
-		};
 		20D3EC8C2D17EDB70096279E /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/simibac/ConfettiSwiftUI.git";
@@ -625,11 +614,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		201966D42D1C942300B7CEEC /* MenuBarExtraAccess */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 20C316502D1C920D0064C2FD /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */;
-			productName = MenuBarExtraAccess;
-		};
 		20D3EC8D2D17EDB70096279E /* ConfettiSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 20D3EC8C2D17EDB70096279E /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */;

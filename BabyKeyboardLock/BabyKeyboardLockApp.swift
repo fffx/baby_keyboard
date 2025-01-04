@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import MenuBarExtraAccess
 let FireworkWindowID = "fireworkTransparentWindow"
 let MainWindowID = "main"
 
@@ -21,7 +20,7 @@ struct BabyKeyboardLockApp: App {
     @AppStorage("lockKeyboardOnLaunch") var lockKeyboardOnLaunch = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
     @AppStorage("showMenuBarExtra") private var showMenuBarExtra = true
-    @StateObject var eventHandler: EventHandler = EventHandler()
+    @StateObject var eventHandler: EventHandler = EventHandler.shared
     
     @State var mainWindow: NSWindow? = nil
     // var letterView: LetterView!
@@ -44,54 +43,12 @@ struct BabyKeyboardLockApp: App {
                 }
         }
         .windowStyle(.hiddenTitleBar)
-        .windowResizability(.contentSize)
+        // .windowResizability(.contentSize)
         
-        MenuBarExtra(
-            "Lock",
-            image: eventHandler.isLocked ? "keyboard.locked" : "keyboard.unlocked",
-            isInserted: $showMenuBarExtra
-        ) {
-            VStack {
-                ContentView(eventHandler: eventHandler)
-                    // https://stackoverflow.com/questions/63825005/handling-close-and-terminate-app-events-swiftui
-                    .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: { output in
-                        debugPrint("-------- stop with eventhandler.stop() --------")
-                        eventHandler.stop()
-                    })
-             }
-             .frame(minWidth: 300, minHeight: 300)
-             .padding()
-             .background(Color(.windowBackgroundColor))
-             .introspectMenuBarExtraWindow() { window in
-                 window.isOpaque = false
-                 window.level = .floating
-             }
-             
-        }
-        .menuBarExtraStyle(.window)
-        .menuBarExtraAccess(isPresented: $menuBarViewIsPresented)
-        .commands {
-            CommandGroup(after: .appInfo) {
-                Color.clear
-                    .onAppear {
-                        eventHandler.isLocked = lockKeyboardOnLaunch
-                        eventHandler.selectedLockEffect = selectedLockEffect
-                        eventHandler.run()
-                        
-                        if !isLaunched {
-                            isLaunched = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                menuBarViewIsPresented = true
-                            }
-                        }
-                    }
-            }
-        }
-
     }
     
     init() {
-
+        eventHandler.setLocked(isLocked: lockKeyboardOnLaunch)
     }
 }
 
@@ -99,9 +56,32 @@ struct BabyKeyboardLockApp: App {
 // https://stackoverflow.com/questions/70697737/hide-app-icon-from-macos-menubar-on-launch
 // https://stackoverflow.com/questions/68884499/make-swiftui-app-appear-in-the-macos-dock
 class AppDelegate: NSObject, NSApplicationDelegate {
-    func applicationDidFinishLaunching(_ notification: Notification) {
+    private var statusItem: NSStatusItem!
+    private var popover: NSPopover!
+    
+    @MainActor func applicationDidFinishLaunching(_ notification: Notification) {
 //        NSApplication.shared.setActivationPolicy(.regular)
 //        NSApplication.shared.activate(ignoringOtherApps: true)
+        
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        
+        if let statusButton = statusItem.button {
+            statusButton.image = NSImage(named: "keyboard.locked")
+            statusButton.image?.accessibilityDescription = Bundle.applicationName
+            statusButton.action = #selector(togglePopover)
+        }
+        
+        self.popover = NSPopover()
+        // self.popover.contentSize = NSSize(width: 300, height: 400)
+        // self.popover.appearance = NSAppearance(named: .accessibilityHighContrastVibrantLight)
+        self.popover.behavior = .transient
+        let nSHostingController = NSHostingController(
+            rootView: ContentView(eventHandler: EventHandler.shared).background(Color(nsColor: .windowBackgroundColor))
+        )
+        // nSHostingController.preferredContentSize = NSSize(width: 300, height: 300)
+        
+        
+        self.popover.contentViewController = nSHostingController
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -109,6 +89,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
+        EventHandler.shared.stop()
         debugPrint("-------- applicationWillTerminate --------")
     }
+    
+    @objc func togglePopover() {
+          if let button = statusItem.button {
+              if popover.isShown {
+                  self.popover.performClose(nil)
+              } else {
+                  // Get the actual menu bar height
+                  let menuBarHeight = NSStatusBar.system.thickness
+                  
+                  // Create properly adjusted bounds
+                  var adjustedBounds = button.bounds
+                  adjustedBounds.origin.y -= menuBarHeight * 0.1
+                  popover.show(relativeTo: adjustedBounds, of: button, preferredEdge: .minY)
+              }
+          }
+          
+      }
 }

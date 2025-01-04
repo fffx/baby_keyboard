@@ -78,6 +78,7 @@
       }
     },
     "Lock" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

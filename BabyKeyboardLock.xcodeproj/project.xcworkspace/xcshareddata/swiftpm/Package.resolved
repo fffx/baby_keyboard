@@ -1,5 +1,5 @@
 {
-  "originHash" : "9eede0934e2deb905af66a7fbcc9343f0de1dd96190b762ccc68f25214a56205",
+  "originHash" : "caad7783a16850f8325a5e2fb11c4be08235e513b61f0b812fde71fec3e2f0d8",
   "pins" : [
     {
       "identity" : "confettiswiftui",
@@ -8,15 +8,6 @@
       "state" : {
         "revision" : "f45961f97bbae6fff6e2e64546fea0189425ad92",
         "version" : "1.1.0"
-      }
-    },
-    {
-      "identity" : "menubarextraaccess",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/orchetect/MenuBarExtraAccess",
-      "state" : {
-        "revision" : "e911e6454f8cbfe34a52136fc48e1ceb989a60e7",
-        "version" : "1.2.1"
       }
     },
     {

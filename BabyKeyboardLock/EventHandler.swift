@@ -27,11 +27,7 @@ class EventHandler: ObservableObject {
     private var eventTap : CFMachPort?
     
     @Published var selectedLockEffect: LockEffect = .none
-    @Published var isLocked = true {
-        didSet {
-            if (isLocked && accessibilityPermissionGranted) { startEventLoop() }
-        }
-    }
+    @Published var isLocked = true
     @Published var accessibilityPermissionGranted = false
     @Published var lastKeyString: String = "a" // fix onReceive won't work as expected for first key press
 
@@ -49,6 +45,8 @@ class EventHandler: ObservableObject {
         return true
     }
     
+    static let shared = EventHandler()
+    
     init(isLocked: Bool = true) {
         self.isLocked = isLocked
         self.accessibilityPermissionGranted = requestAccessibilityPermissions()
@@ -56,6 +54,17 @@ class EventHandler: ObservableObject {
             self.isLocked = false
         }
         self.lastKeyString = lastKeyString
+    }
+    
+    func setLocked(isLocked: Bool) {
+        if (isLocked && accessibilityPermissionGranted) {
+            self.isLocked = true
+            startEventLoop()
+        } else {
+            self.isLocked = false
+        }
+        
+        
     }
 
     func checkAccessibilityPermission(){
