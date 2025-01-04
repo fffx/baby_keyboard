@@ -56,6 +56,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // nSHostingController.preferredContentSize = NSSize(width: 300, height: 300)
         
         self.popover.contentViewController = nSHostingController
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
+            self.showPopover()
+        }
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
