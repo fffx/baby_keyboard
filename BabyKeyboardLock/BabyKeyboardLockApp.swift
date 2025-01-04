@@ -31,7 +31,7 @@ struct BabyKeyboardLockApp: App {
 // https://stackoverflow.com/questions/70697737/hide-app-icon-from-macos-menubar-on-launch
 // https://stackoverflow.com/questions/68884499/make-swiftui-app-appear-in-the-macos-dock
 class AppDelegate: NSObject, NSApplicationDelegate {
-    private var statusItem: NSStatusItem!
+    var statusItem: NSStatusItem!
     private var popover: NSPopover!
     
     @MainActor func applicationDidFinishLaunching(_ notification: Notification) {

@@ -16,7 +16,7 @@ extension Bundle {
         } else if let name: String = Bundle.main.infoDictionary?["CFBundleName"] as? String {
             return name
         }
-        return "App Name"
+        return "BabyKeyboard Lock"
     }
 }
 
@@ -41,6 +41,7 @@ struct HoverableMenuStyle: MenuStyle {
 
 
 struct ContentView: View {
+    @State private var animationWindow: NSWindow?
     @ObservedObject var eventHandler: EventHandler = EventHandler.shared
     
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
@@ -122,28 +123,9 @@ struct ContentView: View {
         .padding()
         .frame(width: 300, height: 400)
         .onChange(of: eventHandler.isLocked) { newVal in
-            if(newVal){
-                AnimationView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .edgesIgnoringSafeArea(.all)
-                    .onAppear {
-                        // Make the window transparent
-                        guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == AnimationWindowID }) else { return }
-                        window.isOpaque = false
-                        // window.backgroundColor = NSColor.clear
-                        window.level = .floating
-                        window.titlebarAppearsTransparent = true
-    
-                        // window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-                    }
-                    .openInWindow(id: AnimationWindowID, sender: self)
-            } else {
-                // TODO close animation window
-                guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == AnimationWindowID }) else { return }
-                
-                window.close()
-                
-            }
+            showOrCloseAnimationWindow(isLocked: newVal)
+        }.onReceive(eventHandler.$isLocked) { newVal in
+            showOrCloseAnimationWindow(isLocked: newVal)
         }
     }
     
@@ -155,6 +137,31 @@ struct ContentView: View {
             
             nsSound.play()
         }
+    }
+    
+    private func showOrCloseAnimationWindow(isLocked: Bool) {
+        if (!isLocked) {
+            let window = NSApp.windows.first(where: { $0.identifier?.rawValue == AnimationWindowID })
+            window?.close()
+            return
+        }
+        
+        // if animationWindow != nil { return }
+        
+        animationWindow = AnimationView()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .edgesIgnoringSafeArea(.all)
+            .onAppear {
+                // Make the window transparent
+                guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == AnimationWindowID }) else { return }
+                window.isOpaque = false
+                // window.backgroundColor = NSColor.clear
+                window.level = .floating
+                window.titlebarAppearsTransparent = true
+
+                // window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+            }
+            .openInWindow(id: AnimationWindowID, sender: self)
     }
     
 }

@@ -74,9 +74,9 @@ struct AnimationView: View {
             .padding()
             .presentedWindowStyle(.hiddenTitleBar)
             .onAppear {
-                debugPrint("\(AnimationWindowID)-------- windowSize: \(windowSize)")
                 // windowSize = geometry.size
                 windowSize = NSScreen.main?.frame.size ?? CGSize(width: 800, height: 600)
+                debugPrint("\(AnimationWindowID)-------- windowSize: \(windowSize)")
             }
             .onChange(of: eventHandler.isLocked) { newVal in
                 if !newVal {
