@@ -6,45 +6,20 @@
 //
 
 import SwiftUI
-let FireworkWindowID = "fireworkTransparentWindow"
+let AnimationWindowID = "animationTransparentWindow"
 let MainWindowID = "main"
 
 @main
 struct BabyKeyboardLockApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.openWindow) private var openWindow
     @State private var isLaunched: Bool = false
-    @State var menuBarViewIsPresented: Bool = false
     
     @AppStorage("lockKeyboardOnLaunch") var lockKeyboardOnLaunch = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
-    @AppStorage("showMenuBarExtra") private var showMenuBarExtra = true
-    @StateObject var eventHandler: EventHandler = EventHandler.shared
-    
-    @State var mainWindow: NSWindow? = nil
-    // var letterView: LetterView!
+    @ObservedObject var eventHandler: EventHandler = EventHandler.shared
+
     var body: some Scene {
-        Window("Firework window", id: FireworkWindowID) {
-            FireworkView(eventHandler: eventHandler).frame(maxWidth: .infinity, maxHeight: .infinity)
-            Color.clear
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .edgesIgnoringSafeArea(.all)
-                // .disabled(true)
-                .onAppear {
-                    // Make the window transparent
-                    guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == FireworkWindowID }) else { return }
-                    // print(window.identifier!.rawValue)
-                    window.isOpaque = false
-                    // window.backgroundColor = NSColor.clear
-                    window.level = .floating
-                
-                    // window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-                }
-        }
-        .windowStyle(.hiddenTitleBar)
-        // .windowResizability(.contentSize)
-        
+        Group { }
     }
     
     init() {
@@ -75,11 +50,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // self.popover.contentSize = NSSize(width: 300, height: 400)
         // self.popover.appearance = NSAppearance(named: .accessibilityHighContrastVibrantLight)
         self.popover.behavior = .transient
-        let nSHostingController = NSHostingController(
-            rootView: ContentView(eventHandler: EventHandler.shared).background(Color(nsColor: .windowBackgroundColor))
-        )
-        // nSHostingController.preferredContentSize = NSSize(width: 300, height: 300)
+        let rootView = ContentView(eventHandler: EventHandler.shared)
+        let nSHostingController = NSHostingController(rootView: rootView)
         
+        // nSHostingController.preferredContentSize = NSSize(width: 300, height: 300)
         
         self.popover.contentViewController = nSHostingController
     }

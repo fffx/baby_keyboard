@@ -41,8 +41,7 @@ struct HoverableMenuStyle: MenuStyle {
 
 
 struct ContentView: View {
-    @Environment(\.openWindow) private var openWindow
-    @ObservedObject var eventHandler: EventHandler
+    @ObservedObject var eventHandler: EventHandler = EventHandler.shared
     
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
@@ -77,7 +76,7 @@ struct ContentView: View {
                     "Lock Keyboard",
                     image: eventHandler.isLocked ? "keyboard.locked" : "keyboard.unlocked"
                 )
-                .bold().font(.title)
+                .font(.title)
                 .foregroundColor(eventHandler.accessibilityPermissionGranted ? .primary : .gray)
             }
             .toggleStyle(SwitchToggleStyle(tint: .red))
@@ -96,7 +95,6 @@ struct ContentView: View {
                 Text("accessibility_permission_grant_hint \(Bundle.applicationName)")
                     .opacity(eventHandler.accessibilityPermissionGranted ? 0 : 1)
                     .font(.callout)
-                    .bold()
                     .fixedSize(horizontal: false, vertical: true)
             }
             Picker("Effect", selection: $eventHandler.selectedLockEffect) {
@@ -123,18 +121,28 @@ struct ContentView: View {
         }
         .padding()
         .frame(width: 300, height: 400)
-        .onChange(of: eventHandler.isLocked){ newVal in
-            if newVal{
-                openWindow(id: FireworkWindowID)
+        .onChange(of: eventHandler.isLocked) { newVal in
+            if(newVal){
+                AnimationView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .edgesIgnoringSafeArea(.all)
+                    .onAppear {
+                        // Make the window transparent
+                        guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == AnimationWindowID }) else { return }
+                        window.isOpaque = false
+                        // window.backgroundColor = NSColor.clear
+                        window.level = .floating
+                        window.titlebarAppearsTransparent = true
+    
+                        // window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+                    }
+                    .openInWindow(id: AnimationWindowID, sender: self)
             } else {
-                NSApp.windows.first(where: { $0.identifier?.rawValue == FireworkWindowID })?.close()
-            }
-        }
-        .onAppear {
-            debugPrint("appeared ------------ ")
-            // Open the other windows here if needed
-            if eventHandler.isLocked {
-                openWindow(id: FireworkWindowID)
+                // TODO close animation window
+                guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == AnimationWindowID }) else { return }
+                
+                window.close()
+                
             }
         }
     }

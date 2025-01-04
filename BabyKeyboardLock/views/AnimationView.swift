@@ -45,7 +45,7 @@ extension View {
     }
 }
 
-struct FireworkView: View {
+struct AnimationView: View {
     @State private var counter: Int = 0
     @State private var initialized = false
     @State private var buttonPosition: CGPoint = .zero
@@ -53,14 +53,13 @@ struct FireworkView: View {
     @State private var soundPool: [NSSound] = []
     @State private var sound: NSSound? = NSSound(named: "confetti-cannon")
     @State private var windowSize: CGSize = .zero
-    @ObservedObject var eventHandler: EventHandler
+    @ObservedObject var eventHandler: EventHandler = EventHandler.shared
+    
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                Color.clear
-                Button("") {
-                    counter += 1
-                }
+                // Color.clear
+                Button("") { counter += 1 }
                 .background(.clear)
                 .buttonStyle(PlainButtonStyle())
                 .confettiCannon(
@@ -75,15 +74,18 @@ struct FireworkView: View {
             .padding()
             .presentedWindowStyle(.hiddenTitleBar)
             .onAppear {
-                windowSize = geometry.size
-                debugPrint("-------- windowSize: \(windowSize)")
+                debugPrint("\(AnimationWindowID)-------- windowSize: \(windowSize)")
+                // windowSize = geometry.size
+                windowSize = NSScreen.main?.frame.size ?? CGSize(width: 800, height: 600)
             }
             .onChange(of: eventHandler.isLocked) { newVal in
                 if !newVal {
+                    // TODO https://stackoverflow.com/questions/64391947/swiftui-prevent-onreceive-from-firing-on-load
                     initialized = false // avoild confetti on toggle lock
                 }
             }
             .onReceive(eventHandler.$lastKeyString) { _ in
+                debugPrint("\(AnimationWindowID)-------- initialized: \(initialized), locked \(eventHandler.isLocked)")
                 if !initialized {
                     self.initialized = true
                     return
