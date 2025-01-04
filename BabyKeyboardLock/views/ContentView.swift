@@ -148,8 +148,11 @@ struct ContentView: View {
             }
             return
         }
-        
-        // if animationWindow != nil { return }
+           
+        if animationWindow != nil {
+            animationWindow?.orderFront(self)
+            return
+        }
         
         animationWindow = AnimationView()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
