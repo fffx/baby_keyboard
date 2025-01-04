@@ -58,9 +58,8 @@ struct AnimationView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Color.clear
                 Button("") { counter += 1 }
-                .background(.clear)
+                    .background(Color.clear)
                 .buttonStyle(PlainButtonStyle())
                 .confettiCannon(
                     counter: $counter,

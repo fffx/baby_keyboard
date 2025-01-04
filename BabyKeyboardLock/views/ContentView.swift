@@ -38,8 +38,6 @@ struct HoverableMenuStyle: MenuStyle {
     }
 }
 
-
-
 struct ContentView: View {
     @State private var animationWindow: NSWindow?
     @ObservedObject var eventHandler: EventHandler = EventHandler.shared
@@ -64,7 +62,13 @@ struct ContentView: View {
                 }
                 .menuStyle(HoverableMenuStyle())
                 .menuStyle(BorderlessButtonMenuStyle())
-                .menuIndicator(.hidden)
+                .apply {
+                    if #available(macOS 12.0, *) {
+                          $0.menuIndicator(.hidden)
+                      } else {
+                          $0
+                      }
+                }
                 .fixedSize()
                 .onHover { _ in
                     hoveringMoreButton = true
