@@ -8,17 +8,7 @@
 import SwiftUI
 import AppKit
 
-extension Bundle {
-    class var applicationName: String {
-        
-        if let displayName: String = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String {
-            return displayName
-        } else if let name: String = Bundle.main.infoDictionary?["CFBundleName"] as? String {
-            return name
-        }
-        return "BabyKeyboard Lock"
-    }
-}
+
 
 struct HoverableMenuStyle: MenuStyle {
     @State private var isHovered = false
@@ -50,7 +40,11 @@ struct ContentView: View {
        VStack(alignment: .leading, spacing: 20) {
             HStack{
                 Spacer() // push the button to right
-                Menu {
+                Menu() {
+                    Button("About") {
+                        AboutView().openInWindow(id: "About", sender: self, focus: true)
+                    }
+                    
                     Button("Quit \(Bundle.applicationName)") {
                         NSApp.terminate(nil)
                     }

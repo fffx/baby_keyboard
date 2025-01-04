@@ -11,6 +11,9 @@
         }
       }
     },
+    "About" : {
+
+    },
     "accessibility_permission_grant_hint %@" : {
       "localizations" : {
         "de" : {
@@ -32,6 +35,9 @@
           }
         }
       }
+    },
+    "BabyKeyboard Lock %@ Beta, All rights reserved" : {
+
     },
     "Effect" : {
       "localizations" : {
@@ -77,6 +83,12 @@
           }
         }
       }
+    },
+    "For more information please visit" : {
+
+    },
+    "https://keyboardlock.app" : {
+
     },
     "Lock" : {
       "extractionState" : "stale",
