@@ -141,8 +141,11 @@ struct ContentView: View {
     
     private func showOrCloseAnimationWindow(isLocked: Bool) {
         if (!isLocked) {
-            let window = NSApp.windows.first(where: { $0.identifier?.rawValue == AnimationWindowID })
-            window?.close()
+            NSApp.windows.forEach { window in
+                if window.identifier?.rawValue == AnimationWindowID {
+                    window.close()
+                }
+            }
             return
         }
         

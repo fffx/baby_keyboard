@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import Combine
+
 let AnimationWindowID = "animationTransparentWindow"
 let MainWindowID = "main"
 
@@ -24,6 +26,7 @@ struct BabyKeyboardLockApp: App {
     
     init() {
         eventHandler.setLocked(isLocked: lockKeyboardOnLaunch)
+        eventHandler.selectedLockEffect = selectedLockEffect
     }
 }
 
@@ -33,7 +36,7 @@ struct BabyKeyboardLockApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
     private var popover: NSPopover!
-    
+    private var cancellables = Set<AnyCancellable>() // Add this property
     @MainActor func applicationDidFinishLaunching(_ notification: Notification) {
 //        NSApplication.shared.setActivationPolicy(.regular)
 //        NSApplication.shared.activate(ignoringOtherApps: true)
@@ -41,10 +44,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         
         if let statusButton = statusItem.button {
-            statusButton.image = NSImage(named: "keyboard.locked")
+            statusButton.image = NSImage(named: EventHandler.shared.isLocked ? "keyboard.locked" : "keyboard.unlocked")
             statusButton.image?.accessibilityDescription = Bundle.applicationName
             statusButton.action = #selector(togglePopover)
         }
+        
+        // Add observer for isLocked changes
+        EventHandler.shared.$isLocked
+            .sink { [weak self] isLocked in
+                if let statusButton = self?.statusItem.button {
+                    statusButton.image = NSImage(named: isLocked ? "keyboard.locked" : "keyboard.unlocked")
+                }
+            }
+            .store(in: &cancellables)
         
         self.popover = NSPopover()
         // self.popover.contentSize = NSSize(width: 300, height: 400)
