@@ -16,7 +16,8 @@ extension View {
         win.title = title
         win.identifier = NSUserInterfaceItemIdentifier(id)
         if sender != nil {
-            win.makeKeyAndOrderFront(sender)
+            // win.makeKeyAndOrderFront(sender)
+            win.orderFront(sender)
         }
 
         return win

@@ -67,19 +67,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         debugPrint("-------- applicationWillTerminate --------")
     }
     
+    func showPopover(){
+        if let button = statusItem.button {
+            // Get the actual menu bar height
+            let menuBarHeight = NSStatusBar.system.thickness
+            
+            // Create properly adjusted bounds
+            var adjustedBounds = button.bounds
+            adjustedBounds.origin.y -= menuBarHeight * 0.1
+            popover.show(relativeTo: adjustedBounds, of: button, preferredEdge: .minY)
+        }
+    }
+    
+    func hidePopover() {
+        if popover.isShown {
+            self.popover.performClose(nil)
+        }
+    }
+    
     @objc func togglePopover() {
-          if let button = statusItem.button {
-              if popover.isShown {
-                  self.popover.performClose(nil)
-              } else {
-                  // Get the actual menu bar height
-                  let menuBarHeight = NSStatusBar.system.thickness
-                  
-                  // Create properly adjusted bounds
-                  var adjustedBounds = button.bounds
-                  adjustedBounds.origin.y -= menuBarHeight * 0.1
-                  popover.show(relativeTo: adjustedBounds, of: button, preferredEdge: .minY)
-              }
+          if popover.isShown {
+                hidePopover()
+          } else {
+                showPopover()
           }
           
       }
