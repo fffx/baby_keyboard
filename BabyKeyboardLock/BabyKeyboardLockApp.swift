@@ -70,6 +70,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.popover.contentViewController = nSHostingController
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
             self.showPopover()
+            EventHandler.shared.run()
         }
     }
     
