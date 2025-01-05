@@ -22,12 +22,19 @@ enum KeyCode: CGKeyCode, CaseIterable, Identifiable {
 }
 
 class EventHandler: ObservableObject {
+    private let lock = NSLock()
     let eventEffectHandler = EventEffectHandler()
     private var eventLoopStarted = false
     private var eventTap : CFMachPort?
     
     @Published var selectedLockEffect: LockEffect = .none
-    @Published var isLocked = true
+    @Published var isLocked = true {
+        didSet {
+            if isLocked {
+                startEventLoop()
+            }
+        }
+    }
     @Published var accessibilityPermissionGranted = false
     @Published var lastKeyString: String = "a" // fix onReceive won't work as expected for first key press
 
@@ -112,6 +119,9 @@ class EventHandler: ObservableObject {
     
     func startEventLoop() {
         if(eventLoopStarted) { return }
+        if(!accessibilityPermissionGranted) { return }
+        lock.lock()
+        defer { lock.unlock() }
         
         setupEventTap() // Setup event tap to capture key events
         DispatchQueue.main.async {
