@@ -7,21 +7,26 @@
 
 import SwiftUI
 
+
 struct AboutView: View {
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text("\(Bundle.applicationName) \(Bundle.main.appVersionLong), All rights reserved")
+        VStack {
+            HStack(alignment: .firstTextBaseline) {
+                Text("\(Bundle.applicationName) \(Bundle.main.appVersionLong) (Build \(Bundle.main.appBuild)), All rights reserved")
+                Spacer()
+            }
+            HStack(alignment: .center) {
+                Image(nsImage: NSImage(named: "AppIcon") ?? NSImage())
             }
             Spacer()
-            HStack {
+            HStack(alignment: .firstTextBaseline) {
                 Text("For more information please visit")
                 Link("https://keyboardlock.app", destination: URL(string: "https://keyboardlock.app")!)
             }
                 
         }
         .padding()
-        .frame(width: 400, height: 200)
+        .frame(width: 400, height: 300)
     }
 }
 

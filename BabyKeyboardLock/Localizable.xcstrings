@@ -11,12 +11,12 @@
         }
       }
     },
-    "%@ %@, All rights reserved" : {
+    "%@ %@ (Build %@), All rights reserved" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@ %2$@, All rights reserved"
+            "value" : "%1$@ %2$@ (Build %3$@), All rights reserved"
           }
         }
       }
