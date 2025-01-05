@@ -11,12 +11,12 @@
         }
       }
     },
-    "%@ %@ Beta, All rights reserved" : {
+    "%@ %@, All rights reserved" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$@ %2$@ Beta, All rights reserved"
+            "value" : "%1$@ %2$@, All rights reserved"
           }
         }
       }

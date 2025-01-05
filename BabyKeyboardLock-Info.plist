@@ -2,22 +2,17 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSAppleEventsUsageDescription</key>
-	<string>This app needs to monitor keyboard events</string>
-
-	<key>Privacy - Accessibility API Enabled</key>
-	<string>YES</string>
 	<key>CFBundleSpokenName</key>
 	<string></string>
 	<key>NSServices</key>
 	<array>
 		<dict/>
 	</array>
+	<key>Privacy - Accessibility API Enabled</key>
+	<string>YES</string>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict/>
 	</array>
-    <!--  <key>com.apple.security.temporary-exception.apple-events</key>
-    <true/> -->
 </dict>
 </plist>
