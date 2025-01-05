@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "20141CA72D0F52E500D0ED5D"
-               BuildableName = "BabyKeyboardLock.app"
-               BlueprintName = "BabyKeyboardLock"
+               BuildableName = "BabyKeyboard Lock.app"
+               BlueprintName = "BabyKeyboard Lock"
                ReferencedContainer = "container:BabyKeyboardLock.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,8 +46,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "20141CA72D0F52E500D0ED5D"
-            BuildableName = "BabyKeyboardLock.app"
-            BlueprintName = "BabyKeyboardLock"
+            BuildableName = "BabyKeyboard Lock.app"
+            BlueprintName = "BabyKeyboard Lock"
             ReferencedContainer = "container:BabyKeyboardLock.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -63,8 +63,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "20141CA72D0F52E500D0ED5D"
-            BuildableName = "BabyKeyboardLock.app"
-            BlueprintName = "BabyKeyboardLock"
+            BuildableName = "BabyKeyboard Lock.app"
+            BlueprintName = "BabyKeyboard Lock"
             ReferencedContainer = "container:BabyKeyboardLock.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

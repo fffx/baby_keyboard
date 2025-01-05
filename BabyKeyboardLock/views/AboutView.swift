@@ -11,7 +11,7 @@ struct AboutView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("BabyKeyboard Lock \(Bundle.main.appVersionLong) Beta, All rights reserved")
+                Text("\(Bundle.applicationName) \(Bundle.main.appVersionLong), All rights reserved")
             }
             Spacer()
             HStack {

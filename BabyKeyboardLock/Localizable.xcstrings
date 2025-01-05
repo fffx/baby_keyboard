@@ -11,6 +11,16 @@
         }
       }
     },
+    "%@ %@ Beta, All rights reserved" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@ Beta, All rights reserved"
+          }
+        }
+      }
+    },
     "About" : {
 
     },
@@ -35,9 +45,6 @@
           }
         }
       }
-    },
-    "BabyKeyboard Lock %@ Beta, All rights reserved" : {
-
     },
     "Effect" : {
       "localizations" : {
