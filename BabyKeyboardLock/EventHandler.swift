@@ -70,8 +70,8 @@ class EventHandler: ObservableObject {
     func checkAccessibilityPermission(){
         debugPrint("------ Checking Accessibility Permission ------")
         if eventTap != nil && !CGEvent.tapIsEnabled(tap: eventTap!) {
-                print("Event tap disabled, attempting restart...")
-                setupEventTap()
+            print("Event tap disabled, attempting restart...")
+            setupEventTap()
         }
         let processTrusted = AXIsProcessTrusted()
         if !processTrusted && self.accessibilityPermissionGranted {

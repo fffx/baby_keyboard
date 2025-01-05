@@ -19,13 +19,15 @@ extension View {
         win.contentViewController = controller
         win.title = title
         win.identifier = NSUserInterfaceItemIdentifier(id)
-        
+    
     
         if sender != nil {
-            win.orderFront(sender)
             if focus {
                 debugPrint("openInWindow ----- \(id) focus")
+                NSApp.activate(ignoringOtherApps: true)
                 win.makeKeyAndOrderFront(sender)
+            } else {
+                win.orderFront(sender)
             }
         }
 
