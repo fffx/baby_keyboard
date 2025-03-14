@@ -31,7 +31,7 @@
 /* Begin PBXFileReference section */
 		20141CA82D0F52E500D0ED5D /* BabyKeyboardLock Debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BabyKeyboardLock Debug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		20141CB92D0F52E700D0ED5D /* BabyKeyboardLockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BabyKeyboardLockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		20141CC32D0F52E700D0ED5D /* BabyKeyboardLockUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = BabyKeyboardLockUITests.xctest; path = "BabyKeyboardLockUITests Debug.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		20141CC32D0F52E700D0ED5D /* BabyKeyboardLockUITests Debug.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "BabyKeyboardLockUITests Debug.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -94,7 +94,7 @@
 			children = (
 				20141CA82D0F52E500D0ED5D /* BabyKeyboardLock Debug.app */,
 				20141CB92D0F52E700D0ED5D /* BabyKeyboardLockTests.xctest */,
-				20141CC32D0F52E700D0ED5D /* BabyKeyboardLockUITests.xctest */,
+				20141CC32D0F52E700D0ED5D /* BabyKeyboardLockUITests Debug.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -169,7 +169,7 @@
 			packageProductDependencies = (
 			);
 			productName = BabyKeyboardLockUITests;
-			productReference = 20141CC32D0F52E700D0ED5D /* BabyKeyboardLockUITests.xctest */;
+			productReference = 20141CC32D0F52E700D0ED5D /* BabyKeyboardLockUITests Debug.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -346,6 +346,7 @@
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_ENABLE_OPAQUE_TYPE_ERASURE = No;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -405,6 +406,7 @@
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_ENABLE_OPAQUE_TYPE_ERASURE = No;
 			};
 			name = Release;
 		};
@@ -418,12 +420,12 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"BabyKeyboardLock/Preview Content\"";
 				DEVELOPMENT_TEAM = SQ5HJJDHG9;
 				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
+				ENABLE_PREVIEWS = No;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "BabyKeyboardLock-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "BabyKeyboard Lock (Debug)";
@@ -436,10 +438,11 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.2;
+				MARKETING_VERSION = 0.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fangxing.BabyKeyboardLockDebug;
 				PRODUCT_NAME = "$(TARGET_NAME) Debug";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_ENABLE_OPAQUE_TYPE_ERASURE = No;
 				SWIFT_UPCOMING_FEATURE_INTERNAL_IMPORTS_BY_DEFAULT = NO;
 				SWIFT_VERSION = 5.0;
 			};
@@ -455,12 +458,12 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"BabyKeyboardLock/Preview Content\"";
 				DEVELOPMENT_TEAM = SQ5HJJDHG9;
 				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
+				ENABLE_PREVIEWS = No;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "BabyKeyboardLock-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "BabyKeyboard Lock";
@@ -473,10 +476,11 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.2;
+				MARKETING_VERSION = 0.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fangxing.BabyKeyboardLock;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_ENABLE_OPAQUE_TYPE_ERASURE = No;
 				SWIFT_UPCOMING_FEATURE_INTERNAL_IMPORTS_BY_DEFAULT = NO;
 				SWIFT_VERSION = 5.0;
 			};

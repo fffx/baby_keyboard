@@ -10,6 +10,7 @@
 - whitelist by keys
 - blacklist by keys
 - temporary lock by holding Fn
+- notarizing https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution
 
 
 
