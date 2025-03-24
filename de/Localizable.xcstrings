@@ -1,0 +1,16 @@
+"CrowdinId:2" = "";
+"accessibility_permission_grant_hint %@" = "Bitte erteilen Sie Zugriffsberechtigungen für [%@] in:
+[Systemeinstellungen]
+    > [Sicherheit & Privatsphäre] 
+        > [Accessibility] (herunterscrollen)";
+"Effect" = "Effekt";
+"Firework window" = "Feuerwerksfenster";
+"Lock" = "Sperren";
+"Lock Keyboard" = "Tastatur sperren";
+"Lock keyboard on launch" = "Tastatur beim Starten sperren";
+"LockEffect.confettiCannon" = "Confetti";
+"LockEffect.none" = "Keine";
+"LockEffect.speakAKeyWord" = "Sprich ein Wort";
+"LockEffect.speakTheKey" = "Die gedrückte Taste sprechen";
+"Quit %@" = "%@ beenden";
+"unlock_shortcut_hint" = "Sie können Tastaturkürzel Strg + Option + U zum Umschalten der Tastatursperre verwenden";
