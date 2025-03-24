@@ -1,0 +1,16 @@
+"CrowdinId:2" = "";
+"accessibility_permission_grant_hint %@" = "Verleen toegangsrechten aan [%@] in:
+[Systeeminstellingen]
+    > [Secueriteit & Privacy] 
+        > [Accessibility] (scroll naar beneden)";
+"Effect" = "Effect";
+"Firework window" = "Vuurwerk Venster";
+"Lock" = "Vergrendelen";
+"Lock Keyboard" = "Toetsenbord vergrendelen";
+"Lock keyboard on launch" = "Toetsenbord vergrendelen bij opstarten";
+"LockEffect.confettiCannon" = "Confetti";
+"LockEffect.none" = "geen";
+"LockEffect.speakAKeyWord" = "Spreek een woord";
+"LockEffect.speakTheKey" = "Spreek de ingedrukte toets";
+"Quit %@" = "Afsluiten %@";
+"unlock_shortcut_hint" = "Je kunt snelkoppeling Ctrl + Optie + U gebruiken om toetsenbord vergrendeling in/uit te schakelen";
