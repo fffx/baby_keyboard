@@ -1,4 +1,8 @@
-Baby keyboard lock is a Macos app that can lock your keyboard, while your toddlers or kids can still have fun with it.
+# BabyKeyboard Lock
+
+Baby keyboard lock is a Macos app that can lock your keyboard, while your toddlers or kids can still have fun with it. Find more on official site https://keyboardlock.app/
+
+![BabyKeyboard Lock screen shot](screenshots/main.png)
 
 **Features**
 
@@ -7,15 +11,8 @@ Baby keyboard lock is a Macos app that can lock your keyboard, while your toddle
 - No visible window is created, so you can still read your webpage or movie as normal
 - A Menu bar only App, and you can toggle keyboard lock with a global shortcut
 
-
-Limitations
-
-- It can't turn off touch bar yet, if you need to turn off touch bar, I recommend you check KeyboardCleanTool
-- The App can't be published on the App Store because of Apple's Sandbox policy
-
-
-
 **TODO**
+
 - ~~show window on launch~~
 - ~~hide docker icon, only need menu bar~~
 - ~~https://developer.apple.com/documentation/uikit/creating-custom-symbol-images-for-your-app~~
@@ -28,5 +25,6 @@ Limitations
 
 
 **Credits**
+
 - Sound effects are downloaded from https://freesound.org/
 - This app is inspired by https://github.com/kfv/keylock/
