@@ -28,3 +28,8 @@ Baby keyboard lock is a Macos app that can lock your keyboard, while your toddle
 
 - Sound effects are downloaded from https://freesound.org/
 - This app is inspired by https://github.com/kfv/keylock/
+
+
+**Buy me a Coffee**
+
+Just in case you wana buy me a coffee: https://paypal.me/fangxing204
