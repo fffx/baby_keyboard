@@ -46,7 +46,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let statusButton = statusItem.button {
             statusButton.image = NSImage(named: EventHandler.shared.isLocked ? "keyboard.locked" : "keyboard.unlocked")
             statusButton.image?.accessibilityDescription = Bundle.applicationName
-            statusButton.action = #selector(togglePopover)
+            statusButton.sendAction(on: [.rightMouseUp, .leftMouseUp])  // Only trigger on mouse click
+            statusButton.target = self
+            statusButton.action = #selector(handleStatusBarClick)
         }
         
         // Add observer for isLocked changes
@@ -106,12 +108,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    @objc func togglePopover() {
-          if popover.isShown {
+    @objc func handleStatusBarClick(_ sender: NSStatusBarButton? = nil) {
+        guard let event = NSApp.currentEvent else { return }
+        
+        switch event.type {
+        case .leftMouseUp:
+            EventHandler.shared.setLocked(isLocked: !EventHandler.shared.isLocked)
+        case .rightMouseUp:
+            if popover.isShown {
                 hidePopover()
-          } else {
+            } else {
                 showPopover()
-          }
-          
-      }
+            }
+        default:
+            return
+        }
+    }
 }
