@@ -34,6 +34,10 @@ class RandomWordList {
         return words.randomElement()
     }
     
+    func findWord(english: String) -> RandomWord? {
+        return words.first { $0.english.lowercased() == english.lowercased() }
+    }
+    
     func updateWords(_ newWords: [RandomWord]) {
         words = newWords
         saveWords()

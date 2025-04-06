@@ -76,3 +76,6 @@ enum WordSetType: String, CaseIterable, Identifiable {
     }
 }
 
+// Default duration for word display in seconds
+let DEFAULT_WORD_DISPLAY_DURATION: Double = 3.0
+

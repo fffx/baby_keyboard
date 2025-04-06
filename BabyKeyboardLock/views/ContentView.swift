@@ -36,6 +36,7 @@ struct ContentView: View {
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
     @AppStorage("selectedTranslationLanguage") var selectedTranslationLanguage: TranslationLanguage = .none
     @AppStorage("selectedWordSetType") var savedWordSetType: String = WordSetType.randomShortWords.rawValue
+    @AppStorage("wordDisplayDuration") var wordDisplayDuration: Double = DEFAULT_WORD_DISPLAY_DURATION
     
     @State private var showWordSetEditor = false
     @State private var showRandomWordEditor = false
@@ -159,6 +160,26 @@ struct ContentView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
+                    
+                    // Word display duration settings
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("Word Display Duration: \(String(format: "%.1f", wordDisplayDuration))s")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        HStack {
+                            Text("1s")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                            
+                            Slider(value: $wordDisplayDuration, in: 1...10, step: 0.5)
+                            
+                            Text("10s")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.top, 5)
                 }
             }
             
@@ -191,6 +212,26 @@ struct ContentView: View {
                 Text("Contains \(RandomWordList.shared.words.count) words")
                     .font(.caption)
                     .foregroundColor(.secondary)
+                
+                // Word display duration settings
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("Word Display Duration: \(String(format: "%.1f", wordDisplayDuration))s")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    HStack {
+                        Text("1s")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        
+                        Slider(value: $wordDisplayDuration, in: 1...10, step: 0.5)
+                        
+                        Text("10s")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.top, 5)
             }
             
             Toggle(isOn: $lockKeyboardOnLaunch) {

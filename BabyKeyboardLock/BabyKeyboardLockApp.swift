@@ -9,6 +9,7 @@ import SwiftUI
 import Combine
 
 let AnimationWindowID = "animationTransparentWindow"
+let WordDisplayWindowID = "wordDisplayTransparentWindow"
 let MainWindowID = "main"
 
 @main
@@ -75,6 +76,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
             self.showPopover()
             EventHandler.shared.run()
+            
+            // Create the animation window for confetti animations
+            let animationWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: NSScreen.main?.frame.width ?? 1200, height: NSScreen.main?.frame.height ?? 800),
+                styleMask: [.borderless, .fullSizeContentView],
+                backing: .buffered,
+                defer: false
+            )
+            animationWindow.identifier = NSUserInterfaceItemIdentifier(AnimationWindowID)
+            animationWindow.backgroundColor = .clear
+            animationWindow.isReleasedWhenClosed = false
+            animationWindow.center()
+            animationWindow.setFrameAutosaveName("Animation Window")
+            animationWindow.contentView = NSHostingView(rootView: AnimationView())
+            animationWindow.orderFrontRegardless()
+            
+            // Create the word display window for showing words and translations
+            let wordDisplayWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: NSScreen.main?.frame.width ?? 1200, height: NSScreen.main?.frame.height ?? 800),
+                styleMask: [.borderless, .fullSizeContentView],
+                backing: .buffered,
+                defer: false
+            )
+            wordDisplayWindow.identifier = NSUserInterfaceItemIdentifier(WordDisplayWindowID)
+            wordDisplayWindow.backgroundColor = .clear
+            wordDisplayWindow.isReleasedWhenClosed = false
+            wordDisplayWindow.center()
+            wordDisplayWindow.setFrameAutosaveName("Word Display Window")
+            wordDisplayWindow.contentView = NSHostingView(rootView: WordDisplayView())
+            wordDisplayWindow.orderFrontRegardless()
         }
     }
     
