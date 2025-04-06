@@ -63,7 +63,7 @@ enum TranslationLanguage: String, CaseIterable, Identifiable {
 }
 
 enum WordSetType: String, CaseIterable, Identifiable {
-    case standard = "WordSetType.standard"
+    case randomShortWords = "WordSetType.randomShortWords"
     case mainWords = "WordSetType.mainWords"
     
     var id: Self {

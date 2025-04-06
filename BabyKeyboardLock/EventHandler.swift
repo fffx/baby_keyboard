@@ -35,7 +35,7 @@ class EventHandler: ObservableObject {
             eventEffectHandler.translationLanguage = selectedTranslationLanguage
         }
     }
-    @Published var selectedWordSetType: WordSetType = .standard {
+    @Published var selectedWordSetType: WordSetType = .randomShortWords {
         didSet {
             eventEffectHandler.setWordSetType(selectedWordSetType)
         }

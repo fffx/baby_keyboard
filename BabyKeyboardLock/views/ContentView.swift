@@ -35,7 +35,7 @@ struct ContentView: View {
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
     @AppStorage("selectedTranslationLanguage") var selectedTranslationLanguage: TranslationLanguage = .none
-    @AppStorage("selectedWordSetType") var savedWordSetType: String = WordSetType.standard.rawValue
+    @AppStorage("selectedWordSetType") var savedWordSetType: String = WordSetType.randomShortWords.rawValue
     
     @State private var showWordSetEditor = false
     @StateObject private var customWordSetsManager = CustomWordSetsManager.shared

@@ -532,8 +532,17 @@
     "Word Set" : {
 
     },
+    "WordSetType.randomShortWords" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Random short words"
+          }
+        }
+      }
+    },
     "WordSetType.mainWords" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

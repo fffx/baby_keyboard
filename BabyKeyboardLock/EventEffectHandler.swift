@@ -275,7 +275,7 @@ class EventEffectHandler {
         "zebra": "斑马", "zip": "拉链", "zap": "啪", "zig": "锯齿", "zoo": "动物园", "zen": "禅", "zero": "零", "zone": "区域"
     ]
     
-    private var wordSetType: WordSetType = .standard
+    private var wordSetType: WordSetType = .randomShortWords
     private let customWordSetsManager = CustomWordSetsManager.shared
     
     private let synthesizer = NSSpeechSynthesizer()
