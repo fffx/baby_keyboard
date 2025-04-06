@@ -88,6 +88,14 @@ class EventHandler: ObservableObject {
                 self?.objectWillChange.send()
             }
             .store(in: &cancellables)
+        
+        // Observe changes to the random words list
+        NotificationCenter.default.publisher(for: .init("RandomWordsUpdated"))
+            .sink { [weak self] _ in
+                // Refresh UI when random words change
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
     
     func setLocked(isLocked: Bool) {

@@ -283,32 +283,53 @@ class EventEffectHandler {
     var translationLanguage: TranslationLanguage = .none
     
     func handle(event: CGEvent, eventType: CGEventType, selectedLockEffect: LockEffect) -> String {
-        debugPrint("speaking handle ------- \(selectedLockEffect)")
-        // guard eventType == .keyUp else { return }
-        guard let str = getString(event: event, eventType: eventType) else { return "" }
-        debugPrint("get key name ------- \(str)")
- 
-       
+        guard let str = getString(event: event, eventType: eventType) else {
+            return ""
+        }
+        
+        debugPrint("\(selectedLockEffect) ------- \(str)")
+        
         switch selectedLockEffect {
+        case .confettiConnon:
+            break
         case .speakTheKey:
-            DispatchQueue.global(qos: .background).async {
-                self.synth.speak(self.createUtterance(for: str))
-            }
+            let utterance = createUtterance(for: str)
+            synth.speak(utterance)
         case .speakAKeyWord:
             let randomWord = getRandomWord(forKey: str)
-            DispatchQueue.global(qos: .background).async {
-                self.synth.speak(self.createUtterance(for: randomWord))
-                
-                // If translation is enabled, speak the translation after a short delay
-                if self.translationLanguage != .none {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        if let translatedWord = self.getTranslation(word: randomWord, language: self.translationLanguage) {
-                            self.synth.speak(self.createUtterance(for: translatedWord, language: self.translationLanguage.languageCode))
-                        }
+            debugPrint("speakAKeyWord------- \(randomWord)")
+            
+            let utterance = createUtterance(for: randomWord)
+            synth.speak(utterance)
+            
+            if translationLanguage != .none {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    if let translatedWord = self.getTranslation(word: randomWord, language: self.translationLanguage) {
+                        self.synth.speak(self.createUtterance(for: translatedWord, language: self.translationLanguage.languageCode))
                     }
                 }
             }
             return randomWord
+        case .speakRandomWord:
+            if let randomWord = RandomWordList.shared.getRandomWord() {
+                debugPrint("speakRandomWord------- \(randomWord.english)")
+                
+                let utterance = createUtterance(for: randomWord.english)
+                synth.speak(utterance)
+                
+                if translationLanguage != .none {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        self.synth.speak(self.createUtterance(for: randomWord.translation, language: self.translationLanguage.languageCode))
+                    }
+                } else {
+                    // If no translation language is selected, speak the translation anyway
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        self.synth.speak(self.createUtterance(for: randomWord.translation))
+                    }
+                }
+                return randomWord.english
+            }
+            return str
         default:
             break
         }

@@ -55,6 +55,9 @@
     "Edit the words used in 'Main Words' set" : {
 
     },
+    "Edit the words used in 'Speak Random Word' mode" : {
+
+    },
     "Effect" : {
       "localizations" : {
         "de" : {
@@ -246,6 +249,17 @@
         }
       }
     },
+    "LockEffect.speakRandomWord" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speak Random Word"
+          }
+        }
+      }
+    },
     "LockEffect.speakTheKey" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -296,6 +310,12 @@
           }
         }
       }
+    },
+    "Random words" : {
+
+    },
+    "Random Words" : {
+
     },
     "Save" : {
 
@@ -532,22 +552,24 @@
     "Word Set" : {
 
     },
-    "WordSetType.randomShortWords" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Random short words"
-          }
-        }
-      }
-    },
     "WordSetType.mainWords" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Main Words"
+          }
+        }
+      }
+    },
+    "WordSetType.randomShortWords" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Random short words"
           }
         }
       }

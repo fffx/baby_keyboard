@@ -38,6 +38,7 @@ struct ContentView: View {
     @AppStorage("selectedWordSetType") var savedWordSetType: String = WordSetType.randomShortWords.rawValue
     
     @State private var showWordSetEditor = false
+    @State private var showRandomWordEditor = false
     @StateObject private var customWordSetsManager = CustomWordSetsManager.shared
     
     @State var hoveringMoreButton: Bool = false
@@ -161,6 +162,37 @@ struct ContentView: View {
                 }
             }
             
+            if eventHandler.selectedLockEffect == .speakRandomWord {
+                Picker("Translation", selection: $eventHandler.selectedTranslationLanguage) {
+                    ForEach(TranslationLanguage.allCases) { language in
+                        Text(language.localizedString)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .onChange(of: eventHandler.selectedTranslationLanguage) { newVal in
+                    selectedTranslationLanguage = newVal
+                }
+                
+                HStack {
+                    Text("Random words")
+                        .foregroundColor(.secondary)
+                        .font(.subheadline)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        showRandomWordEditor = true
+                    }) {
+                        Image(systemName: "pencil")
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+                
+                Text("Contains \(RandomWordList.shared.words.count) words")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
             Toggle(isOn: $lockKeyboardOnLaunch) {
                 Text("Lock keyboard on launch")
             }
@@ -189,6 +221,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showWordSetEditor) {
             WordSetEditorView()
+        }
+        .sheet(isPresented: $showRandomWordEditor) {
+            RandomWordEditorView()
         }
     }
     

@@ -11,6 +11,7 @@ enum LockEffect: String, CaseIterable, Identifiable{
     case confettiConnon = "LockEffect.confettiCannon"
     case speakTheKey = "LockEffect.speakTheKey"
     case speakAKeyWord = "LockEffect.speakAKeyWord"
+    case speakRandomWord = "LockEffect.speakRandomWord"
     // TODO add random
     
     var id: Self {
