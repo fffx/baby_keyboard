@@ -258,7 +258,8 @@ struct ContentView: View {
             }
             
             debugPrint("onAppear --- ")
-            guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == MainWindowID }) else { return}
+            // Check if main window exists but don't create an unused variable
+            _ = NSApp.windows.first(where: { $0.identifier?.rawValue == MainWindowID })
         }
         .sheet(isPresented: $showWordSetEditor) {
             WordSetEditorView()
