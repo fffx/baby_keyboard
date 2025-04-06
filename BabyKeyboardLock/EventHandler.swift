@@ -4,6 +4,7 @@ import AppKit
 import ApplicationServices
 import CoreData
 import SwiftData
+import Combine
 
 enum KeyCode: CGKeyCode, CaseIterable, Identifiable {
     case u = 0x20
@@ -26,11 +27,17 @@ class EventHandler: ObservableObject {
     let eventEffectHandler = EventEffectHandler()
     private var eventLoopStarted = false
     private var eventTap : CFMachPort?
+    private var cancellables = Set<AnyCancellable>()
     
     @Published var selectedLockEffect: LockEffect = .none
     @Published var selectedTranslationLanguage: TranslationLanguage = .none {
         didSet {
             eventEffectHandler.translationLanguage = selectedTranslationLanguage
+        }
+    }
+    @Published var selectedWordSetType: WordSetType = .standard {
+        didSet {
+            eventEffectHandler.setWordSetType(selectedWordSetType)
         }
     }
     @Published var isLocked = true {
@@ -66,6 +73,21 @@ class EventHandler: ObservableObject {
             self.isLocked = false
         }
         self.lastKeyString = lastKeyString
+        
+        // Initialize wordSetType from UserDefaults
+        if let savedTypeRaw = UserDefaults.standard.string(forKey: "selectedWordSetType"),
+           let savedType = WordSetType(rawValue: savedTypeRaw) {
+            self.selectedWordSetType = savedType
+        }
+        eventEffectHandler.setWordSetType(self.selectedWordSetType)
+        
+        // Observe changes to the main words set
+        NotificationCenter.default.publisher(for: .init("MainWordsUpdated"))
+            .sink { [weak self] _ in
+                // Refresh UI when main words change
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
     
     func setLocked(isLocked: Bool) {

@@ -62,3 +62,16 @@ enum TranslationLanguage: String, CaseIterable, Identifiable {
     }
 }
 
+enum WordSetType: String, CaseIterable, Identifiable {
+    case standard = "WordSetType.standard"
+    case mainWords = "WordSetType.mainWords"
+    
+    var id: Self {
+        return self
+    }
+    
+    var localizedString: String {
+        NSLocalizedString(self.rawValue, comment: "Word set type option")
+    }
+}
+

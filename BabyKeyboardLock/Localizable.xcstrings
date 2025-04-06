@@ -46,6 +46,15 @@
         }
       }
     },
+    "Cancel" : {
+
+    },
+    "Contains %lld words" : {
+
+    },
+    "Edit the words used in 'Main Words' set" : {
+
+    },
     "Effect" : {
       "localizations" : {
         "de" : {
@@ -67,6 +76,9 @@
           }
         }
       }
+    },
+    "English word" : {
+
     },
     "Firework window" : {
       "extractionState" : "stale",
@@ -257,6 +269,12 @@
         }
       }
     },
+    "Main words" : {
+
+    },
+    "Main Words" : {
+
+    },
     "Quit %@" : {
       "localizations" : {
         "de" : {
@@ -279,28 +297,8 @@
         }
       }
     },
-    "unlock_shortcut_hint" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sie können die Tastenkombination Strg + Wahltaste + U verwenden, um die Tastatursperre umzuschalten."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can use shortcut Ctrl + Option + U to toggle keyboard lock"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你可以用快捷键 Ctrl + Option + U 来切换键盘锁定"
-          }
-        }
-      }
+    "Save" : {
+
     },
     "Translation" : {
       "localizations" : {
@@ -324,25 +322,25 @@
         }
       }
     },
-    "TranslationLanguage.none" : {
+    "TranslationLanguage.chinese" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine Übersetzung"
+            "value" : "Chinesisch"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No translation"
+            "value" : "Chinese"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "不翻译"
+            "value" : "中文"
           }
         }
       }
@@ -393,52 +391,6 @@
         }
       }
     },
-    "TranslationLanguage.russian" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Russisch"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Russian"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "俄语"
-          }
-        }
-      }
-    },
-    "TranslationLanguage.spanish" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spanisch"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spanish"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "西班牙语"
-          }
-        }
-      }
-    },
     "TranslationLanguage.italian" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -485,25 +437,119 @@
         }
       }
     },
-    "TranslationLanguage.chinese" : {
+    "TranslationLanguage.none" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chinesisch"
+            "value" : "Keine Übersetzung"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chinese"
+            "value" : "No translation"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "中文"
+            "value" : "不翻译"
+          }
+        }
+      }
+    },
+    "TranslationLanguage.russian" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Russisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Russian"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "俄语"
+          }
+        }
+      }
+    },
+    "TranslationLanguage.spanish" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spanisch"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spanish"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "西班牙语"
+          }
+        }
+      }
+    },
+    "unlock_shortcut_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können die Tastenkombination Strg + Wahltaste + U verwenden, um die Tastatursperre umzuschalten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can use shortcut Ctrl + Option + U to toggle keyboard lock"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你可以用快捷键 Ctrl + Option + U 来切换键盘锁定"
+          }
+        }
+      }
+    },
+    "Word Set" : {
+
+    },
+    "WordSetType.mainWords" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Main Words"
+          }
+        }
+      }
+    },
+    "WordSetType.standard" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
           }
         }
       }

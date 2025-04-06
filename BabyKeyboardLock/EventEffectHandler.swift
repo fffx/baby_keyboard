@@ -275,7 +275,11 @@ class EventEffectHandler {
         "zebra": "斑马", "zip": "拉链", "zap": "啪", "zig": "锯齿", "zoo": "动物园", "zen": "禅", "zero": "零", "zone": "区域"
     ]
     
-    let synth = AVSpeechSynthesizer()
+    private var wordSetType: WordSetType = .standard
+    private let customWordSetsManager = CustomWordSetsManager.shared
+    
+    private let synthesizer = NSSpeechSynthesizer()
+    private let synth = AVSpeechSynthesizer()
     var translationLanguage: TranslationLanguage = .none
     
     func handle(event: CGEvent, eventType: CGEventType, selectedLockEffect: LockEffect) -> String {
@@ -326,7 +330,17 @@ class EventEffectHandler {
     
     func getRandomWord(forKey key: String) -> String {
         let key = key.lowercased()
-        // debugPrint("getWord ------- \(key) -- \(wordCache[key])")
+        
+        if wordSetType == .mainWords {
+            let customMap = customWordSetsManager.getWordMap()
+            if let words = customMap[key], let randomWord = words.randomElement() {
+                debugPrint("getWord from main words set ------- \(key) -- \(randomWord)")
+                return randomWord
+            }
+            return key
+        }
+        
+        // Default behavior using simpleWordsMap
         guard let words = simpleWordsMap[key],
               let randomWord = words.randomElement() else {
             return key
@@ -355,6 +369,12 @@ class EventEffectHandler {
     
     // Get translation for a word based on the selected language
     func getTranslation(word: String, language: TranslationLanguage) -> String? {
+        if wordSetType == .mainWords {
+            if let translation = customWordSetsManager.getTranslation(for: word) {
+                return translation
+            }
+        }
+        
         switch language {
         case .french:
             return frenchTranslations[word.lowercased()]
@@ -373,5 +393,9 @@ class EventEffectHandler {
         case .none:
             return nil
         }
+    }
+    
+    func setWordSetType(_ type: WordSetType) {
+        wordSetType = type
     }
 }

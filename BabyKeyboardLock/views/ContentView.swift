@@ -35,6 +35,10 @@ struct ContentView: View {
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
     @AppStorage("selectedTranslationLanguage") var selectedTranslationLanguage: TranslationLanguage = .none
+    @AppStorage("selectedWordSetType") var savedWordSetType: String = WordSetType.standard.rawValue
+    
+    @State private var showWordSetEditor = false
+    @StateObject private var customWordSetsManager = CustomWordSetsManager.shared
     
     @State var hoveringMoreButton: Bool = false
     var body: some View {
@@ -117,6 +121,44 @@ struct ContentView: View {
                 .onChange(of: eventHandler.selectedTranslationLanguage) { newVal in
                     selectedTranslationLanguage = newVal
                 }
+                
+                // Word set selection
+                Picker("Word Set", selection: $eventHandler.selectedWordSetType) {
+                    ForEach(WordSetType.allCases) { type in
+                        Text(type.localizedString)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .onChange(of: eventHandler.selectedWordSetType) { newVal in
+                    savedWordSetType = newVal.rawValue
+                    if newVal == .mainWords && customWordSetsManager.wordSets.isEmpty {
+                        // If switching to mainWords but no sets exist, show editor
+                        showWordSetEditor = true
+                    }
+                }
+                
+                if eventHandler.selectedWordSetType == .mainWords {
+                    HStack {
+                        Text("Main words")
+                            .foregroundColor(.secondary)
+                            .font(.subheadline)
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            showWordSetEditor = true
+                        }) {
+                            Image(systemName: "pencil")
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                    
+                    if let currentSet = customWordSetsManager.currentWordSet {
+                        Text("Contains \(currentSet.words.count) words")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
             }
             
             Toggle(isOn: $lockKeyboardOnLaunch) {
@@ -137,10 +179,16 @@ struct ContentView: View {
         }.onReceive(eventHandler.$isLocked) { newVal in
             showOrCloseAnimationWindow(isLocked: newVal)
         }.onAppear() {
+            // Update the event handler with the saved word set type
+            if let type = WordSetType(rawValue: savedWordSetType) {
+                eventHandler.selectedWordSetType = type
+            }
+            
             debugPrint("onAppear --- ")
             guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == MainWindowID }) else { return}
-            
-            
+        }
+        .sheet(isPresented: $showWordSetEditor) {
+            WordSetEditorView()
         }
     }
     
@@ -185,6 +233,88 @@ struct ContentView: View {
             .openInWindow(id: AnimationWindowID, sender: self)
     }
     
+}
+
+struct WordSetEditorView: View {
+    @Environment(\.presentationMode) var presentationMode
+    @StateObject private var customWordSetsManager = CustomWordSetsManager.shared
+    @State private var words: [CustomWordPair] = []
+    @State private var newEnglishWord: String = ""
+    @State private var newTranslation: String = ""
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Main Words")
+                .font(.headline)
+            
+            Text("Edit the words used in 'Main Words' set")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            List {
+                ForEach(words) { word in
+                    HStack {
+                        Text(word.english)
+                        Spacer()
+                        Text(word.translation)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .onDelete(perform: deleteWord)
+            }
+            .listStyle(PlainListStyle())
+            .frame(height: 200)
+            
+            HStack {
+                TextField("English word", text: $newEnglishWord)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                
+                TextField("Translation", text: $newTranslation)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                
+                Button(action: addWord) {
+                    Image(systemName: "plus")
+                }
+                .disabled(newEnglishWord.isEmpty || newTranslation.isEmpty)
+            }
+            
+            HStack {
+                Spacer()
+                
+                Button("Cancel") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                
+                Button("Save") {
+                    customWordSetsManager.updateMainWords(words: words)
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .disabled(words.isEmpty)
+            }
+        }
+        .padding()
+        .frame(width: 400, height: 400)
+        .onAppear {
+            if let currentSet = customWordSetsManager.currentWordSet {
+                words = currentSet.words
+            }
+        }
+    }
+    
+    private func addWord() {
+        guard !newEnglishWord.isEmpty && !newTranslation.isEmpty else { return }
+        
+        let newWord = CustomWordPair(english: newEnglishWord, translation: newTranslation)
+        words.append(newWord)
+        
+        // Clear the input fields
+        newEnglishWord = ""
+        newTranslation = ""
+    }
+    
+    private func deleteWord(at offsets: IndexSet) {
+        words.remove(atOffsets: offsets)
+    }
 }
 
 #Preview {
