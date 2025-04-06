@@ -27,6 +27,10 @@ enum TranslationLanguage: String, CaseIterable, Identifiable {
     case french = "TranslationLanguage.french"
     case russian = "TranslationLanguage.russian"
     case german = "TranslationLanguage.german"
+    case spanish = "TranslationLanguage.spanish"
+    case italian = "TranslationLanguage.italian"
+    case japanese = "TranslationLanguage.japanese"
+    case chinese = "TranslationLanguage.chinese"
     
     var id: Self {
         return self
@@ -46,6 +50,14 @@ enum TranslationLanguage: String, CaseIterable, Identifiable {
             return "ru-RU"
         case .german:
             return "de-DE"
+        case .spanish:
+            return "es-ES"
+        case .italian:
+            return "it-IT"
+        case .japanese:
+            return "ja-JP"
+        case .chinese:
+            return "zh-CN"
         }
     }
 }

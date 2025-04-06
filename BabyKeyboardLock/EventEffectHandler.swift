@@ -159,6 +159,122 @@ class EventEffectHandler {
         "zebra": "Zebra", "zip": "Reißverschluss", "zap": "zappen", "zig": "Zickzack", "zoo": "Zoo", "zen": "Zen", "zero": "null", "zone": "Zone"
     ]
     
+    let spanishTranslations: [String: String] = [
+        "apple": "manzana", "ant": "hormiga", "air": "aire", "arm": "brazo", "axe": "hacha", "all": "todo", "ask": "preguntar", "and": "y", "add": "añadir",
+        "ball": "pelota", "bat": "murciélago", "bag": "bolsa", "bed": "cama", "bear": "oso", "bug": "bicho", "bun": "bollo", "bus": "autobús", "big": "grande", "bit": "pedazo",
+        "cat": "gato", "car": "coche", "cow": "vaca", "cup": "taza", "cap": "gorra", "can": "poder", "cut": "cortar", "cry": "llorar", "corn": "maíz",
+        "dog": "perro", "duck": "pato", "dot": "punto", "dig": "cavar", "doll": "muñeca", "dip": "mojar", "day": "día", "den": "guarida", "dam": "presa",
+        "egg": "huevo", "ear": "oreja", "eat": "comer", "end": "fin", "eye": "ojo", "elf": "elfo", "eel": "anguila", "edge": "borde", "easy": "fácil",
+        "fish": "pez", "fan": "ventilador", "fog": "niebla", "fat": "gordo", "fit": "ajustar", "fig": "higo", "fun": "diversión", "far": "lejos", "fox": "zorro",
+        "goat": "cabra", "gum": "chicle", "gap": "brecha", "got": "conseguido", "gun": "pistola", "gas": "gas", "gut": "tripa", "gig": "concierto", "go": "ir",
+        "hat": "sombrero", "hen": "gallina", "hop": "salto", "hit": "golpear", "hug": "abrazo", "hot": "caliente", "hip": "cadera", "hum": "tararear", "hut": "cabaña",
+        "ice": "hielo", "ink": "tinta", "igloo": "iglú", "ill": "enfermo", "inn": "posada", "it": "ello", "is": "es", "if": "si", "in": "en",
+        "jam": "mermelada", "jug": "jarra", "jet": "jet", "job": "trabajo", "jog": "trotar", "jaw": "mandíbula", "joy": "alegría", "jump": "saltar", "jot": "anotar",
+        "kite": "cometa", "key": "llave", "kid": "niño", "kit": "kit", "king": "rey", "kick": "patada", "kind": "amable", "keep": "mantener", "kitty": "gatito",
+        "lion": "león", "leg": "pierna", "lip": "labio", "lap": "regazo", "log": "tronco", "let": "dejar", "lot": "mucho", "low": "bajo", "lid": "tapa",
+        "moon": "luna", "man": "hombre", "map": "mapa", "mug": "taza", "mat": "alfombrilla", "mix": "mezcla", "mud": "barro", "mom": "mamá", "me": "yo", "mad": "loco",
+        "nest": "nido", "net": "red", "nap": "siesta", "nut": "nuez", "nod": "asentir", "new": "nuevo", "not": "no", "no": "no", "nice": "agradable",
+        "owl": "búho", "ox": "buey", "oil": "aceite", "odd": "impar", "off": "apagado", "old": "viejo", "on": "en", "out": "fuera", "oak": "roble",
+        "pig": "cerdo", "pen": "bolígrafo", "pot": "olla", "pan": "sartén", "pet": "mascota", "pin": "alfiler", "pop": "pop", "pit": "foso", "pat": "palmadita",
+        "queen": "reina", "quilt": "colcha", "quiz": "cuestionario", "quick": "rápido", "quit": "dejar", "quack": "cuac", "quest": "búsqueda",
+        "rat": "rata", "rug": "alfombra", "run": "correr", "red": "rojo", "row": "fila", "rip": "rasgar", "rob": "robar", "ram": "carnero", "rod": "vara",
+        "sun": "sol", "sit": "sentarse", "sip": "sorbo", "sad": "triste", "sow": "sembrar", "set": "conjunto", "saw": "sierra", "sea": "mar", "six": "seis",
+        "top": "arriba", "tap": "grifo", "tin": "estaño", "toy": "juguete", "tip": "consejo", "tag": "etiqueta", "tub": "bañera", "tan": "bronceado", "ten": "diez",
+        "umbrella": "paraguas", "up": "arriba", "use": "usar", "us": "nosotros", "urn": "urna", "ugly": "feo", "unit": "unidad",
+        "van": "furgoneta", "vet": "veterinario", "vase": "jarrón", "vat": "cuba", "vie": "competir", "via": "vía", "vest": "chaleco", "vivid": "vívido",
+        "wet": "mojado", "win": "ganar", "wig": "peluca", "wax": "cera", "way": "camino", "wow": "guau", "web": "web", "was": "era", "will": "voluntad",
+        "x-ray": "rayos-x", "xylophone": "xilófono", "xenon": "xenón",
+        "yak": "yak", "yes": "sí", "yarn": "hilo", "yell": "gritar", "yet": "aún", "yum": "rico", "you": "tú", "young": "joven",
+        "zebra": "cebra", "zip": "cerniera", "zap": "golpear", "zig": "zigzag", "zoo": "zoo", "zen": "zen", "zero": "cero", "zone": "zona"
+    ]
+    
+    let italianTranslations: [String: String] = [
+        "apple": "mela", "ant": "formica", "air": "aria", "arm": "braccio", "axe": "ascia", "all": "tutti", "ask": "chiedere", "and": "e", "add": "aggiungere",
+        "ball": "palla", "bat": "pipistrello", "bag": "borsa", "bed": "letto", "bear": "orso", "bug": "insetto", "bun": "panino", "bus": "autobus", "big": "grande", "bit": "pezzo",
+        "cat": "gatto", "car": "auto", "cow": "mucca", "cup": "tazza", "cap": "cappello", "can": "potere", "cut": "tagliare", "cry": "piangere", "corn": "mais",
+        "dog": "cane", "duck": "anatra", "dot": "punto", "dig": "scavare", "doll": "bambola", "dip": "immergere", "day": "giorno", "den": "tana", "dam": "diga",
+        "egg": "uovo", "ear": "orecchio", "eat": "mangiare", "end": "fine", "eye": "occhio", "elf": "elfo", "eel": "anguilla", "edge": "bordo", "easy": "facile",
+        "fish": "pesce", "fan": "ventilatore", "fog": "nebbia", "fat": "grasso", "fit": "adattare", "fig": "fico", "fun": "divertimento", "far": "lontano", "fox": "volpe",
+        "goat": "capra", "gum": "gomma", "gap": "divario", "got": "ottenuto", "gun": "pistola", "gas": "gas", "gut": "intestino", "gig": "concerto", "go": "andare",
+        "hat": "cappello", "hen": "gallina", "hop": "salto", "hit": "colpire", "hug": "abbraccio", "hot": "caldo", "hip": "anca", "hum": "canticchiare", "hut": "capanna",
+        "ice": "ghiaccio", "ink": "inchiostro", "igloo": "igloo", "ill": "malato", "inn": "locanda", "it": "esso", "is": "è", "if": "se", "in": "in",
+        "jam": "marmellata", "jug": "brocca", "jet": "jet", "job": "lavoro", "jog": "jogging", "jaw": "mascella", "joy": "gioia", "jump": "saltare", "jot": "annotare",
+        "kite": "aquilone", "key": "chiave", "kid": "bambino", "kit": "kit", "king": "re", "kick": "calcio", "kind": "gentile", "keep": "tenere", "kitty": "gattino",
+        "lion": "leone", "leg": "gamba", "lip": "labbro", "lap": "giro", "log": "tronco", "let": "lasciare", "lot": "molto", "low": "basso", "lid": "coperchio",
+        "moon": "luna", "man": "uomo", "map": "mappa", "mug": "tazza", "mat": "tappetino", "mix": "miscela", "mud": "fango", "mom": "mamma", "me": "me", "mad": "pazzo",
+        "nest": "nido", "net": "rete", "nap": "pisolino", "nut": "noce", "nod": "cenno", "new": "nuovo", "not": "non", "no": "no", "nice": "bello",
+        "owl": "gufo", "ox": "bue", "oil": "olio", "odd": "dispari", "off": "spento", "old": "vecchio", "on": "su", "out": "fuori", "oak": "quercia",
+        "pig": "maiale", "pen": "penna", "pot": "pentola", "pan": "padella", "pet": "animale", "pin": "spillo", "pop": "pop", "pit": "fossa", "pat": "carezza",
+        "queen": "regina", "quilt": "trapunta", "quiz": "quiz", "quick": "veloce", "quit": "uscire", "quack": "qua qua", "quest": "ricerca",
+        "rat": "topo", "rug": "tappeto", "run": "correre", "red": "rosso", "row": "fila", "rip": "strappare", "rob": "rubare", "ram": "ariete", "rod": "asta",
+        "sun": "sole", "sit": "sedersi", "sip": "sorseggiare", "sad": "triste", "sow": "seminare", "set": "set", "saw": "sega", "sea": "mare", "six": "sei",
+        "top": "cima", "tap": "rubinetto", "tin": "latta", "toy": "giocattolo", "tip": "consiglio", "tag": "etichetta", "tub": "vasca", "tan": "abbronzatura", "ten": "dieci",
+        "umbrella": "ombrello", "up": "su", "use": "usare", "us": "noi", "urn": "urna", "ugly": "brutto", "unit": "unità",
+        "van": "furgone", "vet": "veterinario", "vase": "vaso", "vat": "tino", "vie": "competere", "via": "via", "vest": "gilet", "vivid": "vivido",
+        "wet": "bagnato", "win": "vincere", "wig": "parrucca", "wax": "cera", "way": "via", "wow": "wow", "web": "web", "was": "era", "will": "volontà",
+        "x-ray": "raggi x", "xylophone": "xilofono", "xenon": "xenon",
+        "yak": "yak", "yes": "sì", "yarn": "filato", "yell": "urlare", "yet": "ancora", "yum": "yum", "you": "tu", "young": "giovane",
+        "zebra": "zebra", "zip": "cerniera", "zap": "colpire", "zig": "zigzag", "zoo": "zoo", "zen": "zen", "zero": "zero", "zone": "zona"
+    ]
+    
+    let japaneseTranslations: [String: String] = [
+        "apple": "りんご", "ant": "あり", "air": "くうき", "arm": "うで", "axe": "おの", "all": "すべて", "ask": "たずねる", "and": "そして", "add": "くわえる",
+        "ball": "ボール", "bat": "こうもり", "bag": "かばん", "bed": "ベッド", "bear": "くま", "bug": "むし", "bun": "パン", "bus": "バス", "big": "おおきい", "bit": "かけら",
+        "cat": "ねこ", "car": "くるま", "cow": "うし", "cup": "カップ", "cap": "ぼうし", "can": "できる", "cut": "きる", "cry": "なく", "corn": "とうもろこし",
+        "dog": "いぬ", "duck": "あひる", "dot": "てん", "dig": "ほる", "doll": "にんぎょう", "dip": "つける", "day": "ひ", "den": "あな", "dam": "ダム",
+        "egg": "たまご", "ear": "みみ", "eat": "たべる", "end": "おわり", "eye": "め", "elf": "エルフ", "eel": "うなぎ", "edge": "はし", "easy": "かんたん",
+        "fish": "さかな", "fan": "せんぷうき", "fog": "きり", "fat": "ふとい", "fit": "あう", "fig": "いちじく", "fun": "たのしい", "far": "とおい", "fox": "きつね",
+        "goat": "やぎ", "gum": "ガム", "gap": "すきま", "got": "えた", "gun": "ピストル", "gas": "ガス", "gut": "はらわた", "gig": "ライブ", "go": "いく",
+        "hat": "ぼうし", "hen": "めんどり", "hop": "はねる", "hit": "たたく", "hug": "だきしめる", "hot": "あつい", "hip": "こし", "hum": "ハミング", "hut": "こや",
+        "ice": "こおり", "ink": "インク", "igloo": "かまくら", "ill": "びょうき", "inn": "やど", "it": "それ", "is": "です", "if": "もし", "in": "なかに",
+        "jam": "ジャム", "jug": "かめ", "jet": "ジェット", "job": "しごと", "jog": "ジョギング", "jaw": "あご", "joy": "よろこび", "jump": "ジャンプ", "jot": "メモ",
+        "kite": "たこ", "key": "かぎ", "kid": "こども", "kit": "キット", "king": "おう", "kick": "ける", "kind": "しんせつ", "keep": "たもつ", "kitty": "こねこ",
+        "lion": "ライオン", "leg": "あし", "lip": "くちびる", "lap": "ひざ", "log": "まるた", "let": "させる", "lot": "たくさん", "low": "ひくい", "lid": "ふた",
+        "moon": "つき", "man": "おとこ", "map": "ちず", "mug": "マグカップ", "mat": "マット", "mix": "まぜる", "mud": "どろ", "mom": "かあさん", "me": "わたし", "mad": "おこった",
+        "nest": "す", "net": "あみ", "nap": "うたたね", "nut": "ナッツ", "nod": "うなずく", "new": "あたらしい", "not": "ない", "no": "いいえ", "nice": "すてき",
+        "owl": "ふくろう", "ox": "うし", "oil": "あぶら", "odd": "きすう", "off": "オフ", "old": "ふるい", "on": "オン", "out": "そと", "oak": "かしの木",
+        "pig": "ぶた", "pen": "ペン", "pot": "なべ", "pan": "フライパン", "pet": "ペット", "pin": "ピン", "pop": "ポップ", "pit": "あな", "pat": "ポン",
+        "queen": "じょおう", "quilt": "キルト", "quiz": "クイズ", "quick": "はやい", "quit": "やめる", "quack": "ガーガー", "quest": "たんきゅう",
+        "rat": "ねずみ", "rug": "じゅうたん", "run": "はしる", "red": "あか", "row": "れつ", "rip": "やぶる", "rob": "うばう", "ram": "おひつじ", "rod": "さお",
+        "sun": "たいよう", "sit": "すわる", "sip": "すする", "sad": "かなしい", "sow": "まく", "set": "セット", "saw": "のこぎり", "sea": "うみ", "six": "ろく",
+        "top": "てっぺん", "tap": "たたく", "tin": "すず", "toy": "おもちゃ", "tip": "ヒント", "tag": "タグ", "tub": "たらい", "tan": "ひやけ", "ten": "じゅう",
+        "umbrella": "かさ", "up": "うえ", "use": "つかう", "us": "わたしたち", "urn": "つぼ", "ugly": "みにくい", "unit": "たんい",
+        "van": "バン", "vet": "じゅうい", "vase": "かびん", "vat": "おけ", "vie": "きそう", "via": "けいゆ", "vest": "ベスト", "vivid": "あざやか",
+        "wet": "ぬれた", "win": "かつ", "wig": "かつら", "wax": "ろう", "way": "みち", "wow": "わあ", "web": "ウェブ", "was": "だった", "will": "つもり",
+        "x-ray": "レントゲン", "xylophone": "木琴", "xenon": "キセノン",
+        "yak": "ヤク", "yes": "はい", "yarn": "毛糸", "yell": "さけぶ", "yet": "まだ", "yum": "おいしい", "you": "あなた", "young": "わかい",
+        "zebra": "しまうま", "zip": "ジッパー", "zap": "ピシッ", "zig": "ジグザグ", "zoo": "どうぶつえん", "zen": "禅", "zero": "ゼロ", "zone": "エリア"
+    ]
+    
+    let chineseTranslations: [String: String] = [
+        "apple": "苹果", "ant": "蚂蚁", "air": "空气", "arm": "手臂", "axe": "斧头", "all": "全部", "ask": "问", "and": "和", "add": "添加",
+        "ball": "球", "bat": "蝙蝠", "bag": "包", "bed": "床", "bear": "熊", "bug": "虫子", "bun": "面包", "bus": "公交车", "big": "大", "bit": "一点",
+        "cat": "猫", "car": "车", "cow": "牛", "cup": "杯子", "cap": "帽子", "can": "能", "cut": "切", "cry": "哭", "corn": "玉米",
+        "dog": "狗", "duck": "鸭子", "dot": "点", "dig": "挖", "doll": "娃娃", "dip": "蘸", "day": "天", "den": "洞穴", "dam": "水坝",
+        "egg": "蛋", "ear": "耳朵", "eat": "吃", "end": "结束", "eye": "眼睛", "elf": "精灵", "eel": "鳗鱼", "edge": "边缘", "easy": "容易",
+        "fish": "鱼", "fan": "风扇", "fog": "雾", "fat": "胖", "fit": "适合", "fig": "无花果", "fun": "有趣", "far": "远", "fox": "狐狸",
+        "goat": "山羊", "gum": "口香糖", "gap": "间隙", "got": "得到", "gun": "枪", "gas": "气体", "gut": "肠子", "gig": "演出", "go": "去",
+        "hat": "帽子", "hen": "母鸡", "hop": "跳", "hit": "打", "hug": "拥抱", "hot": "热", "hip": "臀部", "hum": "哼唱", "hut": "小屋",
+        "ice": "冰", "ink": "墨水", "igloo": "冰屋", "ill": "生病", "inn": "旅馆", "it": "它", "is": "是", "if": "如果", "in": "在",
+        "jam": "果酱", "jug": "壶", "jet": "喷气机", "job": "工作", "jog": "慢跑", "jaw": "下巴", "joy": "喜悦", "jump": "跳", "jot": "记下",
+        "kite": "风筝", "key": "钥匙", "kid": "孩子", "kit": "工具包", "king": "国王", "kick": "踢", "kind": "友好", "keep": "保持", "kitty": "小猫",
+        "lion": "狮子", "leg": "腿", "lip": "嘴唇", "lap": "大腿", "log": "原木", "let": "让", "lot": "很多", "low": "低", "lid": "盖子",
+        "moon": "月亮", "man": "男人", "map": "地图", "mug": "杯子", "mat": "垫子", "mix": "混合", "mud": "泥", "mom": "妈妈", "me": "我", "mad": "生气",
+        "nest": "巢", "net": "网", "nap": "小睡", "nut": "坚果", "nod": "点头", "new": "新", "not": "不", "no": "不", "nice": "好",
+        "owl": "猫头鹰", "ox": "牛", "oil": "油", "odd": "奇数", "off": "关", "old": "老", "on": "开", "out": "出", "oak": "橡树",
+        "pig": "猪", "pen": "笔", "pot": "锅", "pan": "平底锅", "pet": "宠物", "pin": "别针", "pop": "流行", "pit": "坑", "pat": "拍",
+        "queen": "女王", "quilt": "被子", "quiz": "测验", "quick": "快", "quit": "退出", "quack": "嘎嘎", "quest": "寻求",
+        "rat": "老鼠", "rug": "地毯", "run": "跑", "red": "红色", "row": "行", "rip": "撕", "rob": "抢", "ram": "公羊", "rod": "杆",
+        "sun": "太阳", "sit": "坐", "sip": "啜饮", "sad": "悲伤", "sow": "播种", "set": "套", "saw": "锯", "sea": "海", "six": "六",
+        "top": "顶部", "tap": "水龙头", "tin": "锡", "toy": "玩具", "tip": "提示", "tag": "标签", "tub": "浴缸", "tan": "晒黑", "ten": "十",
+        "umbrella": "伞", "up": "上", "use": "使用", "us": "我们", "urn": "骨灰盒", "ugly": "丑", "unit": "单位",
+        "van": "厢式货车", "vet": "兽医", "vase": "花瓶", "vat": "大桶", "vie": "竞争", "via": "通过", "vest": "背心", "vivid": "生动",
+        "wet": "湿", "win": "赢", "wig": "假发", "wax": "蜡", "way": "路", "wow": "哇", "web": "网络", "was": "是", "will": "将",
+        "x-ray": "X光", "xylophone": "木琴", "xenon": "氙",
+        "yak": "牦牛", "yes": "是", "yarn": "纱线", "yell": "叫喊", "yet": "尚", "yum": "好吃", "you": "你", "young": "年轻",
+        "zebra": "斑马", "zip": "拉链", "zap": "啪", "zig": "锯齿", "zoo": "动物园", "zen": "禅", "zero": "零", "zone": "区域"
+    ]
+    
     let synth = AVSpeechSynthesizer()
     var translationLanguage: TranslationLanguage = .none
     
@@ -246,6 +362,14 @@ class EventEffectHandler {
             return russianTranslations[word.lowercased()]
         case .german:
             return germanTranslations[word.lowercased()]
+        case .spanish:
+            return spanishTranslations[word.lowercased()]
+        case .italian:
+            return italianTranslations[word.lowercased()]
+        case .japanese:
+            return japaneseTranslations[word.lowercased()]
+        case .chinese:
+            return chineseTranslations[word.lowercased()]
         case .none:
             return nil
         }
