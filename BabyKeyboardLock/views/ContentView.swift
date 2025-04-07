@@ -160,27 +160,27 @@ struct ContentView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
+                }
+                
+                // Word display duration settings - moved outside the if block to always appear in speakAKeyWord mode
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("Word Display Duration: \(String(format: "%.1f", wordDisplayDuration))s")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                     
-                    // Word display duration settings
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text("Word Display Duration: \(String(format: "%.1f", wordDisplayDuration))s")
-                            .font(.caption)
+                    HStack {
+                        Text("1s")
+                            .font(.caption2)
                             .foregroundColor(.secondary)
                         
-                        HStack {
-                            Text("1s")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            
-                            Slider(value: $wordDisplayDuration, in: 1...10, step: 0.5)
-                            
-                            Text("10s")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                        }
+                        Slider(value: $wordDisplayDuration, in: 1...10, step: 0.5)
+                        
+                        Text("10s")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
                     }
-                    .padding(.top, 5)
                 }
+                .padding(.top, 5)
             }
             
             if eventHandler.selectedLockEffect == .speakRandomWord {
@@ -282,7 +282,7 @@ struct ContentView: View {
     private func showOrCloseAnimationWindow(isLocked: Bool) {
         if (!isLocked) {
             NSApp.windows.forEach { window in
-                if window.identifier?.rawValue == AnimationWindowID {
+                if window.identifier?.rawValue == AnimationWindowID || window.identifier?.rawValue == WordDisplayWindowID {
                     window.close()
                 }
             }

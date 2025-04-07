@@ -105,6 +105,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             wordDisplayWindow.center()
             wordDisplayWindow.setFrameAutosaveName("Word Display Window")
             wordDisplayWindow.contentView = NSHostingView(rootView: WordDisplayView())
+            wordDisplayWindow.level = .floating // Ensure it appears above other windows
+            wordDisplayWindow.ignoresMouseEvents = true // Prevent mouse interaction
+            wordDisplayWindow.titlebarAppearsTransparent = true
             wordDisplayWindow.orderFrontRegardless()
         }
     }
