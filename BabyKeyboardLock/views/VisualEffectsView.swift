@@ -24,6 +24,7 @@ struct VisualEffectsView: View {
     @State private var animalType = 0
     @State private var showRainbowTrail = false
     @State private var rainbowPoints: [CGPoint] = []
+    @State private var rainbowOpacities: [Double] = []
     
     var body: some View {
         GeometryReader { geometry in
@@ -59,7 +60,8 @@ struct VisualEffectsView: View {
                 if eventHandler.selectedLockEffect == .rainbowTrail {
                     RainbowTrailEffectView(
                         isActive: $showRainbowTrail,
-                        points: $rainbowPoints
+                        points: $rainbowPoints,
+                        opacities: $rainbowOpacities
                     )
                 }
             }
@@ -67,10 +69,11 @@ struct VisualEffectsView: View {
                 windowSize = NSScreen.main?.frame.size ?? CGSize(width: 800, height: 600)
                 debugPrint("VisualEffectsView -------- windowSize: \(windowSize)")
             }
-            .onChange(of: eventHandler.isLocked) { newVal in
+            .onChange(of: eventHandler.isLocked) { _, newVal in
                 if !newVal {
                     initialized = false
                     rainbowPoints = []
+                    rainbowOpacities = []
                 }
             }
             .onReceive(eventHandler.$lastKeyString) { _ in
@@ -102,13 +105,24 @@ struct VisualEffectsView: View {
                     starCount += 1
                     showStars = true
                 case .animals:
-                    animalType = Int.random(in: 0...5) // Different animal types
+                    animalType = Int.random(in: 0...7) // Different animal types
                     showAnimals = true
+                    debugPrint("Triggering animal effect with type: \(animalType)")
                 case .rainbowTrail:
                     rainbowPoints.append(effectPosition)
-                    if rainbowPoints.count > 20 {
-                        rainbowPoints.removeFirst()
+                    rainbowOpacities.append(0.8) // Start with high opacity
+                    
+                    // Reduce opacity of existing points
+                    for i in 0..<rainbowOpacities.count-1 {
+                        rainbowOpacities[i] = max(0.1, rainbowOpacities[i] - 0.07)
                     }
+                    
+                    // Remove oldest points when too many
+                    if rainbowPoints.count > 30 {
+                        rainbowPoints.removeFirst()
+                        rainbowOpacities.removeFirst()
+                    }
+                    
                     showRainbowTrail = true
                 default:
                     break
@@ -128,7 +142,7 @@ struct BubblesEffectView: View {
     
     var body: some View {
         ZStack {
-            ForEach(0..<15, id: \.self) { index in
+            ForEach(0..<30, id: \.self) { index in
                 Bubble(count: count, index: index, position: position)
             }
         }
@@ -144,43 +158,66 @@ struct Bubble: View {
     @State private var scale: CGFloat = 0
     @State private var opacity: Double = 0
     
+    // Get a random pastel color for each bubble
+    var bubbleColor: Color {
+        let colors: [Color] = [
+            .blue, .green, .purple, .pink, .orange, .teal, .indigo, .mint
+        ]
+        return colors[index % colors.count]
+    }
+    
     var body: some View {
         Circle()
             .fill(
-                LinearGradient(
+                RadialGradient(
                     gradient: Gradient(colors: [
-                        Color.blue.opacity(0.4),
-                        Color.blue.opacity(0.2)
+                        bubbleColor.opacity(0.7),
+                        bubbleColor.opacity(0.2)
                     ]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: 25
                 )
             )
-            .frame(width: CGFloat.random(in: 10...40), height: CGFloat.random(in: 10...40))
+            .overlay(
+                Circle()
+                    .stroke(Color.white.opacity(0.5), lineWidth: 2)
+                    .blur(radius: 1)
+                    .offset(x: -5, y: -5)
+                    .mask(Circle())
+            )
+            .frame(width: CGFloat.random(in: 20...70), height: CGFloat.random(in: 20...70))
             .position(x: position.x, y: position.y)
             .offset(offset)
             .scaleEffect(scale)
             .opacity(opacity)
-            .onChange(of: count) { _ in
-                withAnimation(.easeOut(duration: 3.0)) {
+            .onChange(of: count) { _, _ in
+                let delay = Double(index) * 0.05
+                
+                withAnimation(Animation.easeOut(duration: 4.0).delay(delay)) {
                     let randomAngle = Double.random(in: 0...(2 * .pi))
-                    let randomDistance = CGFloat.random(in: 50...200)
+                    let randomDistance = CGFloat.random(in: 100...300)
                     offset = CGSize(
-                        width: cos(randomAngle) * randomDistance,
+                        width: cos(randomAngle) * randomDistance * 0.5,
                         height: sin(randomAngle) * randomDistance - randomDistance // Always float up
                     )
-                    scale = CGFloat.random(in: 0.5...1.5)
-                    opacity = 1
+                    scale = CGFloat.random(in: 0.7...1.5)
+                    opacity = Double.random(in: 0.7...1.0)
+                }
+                
+                // Add slight wobble animation
+                withAnimation(Animation.easeInOut(duration: 1.0).repeatForever().delay(delay)) {
+                    offset.width += CGFloat.random(in: -10...10)
                 }
                 
                 // Fade out and reset for reuse
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
                     withAnimation(.easeOut(duration: 0.5)) {
                         opacity = 0
                     }
                 }
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
                     offset = .zero
                     scale = 0
                 }
@@ -195,7 +232,7 @@ struct StarsEffectView: View {
     
     var body: some View {
         ZStack {
-            ForEach(0..<20, id: \.self) { index in
+            ForEach(0..<40, id: \.self) { index in
                 Star(count: count, index: index, position: position)
             }
         }
@@ -215,40 +252,41 @@ struct Star: View {
     var body: some View {
         Image(systemName: "star.fill")
             .foregroundColor(Color.yellow)
-            .frame(width: 30, height: 30)
+            .shadow(color: .yellow, radius: 5)
+            .frame(width: 40, height: 40)
             .position(x: position.x, y: position.y)
             .offset(offset)
             .scaleEffect(scale)
             .opacity(opacity)
             .rotationEffect(.degrees(rotation))
-            .onChange(of: count) { _ in
-                let delay = Double(index) * 0.05
+            .onChange(of: count) { _, _ in
+                let delay = Double(index) * 0.03
                 
                 withAnimation(Animation.easeOut(duration: 2.0).delay(delay)) {
                     let randomAngle = Double.random(in: 0...(2 * .pi))
-                    let randomDistance = CGFloat.random(in: 30...150)
+                    let randomDistance = CGFloat.random(in: 50...250)
                     offset = CGSize(
                         width: cos(randomAngle) * randomDistance,
                         height: sin(randomAngle) * randomDistance
                     )
-                    scale = CGFloat.random(in: 0.3...1.0)
-                    opacity = 1
+                    scale = CGFloat.random(in: 0.5...1.5)
+                    opacity = Double.random(in: 0.7...1.0)
                     rotation = Double.random(in: 0...360)
                 }
                 
                 // Twinkle animation
                 withAnimation(Animation.easeInOut(duration: 0.5).repeatForever().delay(delay)) {
-                    scale *= CGFloat.random(in: 0.8...1.2)
+                    scale *= CGFloat.random(in: 0.9...1.3)
                 }
                 
                 // Fade out and reset
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5 + delay) {
-                    withAnimation(.easeOut(duration: 0.5)) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.8 + delay) {
+                    withAnimation(.easeOut(duration: 0.7)) {
                         opacity = 0
                     }
                 }
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0 + delay) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5 + delay) {
                     offset = .zero
                     scale = 0
                     rotation = 0
@@ -262,9 +300,26 @@ struct AnimalsEffectView: View {
     @Binding var animalType: Int
     @Binding var position: CGPoint
     
+    // Add a @State counter to force redraw
+    @State private var counter: Int = 0
+    
     var body: some View {
         ZStack {
-            AnimalImage(animalType: animalType, position: position)
+            // Display multiple animals at once, with a key to force recreation
+            ForEach(0..<3, id: \.self) { index in
+                AnimalImage(
+                    animalType: (animalType + index) % 8,
+                    position: CGPoint(
+                        x: position.x + CGFloat.random(in: -50...50),
+                        y: position.y + CGFloat.random(in: -50...50)
+                    ),
+                    uniqueKey: "\(counter)-\(index)" // Force unique instances
+                )
+            }
+        }
+        .onChange(of: animalType) { _, _ in
+            counter += 1 // Increment counter to create new views
+            debugPrint("Animals counter updated: \(counter)")
         }
     }
 }
@@ -272,80 +327,153 @@ struct AnimalsEffectView: View {
 struct AnimalImage: View {
     let animalType: Int
     let position: CGPoint
+    let uniqueKey: String // Add a unique identifier
     
     @State private var scale: CGFloat = 0
     @State private var opacity: Double = 0
     @State private var bounce: CGFloat = 0
+    @State private var rotation: Double = 0
     
     var animalEmoji: String {
-        // Different animal emojis
-        let animals = ["🐶", "🐱", "🐰", "🐼", "🦊", "🐵"]
+        // Extended animal emojis collection
+        let animals = ["🐶", "🐱", "🐰", "🐼", "🦊", "🐵", "🐨", "🦁"]
         return animals[animalType % animals.count]
     }
     
     var body: some View {
         Text(animalEmoji)
-            .font(.system(size: 60))
+            .font(.system(size: 80))
+            .shadow(radius: 2)
             .position(x: position.x, y: position.y)
             .scaleEffect(scale)
             .opacity(opacity)
             .offset(y: bounce)
+            .rotationEffect(.degrees(rotation))
             .onAppear {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                    scale = 1.0
-                    opacity = 1.0
-                }
+                debugPrint("Animal appearing: \(animalEmoji) at position \(position) with key \(uniqueKey)")
                 
-                // Bounce animation
-                withAnimation(Animation.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true)) {
-                    bounce = -20
-                }
+                // Reset state to ensure animations trigger
+                scale = 0
+                opacity = 0
+                bounce = 0
+                rotation = 0
                 
-                // Fade out and reset
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    withAnimation(.easeOut(duration: 0.5)) {
-                        opacity = 0
-                        scale = 0.5
+                // Initial appear animation with slight delay to ensure proper rendering
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                        scale = 1.0
+                        opacity = 1.0
+                    }
+                    
+                    // Bounce animation
+                    withAnimation(Animation.easeInOut(duration: 0.4).repeatCount(5, autoreverses: true)) {
+                        bounce = -30
+                    }
+                    
+                    // Rotation wiggle
+                    withAnimation(Animation.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true)) {
+                        rotation = Double.random(in: -15...15)
+                    }
+                    
+                    // Fade out and reset after delay
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        withAnimation(.easeOut(duration: 0.7)) {
+                            opacity = 0
+                            scale = 0.5
+                            bounce = 100 // Drop down animation
+                            rotation = Double.random(in: -30...30)
+                        }
                     }
                 }
             }
+            .id(uniqueKey) // Ensure this view is recreated with new key
     }
 }
 
 struct RainbowTrailEffectView: View {
     @Binding var isActive: Bool
     @Binding var points: [CGPoint]
+    @Binding var opacities: [Double]
+    
+    // Timer to gradually fade out the trail after inactivity
+    @State private var timer: Timer? = nil
+    @State private var lastUpdateTime = Date()
     
     var body: some View {
         ZStack {
             // Draw a path through all points
             if points.count > 1 {
-                RainbowPath(points: points)
+                RainbowPath(points: points, opacities: opacities)
             }
+        }
+        .onAppear {
+            // Set up a timer to gradually fade the trail if no new points are added
+            timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+                let now = Date()
+                if now.timeIntervalSince(lastUpdateTime) > 2.0 && !points.isEmpty {
+                    withAnimation {
+                        // Reduce opacity of all points gradually
+                        for i in 0..<opacities.count {
+                            opacities[i] = max(0, opacities[i] - 0.05)
+                        }
+                        
+                        // Remove points that have faded completely
+                        while !opacities.isEmpty && opacities[0] <= 0.05 {
+                            opacities.removeFirst()
+                            if !points.isEmpty {
+                                points.removeFirst()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .onDisappear {
+            timer?.invalidate()
+            timer = nil
+        }
+        .onChange(of: points.count) { _, _ in
+            lastUpdateTime = Date()
         }
     }
 }
 
 struct RainbowPath: View {
     let points: [CGPoint]
+    let opacities: [Double]
     
     var body: some View {
-        Path { path in
-            guard let firstPoint = points.first else { return }
-            
-            path.move(to: firstPoint)
-            for point in points.dropFirst() {
-                path.addLine(to: point)
+        ZStack {
+            // Create segments between each pair of points with different opacities
+            ForEach(0..<max(0, points.count-1), id: \.self) { index in
+                Path { path in
+                    path.move(to: points[index])
+                    path.addLine(to: points[index+1])
+                }
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [.red, .orange, .yellow, .green, .blue, .purple]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ),
+                    style: StrokeStyle(
+                        lineWidth: getLineWidth(for: index),
+                        lineCap: .round,
+                        lineJoin: .round
+                    )
+                )
+                .opacity(index < opacities.count ? opacities[index] : 0.7)
+                .blur(radius: 2)
+                .shadow(color: .white.opacity(0.3), radius: 2)
             }
         }
-        .stroke(
-            LinearGradient(
-                gradient: Gradient(colors: [.red, .orange, .yellow, .green, .blue, .purple]),
-                startPoint: .leading,
-                endPoint: .trailing
-            ),
-            style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round)
-        )
-        .opacity(0.7)
+    }
+    
+    // Make newer segments thicker for a more dynamic trail
+    private func getLineWidth(for index: Int) -> CGFloat {
+        let baseWidth: CGFloat = 10
+        let position = CGFloat(index) / max(1, CGFloat(points.count - 2))
+        // Newer segments (higher indices) are thicker
+        return baseWidth * (0.5 + position)
     }
 } 
