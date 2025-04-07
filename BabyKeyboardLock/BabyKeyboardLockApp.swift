@@ -10,6 +10,7 @@ import Combine
 
 let AnimationWindowID = "animationTransparentWindow"
 let WordDisplayWindowID = "wordDisplayTransparentWindow"
+let VisualEffectsWindowID = "visualEffectsTransparentWindow"
 let MainWindowID = "main"
 
 @main
@@ -109,6 +110,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             wordDisplayWindow.ignoresMouseEvents = true // Prevent mouse interaction
             wordDisplayWindow.titlebarAppearsTransparent = true
             wordDisplayWindow.orderFrontRegardless()
+            
+            // Create the visual effects window for additional animations
+            let visualEffectsWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: NSScreen.main?.frame.width ?? 1200, height: NSScreen.main?.frame.height ?? 800),
+                styleMask: [.borderless, .fullSizeContentView],
+                backing: .buffered,
+                defer: false
+            )
+            visualEffectsWindow.identifier = NSUserInterfaceItemIdentifier(VisualEffectsWindowID)
+            visualEffectsWindow.backgroundColor = .clear
+            visualEffectsWindow.isReleasedWhenClosed = false
+            visualEffectsWindow.center()
+            visualEffectsWindow.setFrameAutosaveName("Visual Effects Window")
+            visualEffectsWindow.contentView = NSHostingView(rootView: VisualEffectsView())
+            visualEffectsWindow.level = .floating 
+            visualEffectsWindow.ignoresMouseEvents = true
+            visualEffectsWindow.titlebarAppearsTransparent = true
+            visualEffectsWindow.orderFrontRegardless()
         }
     }
     

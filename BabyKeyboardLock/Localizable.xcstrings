@@ -198,19 +198,63 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Konfetti"
+            "value" : "Konfettikanone"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Confetti"
+            "value" : "Confetti Cannon"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "五彩纸屑"
+          }
+        }
+      }
+    },
+    "LockEffect.bubbles" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Floating Bubbles"
+          }
+        }
+      }
+    },
+    "LockEffect.stars" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twinkling Stars"
+          }
+        }
+      }
+    },
+    "LockEffect.animals" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bouncing Animals"
+          }
+        }
+      }
+    },
+    "LockEffect.rainbowTrail" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Trail"
           }
         }
       }
