@@ -46,7 +46,7 @@ struct ContentView: View {
     @State private var babyName: String = ""
     
     var body: some View {
-       VStack(alignment: .leading, spacing: 20) {
+       VStack(alignment: .leading, spacing: 22) {
             HStack{
                 Spacer() // push the button to right
                 Menu() {
@@ -314,7 +314,7 @@ struct ContentView: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding()
-        .frame(width: 300, height: 400)
+        .frame(width: 300, height: 600)
         .onChange(of: eventHandler.isLocked) { oldVal, newVal in
             showOrCloseAnimationWindow(isLocked: newVal)
         }.onReceive(eventHandler.$isLocked) { newVal in
