@@ -45,6 +45,34 @@ struct ContentView: View {
     @State var hoveringMoreButton: Bool = false
     @State private var babyName: String = ""
     
+    // Calculate preferred content size based on effect type
+    private var preferredHeight: CGFloat {
+        var height: CGFloat = 300 // Base height for lock toggle and effect picker
+        
+        if !eventHandler.accessibilityPermissionGranted {
+            height += 120 // Extra space for permission message
+        }
+        
+        // Add space for voice options
+        if eventHandler.selectedLockEffect == .speakTheKey || 
+           eventHandler.selectedLockEffect == .speakAKeyWord || 
+           eventHandler.selectedLockEffect == .speakRandomWord {
+            height += 60
+        }
+        
+        // Add space for word-related options
+        if eventHandler.selectedLockEffect == .speakAKeyWord {
+            height += 300 // Translation picker, baby name, word set selection, edit buttons
+        }
+        
+        // Add space for random word options
+        if eventHandler.selectedLockEffect == .speakRandomWord {
+            height += 180 // Translation picker, edit button
+        }
+        
+        return height
+    }
+    
     var body: some View {
        VStack(alignment: .leading, spacing: 22) {
             HStack{
@@ -313,33 +341,59 @@ struct ContentView: View {
                 .font(.footnote)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding()
-        .frame(width: 300, height: 600)
-        .onChange(of: eventHandler.isLocked) { oldVal, newVal in
-            showOrCloseAnimationWindow(isLocked: newVal)
-        }.onReceive(eventHandler.$isLocked) { newVal in
-            showOrCloseAnimationWindow(isLocked: newVal)
-        }.onAppear() {
+        .padding(20)
+        .frame(minWidth: 300, idealWidth: 320, minHeight: preferredHeight)
+        .onAppear {
+            updateWindowSize()
+            
             // Update the event handler with the saved word set type
             if let type = WordSetType(rawValue: savedWordSetType) {
                 eventHandler.selectedWordSetType = type
             }
             
-            // Load the baby's name
+            // Load baby name from shared storage
             babyName = RandomWordList.shared.babyName
             
-            // Update personal voice setting
             eventHandler.usePersonalVoice = usePersonalVoice
             
             debugPrint("onAppear --- ")
             // Check if main window exists but don't create an unused variable
             _ = NSApp.windows.first(where: { $0.identifier?.rawValue == MainWindowID })
         }
+        .onChange(of: eventHandler.isLocked) { oldVal, newVal in
+            playLockSound(isLocked: newVal)
+        }
+        .onReceive(eventHandler.$isLocked) { newVal in
+            playLockSound(isLocked: newVal)
+        }
+        .onChange(of: eventHandler.selectedLockEffect) { _, _ in
+            updateWindowSize()
+        }
+        .onChange(of: eventHandler.accessibilityPermissionGranted) { _, _ in
+            updateWindowSize()
+        }
         .sheet(isPresented: $showWordSetEditor) {
             WordSetEditorView()
         }
         .sheet(isPresented: $showRandomWordEditor) {
             RandomWordEditorView()
+        }
+    }
+    
+    private func updateWindowSize() {
+        // Resize the window when effect changes
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            if let window = NSApp.windows.first(where: { $0.title == Bundle.applicationName || $0.title.isEmpty }) {
+                let contentSize = NSSize(width: 320, height: preferredHeight)
+                let frameSize = window.frameRect(forContentRect: NSRect(origin: .zero, size: contentSize)).size
+                
+                // Preserve the window's x and y position
+                var newRect = window.frame
+                newRect.size = frameSize
+                
+                // Animate the window resize
+                window.animator().setFrame(newRect, display: true)
+            }
         }
     }
     

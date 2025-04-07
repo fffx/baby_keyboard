@@ -14,6 +14,7 @@ struct VisualEffectsView: View {
     @State private var initialized = false
     @State private var effectPosition: CGPoint = .zero
     @State private var windowSize: CGSize = .zero
+    @State private var previousEffect: LockEffect = .none
     
     // Effect states
     @State private var showBubbles = false
@@ -25,6 +26,13 @@ struct VisualEffectsView: View {
     @State private var showRainbowTrail = false
     @State private var rainbowPoints: [CGPoint] = []
     @State private var rainbowOpacities: [Double] = []
+    
+    private func resetAllEffects() {
+        // Clear all animation states
+        rainbowPoints = []
+        rainbowOpacities = []
+        debugPrint("Resetting all visual effects")
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -68,12 +76,19 @@ struct VisualEffectsView: View {
             .onAppear {
                 windowSize = NSScreen.main?.frame.size ?? CGSize(width: 800, height: 600)
                 debugPrint("VisualEffectsView -------- windowSize: \(windowSize)")
+                previousEffect = eventHandler.selectedLockEffect
+            }
+            .onChange(of: eventHandler.selectedLockEffect) { _, newEffect in
+                // Reset effects when switching between effect types
+                if newEffect != previousEffect {
+                    resetAllEffects()
+                    previousEffect = newEffect
+                }
             }
             .onChange(of: eventHandler.isLocked) { _, newVal in
                 if !newVal {
                     initialized = false
-                    rainbowPoints = []
-                    rainbowOpacities = []
+                    resetAllEffects()
                 }
             }
             .onReceive(eventHandler.$lastKeyString) { _ in
@@ -253,6 +268,7 @@ struct Star: View {
         Image(systemName: "star.fill")
             .foregroundColor(Color.yellow)
             .shadow(color: .yellow, radius: 5)
+            .shadow(color: .yellow, radius: 10) // Double shadow for increased glow
             .frame(width: 40, height: 40)
             .position(x: position.x, y: position.y)
             .offset(offset)
@@ -270,7 +286,7 @@ struct Star: View {
                         height: sin(randomAngle) * randomDistance
                     )
                     scale = CGFloat.random(in: 0.5...1.5)
-                    opacity = Double.random(in: 0.7...1.0)
+                    opacity = Double.random(in: 0.8...1.0) // Higher minimum opacity
                     rotation = Double.random(in: 0...360)
                 }
                 
