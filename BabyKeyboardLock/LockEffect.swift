@@ -8,7 +8,7 @@ import SwiftUI
 
 enum LockEffect: String, CaseIterable, Identifiable{
     case none = "LockEffect.none"
-    case confettiConnon = "LockEffect.confettiCannon"
+    case confettiCannon = "LockEffect.confettiCannon"
     case speakTheKey = "LockEffect.speakTheKey"
     case speakAKeyWord = "LockEffect.speakAKeyWord"
     case speakRandomWord = "LockEffect.speakRandomWord"

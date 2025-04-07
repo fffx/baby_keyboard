@@ -44,7 +44,7 @@ struct EventHandlerUnitTests {
     @Test func testEffectChange() async throws {
         setUp()
         let handler = EventHandler()
-        handler.selectedLockEffect = .confettiConnon
-        #expect(handler.selectedLockEffect == .confettiConnon)
+        handler.selectedLockEffect = .confettiCannon
+        #expect(handler.selectedLockEffect == .confettiCannon)
     }
 }

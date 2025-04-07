@@ -283,58 +283,159 @@ class EventEffectHandler {
     var translationLanguage: TranslationLanguage = .none
     
     func handle(event: CGEvent, eventType: CGEventType, selectedLockEffect: LockEffect) -> String {
-        guard let str = getString(event: event, eventType: eventType) else {
+        let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+        let source = TISCopyCurrentKeyboardInputSource().takeRetainedValue()
+        var keyStr = ""
+        // for virtual keys
+        guard let layoutData = TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData) else {
             return ""
         }
+        // Properly cast the CFTypeRef to CFData
+        let cfData = unsafeBitCast(layoutData, to: CFData.self)
+        let ptr = CFDataGetBytePtr(cfData)
+        guard let safePtr = ptr else {
+            return ""
+        }
+        let keyLayout = safePtr.withMemoryRebound(to: UCKeyboardLayout.self, capacity: 1) { $0 }
+        var deadKeyState: UInt32 = 0
+        let maxLength = 4
+        var actualLength = 0
+        var actualStr = [UniChar](repeating: 0, count: maxLength)
+        _ = UCKeyTranslate(keyLayout, UInt16(keyCode), UInt16(kUCKeyActionDisplay),
+                      0, UInt32(LMGetKbdType()), OptionBits(kUCKeyTranslateNoDeadKeysMask),
+                      &deadKeyState, maxLength, &actualLength, &actualStr)
         
-        debugPrint("\(selectedLockEffect) ------- \(str)")
         
-        switch selectedLockEffect {
-        case .confettiConnon:
-            break
-        case .speakTheKey:
-            let utterance = createUtterance(for: str)
-            synth.speak(utterance)
-        case .speakAKeyWord:
-            let randomWord = getRandomWord(forKey: str)
-            debugPrint("speakAKeyWord------- \(randomWord)")
-            
-            let utterance = createUtterance(for: randomWord)
-            synth.speak(utterance)
-            
-            if translationLanguage != .none {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    if let translatedWord = self.getTranslation(word: randomWord, language: self.translationLanguage) {
-                        self.synth.speak(self.createUtterance(for: translatedWord, language: self.translationLanguage.languageCode))
-                    }
-                }
-            }
-            return randomWord
-        case .speakRandomWord:
-            if let randomWord = RandomWordList.shared.getRandomWord() {
-                debugPrint("speakRandomWord------- \(randomWord.english)")
-                
-                let utterance = createUtterance(for: randomWord.english)
-                synth.speak(utterance)
-                
-                if translationLanguage != .none {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        self.synth.speak(self.createUtterance(for: randomWord.translation, language: self.translationLanguage.languageCode))
-                    }
-                } else {
-                    // If no translation language is selected, speak the translation anyway
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        self.synth.speak(self.createUtterance(for: randomWord.translation))
-                    }
-                }
-                return randomWord.english
-            }
-            return str
-        default:
-            break
+        // debugPrint("Key code: \(actualStr) \(keyStr) \(keyCode) \([keyCode])")
+        // keyString
+        if actualLength > 0 {
+            keyStr = String(utf16CodeUnits: actualStr, count: actualLength)
         }
         
-        return str
+        switch selectedLockEffect {
+        case .none:
+            NSSound(named: "bottle")?.play()
+            // This is the keyString
+            return keyStr
+        case .confettiCannon:
+            // Show confetti
+            // This is the keyString
+            return keyStr
+        case .speakTheKey:
+            // Speak the letter
+            synth.stopSpeaking(at: .immediate)
+            let utterance = createUtterance(for: keyStr)
+            synth.speak(utterance)
+            
+            // This is the keyString
+            return keyStr
+        case .speakAKeyWord:
+            // Speak a word that starts with the letter
+            
+            // This is a random word that begins with the letter
+            let randomWord = getRandomWord(forKey: keyStr)
+            synth.stopSpeaking(at: .immediate)
+            
+            // Get translation if appropriate
+            if translationLanguage != .none, let translation = getTranslation(word: randomWord, language: translationLanguage) {
+                // First speak English
+                let englishUtterance = createUtterance(for: randomWord)
+                synth.speak(englishUtterance)
+                
+                // Then with a slight delay, speak the translation
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    let translationUtterance: AVSpeechUtterance
+                    
+                    switch self.translationLanguage {
+                    case .french:
+                        translationUtterance = self.createUtterance(for: translation, language: "fr-FR")
+                    case .russian:
+                        translationUtterance = self.createUtterance(for: translation, language: "ru-RU")
+                    case .german:
+                        translationUtterance = self.createUtterance(for: translation, language: "de-DE")
+                    case .spanish:
+                        translationUtterance = self.createUtterance(for: translation, language: "es-ES")
+                    case .italian:
+                        translationUtterance = self.createUtterance(for: translation, language: "it-IT")
+                    case .japanese:
+                        translationUtterance = self.createUtterance(for: translation, language: "ja-JP")
+                    case .chinese:
+                        translationUtterance = self.createUtterance(for: translation, language: "zh-CN")
+                    case .none:
+                        return
+                    }
+                    
+                    self.synth.speak(translationUtterance)
+                }
+            } else {
+                // Just speak English
+                let utterance = createUtterance(for: randomWord)
+                synth.speak(utterance)
+            }
+            
+            return randomWord
+        case .speakRandomWord:
+            synth.stopSpeaking(at: .immediate)
+            
+            // Get a random word from RandomWordList
+            let randomWord: RandomWord?
+            
+            // Chance to speak baby's name if set
+            if !RandomWordList.shared.babyName.isEmpty && Int.random(in: 1...4) == 1 {
+                // Use baby's name
+                let babyName = RandomWordList.shared.babyName
+                let utterance = createUtterance(for: babyName)
+                synth.speak(utterance)
+                return babyName
+            } else {
+                // Use random word from list
+                randomWord = RandomWordList.shared.getRandomWord()
+            }
+            
+            guard let randomWord = randomWord else {
+                return keyStr
+            }
+            
+            let englishWord = randomWord.english
+            
+            if translationLanguage != .none {
+                // First speak English
+                let englishUtterance = createUtterance(for: englishWord)
+                synth.speak(englishUtterance)
+                
+                // Then with a slight delay, speak the translation
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    let translationUtterance: AVSpeechUtterance
+                    
+                    switch self.translationLanguage {
+                    case .french:
+                        translationUtterance = self.createUtterance(for: randomWord.translation, language: "fr-FR")
+                    case .russian:
+                        translationUtterance = self.createUtterance(for: randomWord.translation, language: "ru-RU")
+                    case .german:
+                        translationUtterance = self.createUtterance(for: randomWord.translation, language: "de-DE")
+                    case .spanish:
+                        translationUtterance = self.createUtterance(for: randomWord.translation, language: "es-ES")
+                    case .italian:
+                        translationUtterance = self.createUtterance(for: randomWord.translation, language: "it-IT")
+                    case .japanese:
+                        translationUtterance = self.createUtterance(for: randomWord.translation, language: "ja-JP")
+                    case .chinese:
+                        translationUtterance = self.createUtterance(for: randomWord.translation, language: "zh-CN")
+                    case .none:
+                        return
+                    }
+                    
+                    self.synth.speak(translationUtterance)
+                }
+            } else {
+                // Just speak English
+                let utterance = createUtterance(for: englishWord)
+                synth.speak(utterance)
+            }
+            
+            return englishWord
+        }
     }
     
     func getString(event: CGEvent, eventType: CGEventType) -> String? {
@@ -352,9 +453,27 @@ class EventEffectHandler {
     func getRandomWord(forKey key: String) -> String {
         let key = key.lowercased()
         
+        // Check if baby's name starts with the key letter and add it to the possible words
+        let babyName = RandomWordList.shared.babyName
+        
         if wordSetType == .mainWords {
             let customMap = customWordSetsManager.getWordMap()
-            if let words = customMap[key], let randomWord = words.randomElement() {
+            
+            // Create a list of possible words for this key
+            var possibleWords: [String] = []
+            
+            // Add words from custom map
+            if let mapWords = customMap[key] {
+                possibleWords.append(contentsOf: mapWords)
+            }
+            
+            // Add baby's name if it starts with the right letter
+            if !babyName.isEmpty && babyName.lowercased().hasPrefix(key) {
+                possibleWords.append(babyName)
+            }
+            
+            // Return a random word if we have any
+            if let randomWord = possibleWords.randomElement() {
                 debugPrint("getWord from main words set ------- \(key) -- \(randomWord)")
                 return randomWord
             }
@@ -362,13 +481,25 @@ class EventEffectHandler {
         }
         
         // Default behavior using simpleWordsMap
-        guard let words = simpleWordsMap[key],
-              let randomWord = words.randomElement() else {
-            return key
+        var possibleWords: [String] = []
+        
+        // Add words from simpleWordsMap
+        if let mapWords = simpleWordsMap[key] {
+            possibleWords.append(contentsOf: mapWords)
         }
         
-        debugPrint("getWord ------- \(key) -- \(randomWord)")
-        return randomWord
+        // Add baby's name if it starts with the right letter
+        if !babyName.isEmpty && babyName.lowercased().hasPrefix(key) {
+            possibleWords.append(babyName)
+        }
+        
+        // Return a random word if we have any
+        if let randomWord = possibleWords.randomElement() {
+            debugPrint("getWord ------- \(key) -- \(randomWord)")
+            return randomWord
+        }
+        
+        return key
     }
     
     private func createUtterance(for str: String, language: String? = nil) -> AVSpeechUtterance {
@@ -390,6 +521,13 @@ class EventEffectHandler {
     
     // Get translation for a word based on the selected language
     func getTranslation(word: String, language: TranslationLanguage) -> String? {
+        let babyName = RandomWordList.shared.babyName
+        
+        // If the word is the baby's name, return it as its own translation
+        if !babyName.isEmpty && word.lowercased() == babyName.lowercased() {
+            return babyName
+        }
+        
         if wordSetType == .mainWords {
             if let translation = customWordSetsManager.getTranslation(for: word) {
                 return translation

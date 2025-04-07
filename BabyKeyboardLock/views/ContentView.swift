@@ -43,6 +43,8 @@ struct ContentView: View {
     @StateObject private var customWordSetsManager = CustomWordSetsManager.shared
     
     @State var hoveringMoreButton: Bool = false
+    @State private var babyName: String = ""
+    
     var body: some View {
        VStack(alignment: .leading, spacing: 20) {
             HStack{
@@ -124,6 +126,24 @@ struct ContentView: View {
                     selectedTranslationLanguage = newVal
                 }
                 
+                // Baby's name input field
+                HStack {
+                    Text("Baby's Name")
+                        .foregroundColor(.secondary)
+                        .font(.subheadline)
+                    
+                    Spacer()
+                    
+                    TextField("Enter name", text: $babyName, onCommit: {
+                        // Do nothing, prevents form submission behavior
+                    })
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .frame(width: 150)
+                        .onChange(of: babyName) { newValue in
+                            RandomWordList.shared.setBabyName(newValue)
+                        }
+                }
+                
                 // Word set selection
                 Picker("Word Set", selection: $eventHandler.selectedWordSetType) {
                     ForEach(WordSetType.allCases) { type in
@@ -194,6 +214,24 @@ struct ContentView: View {
                     selectedTranslationLanguage = newVal
                 }
                 
+                // Baby's name input field
+                HStack {
+                    Text("Baby's Name")
+                        .foregroundColor(.secondary)
+                        .font(.subheadline)
+                    
+                    Spacer()
+                    
+                    TextField("Enter name", text: $babyName, onCommit: {
+                        // Do nothing, prevents form submission behavior
+                    })
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .frame(width: 150)
+                        .onChange(of: babyName) { newValue in
+                            RandomWordList.shared.setBabyName(newValue)
+                        }
+                }
+                
                 HStack {
                     Text("Random words")
                         .foregroundColor(.secondary)
@@ -256,6 +294,9 @@ struct ContentView: View {
             if let type = WordSetType(rawValue: savedWordSetType) {
                 eventHandler.selectedWordSetType = type
             }
+            
+            // Load the baby's name
+            babyName = RandomWordList.shared.babyName
             
             debugPrint("onAppear --- ")
             // Check if main window exists but don't create an unused variable

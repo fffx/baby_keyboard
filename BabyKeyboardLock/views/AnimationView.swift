@@ -92,7 +92,7 @@ struct AnimationView: View {
                 if(!eventHandler.isLocked) { return }
                 
                 // ##### Confetti handler
-                if eventHandler.selectedLockEffect != .confettiConnon { return }
+                if eventHandler.selectedLockEffect != .confettiCannon { return }
                 
                 guard let letter = eventHandler.lastKeyString.first, letter.isLetter || letter.isNumber else { return }
                 
