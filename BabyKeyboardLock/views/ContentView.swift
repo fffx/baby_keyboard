@@ -330,25 +330,45 @@ struct ContentView: View {
             return
         }
            
-        if animationWindow != nil {
-            animationWindow?.orderFront(self)
-            return
+        // Check if animation window exists
+        let existingAnimationWindow = NSApp.windows.first { $0.identifier?.rawValue == AnimationWindowID }
+        if existingAnimationWindow != nil {
+            existingAnimationWindow?.orderFront(self)
+        } else {
+            // Create the animation window
+            animationWindow = AnimationView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .edgesIgnoringSafeArea(.all)
+                .onAppear {
+                    // Make the window transparent
+                    guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == AnimationWindowID }) else { return }
+                    window.isOpaque = false
+                    window.level = .floating
+                    window.titlebarAppearsTransparent = true
+                }
+                .openInWindow(id: AnimationWindowID, sender: self)
         }
         
-        animationWindow = AnimationView()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .edgesIgnoringSafeArea(.all)
-            .onAppear {
-                // Make the window transparent
-                guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == AnimationWindowID }) else { return }
-                window.isOpaque = false
-                // window.backgroundColor = NSColor.clear
-                window.level = .floating
-                window.titlebarAppearsTransparent = true
-
-                // window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-            }
-            .openInWindow(id: AnimationWindowID, sender: self)
+        // Check if word display window exists
+        let existingWordDisplayWindow = NSApp.windows.first { $0.identifier?.rawValue == WordDisplayWindowID }
+        if existingWordDisplayWindow != nil {
+            existingWordDisplayWindow?.orderFront(self)
+        } else {
+            // Create the word display window
+            WordDisplayView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .edgesIgnoringSafeArea(.all)
+                .onAppear {
+                    // Make the window transparent
+                    guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == WordDisplayWindowID }) else { return }
+                    window.isOpaque = false
+                    window.backgroundColor = NSColor.clear
+                    window.level = .floating
+                    window.ignoresMouseEvents = true
+                    window.titlebarAppearsTransparent = true
+                }
+                .openInWindow(id: WordDisplayWindowID, sender: self)
+        }
     }
     
 }
