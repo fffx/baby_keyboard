@@ -283,47 +283,82 @@ class EventHandler: ObservableObject {
     }
 
     private func requestPersonalVoicePermission() {
-        AVSpeechSynthesizer.requestPersonalVoiceAuthorization { status in
-            DispatchQueue.main.async {
-                if status == .authorized {
-                    self.personalVoiceAvailable = true
-                } else {
-                    // If not authorized, disable the feature
-                    self.personalVoiceAvailable = false
-                    if self.usePersonalVoice {
-                        // Only show message if user has explicitly enabled the feature
-                        let alert = NSAlert()
-                        alert.messageText = "Personal Voice Not Available"
-                        alert.informativeText = "Please enable Personal Voice in System Settings > Accessibility > Personal Voice and make sure you've created a Personal Voice."
-                        alert.alertStyle = .informational
-                        alert.addButton(withTitle: "OK")
-                        alert.runModal()
+        if #available(macOS 14.0, *) {
+            AVSpeechSynthesizer.requestPersonalVoiceAuthorization { status in
+                DispatchQueue.main.async {
+                    if status == .authorized {
+                        self.personalVoiceAvailable = true
+                    } else {
+                        // If not authorized, disable the feature
+                        self.personalVoiceAvailable = false
+                        if self.usePersonalVoice {
+                            // Only show message if user has explicitly enabled the feature
+                            let alert = NSAlert()
+                            alert.messageText = "Personal Voice Not Available"
+                            alert.informativeText = "Please enable Personal Voice in System Settings > Accessibility > Personal Voice and make sure you've created a Personal Voice."
+                            alert.alertStyle = .informational
+                            alert.addButton(withTitle: "OK")
+                            alert.runModal()
+                        }
                     }
                 }
+            }
+        } else {
+            // Personal Voice is not available on this version of macOS
+            self.personalVoiceAvailable = false
+            if self.usePersonalVoice {
+                let alert = NSAlert()
+                alert.messageText = "Personal Voice Not Supported"
+                alert.informativeText = "Personal Voice requires macOS 14.0 or newer."
+                alert.alertStyle = .informational
+                alert.addButton(withTitle: "OK")
+                alert.runModal()
+                
+                // Disable the feature since not supported
+                self.usePersonalVoice = false
             }
         }
     }
     
     private func checkPersonalVoiceAvailability() {
-        // Check if any personal voices are available
-        let personalVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
-            return voice.voiceTraits.contains(.isPersonalVoice)
-        }
-        
-        DispatchQueue.main.async {
-            self.personalVoiceAvailable = !personalVoices.isEmpty
+        if #available(macOS 14.0, *) {
+            // Check if any personal voices are available
+            let personalVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
+                return voice.voiceTraits.contains(.isPersonalVoice)
+            }
             
-            // If no personal voices available but feature is enabled, show alert
-            if personalVoices.isEmpty && self.usePersonalVoice {
-                let alert = NSAlert()
-                alert.messageText = "No Personal Voice Found"
-                alert.informativeText = "You need to create a Personal Voice in System Settings > Accessibility > Personal Voice before using this feature."
-                alert.alertStyle = .informational
-                alert.addButton(withTitle: "OK")
-                alert.runModal()
+            DispatchQueue.main.async {
+                self.personalVoiceAvailable = !personalVoices.isEmpty
                 
-                // Disable the feature since no voice is available
-                self.usePersonalVoice = false
+                // If no personal voices available but feature is enabled, show alert
+                if personalVoices.isEmpty && self.usePersonalVoice {
+                    let alert = NSAlert()
+                    alert.messageText = "No Personal Voice Found"
+                    alert.informativeText = "You need to create a Personal Voice in System Settings > Accessibility > Personal Voice before using this feature."
+                    alert.alertStyle = .informational
+                    alert.addButton(withTitle: "OK")
+                    alert.runModal()
+                    
+                    // Disable the feature since no voice is available
+                    self.usePersonalVoice = false
+                }
+            }
+        } else {
+            // Personal Voice is not available on this version of macOS
+            DispatchQueue.main.async {
+                self.personalVoiceAvailable = false
+                
+                if self.usePersonalVoice {
+                    let alert = NSAlert()
+                    alert.messageText = "Personal Voice Not Supported"
+                    alert.informativeText = "Personal Voice requires macOS 14.0 or newer."
+                    alert.alertStyle = .informational
+                    alert.addButton(withTitle: "OK")
+                    alert.runModal()
+                    
+                    // Disable the feature since not supported
+                    self.usePersonalVoice = false
+                }
             }
         }
     }

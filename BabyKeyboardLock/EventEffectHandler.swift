@@ -278,7 +278,6 @@ class EventEffectHandler {
     private var wordSetType: WordSetType = .randomShortWords
     private let customWordSetsManager = CustomWordSetsManager.shared
     
-    private let synthesizer = NSSpeechSynthesizer()
     private let synth = AVSpeechSynthesizer()
     var translationLanguage: TranslationLanguage = .none
     var usePersonalVoice: Bool = false
@@ -436,6 +435,9 @@ class EventEffectHandler {
             }
             
             return englishWord
+        case .bubbles, .stars, .animals, .rainbowTrail:
+            // Visual effects only - no sound
+            return keyStr
         }
     }
     
@@ -512,13 +514,15 @@ class EventEffectHandler {
         // If personal voice is enabled and we're not using a translation, try to use it
         if usePersonalVoice && language == nil {
             // Check if we have any personal voices available
-            let personalVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
-                return voice.voiceTraits.contains(.isPersonalVoice)
-            }
-            
-            if let personalVoice = personalVoices.first {
-                utterance.voice = personalVoice
-                return utterance
+            if #available(macOS 14.0, *) {
+                let personalVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
+                    return voice.voiceTraits.contains(.isPersonalVoice)
+                }
+                
+                if let personalVoice = personalVoices.first {
+                    utterance.voice = personalVoice
+                    return utterance
+                }
             }
         }
         

@@ -77,7 +77,7 @@ struct AnimationView: View {
                 windowSize = NSScreen.main?.frame.size ?? CGSize(width: 800, height: 600)
                 debugPrint("\(AnimationWindowID)-------- windowSize: \(windowSize)")
             }
-            .onChange(of: eventHandler.isLocked) { newVal in
+            .onChange(of: eventHandler.isLocked) { oldVal, newVal in
                 if !newVal {
                     // TODO https://stackoverflow.com/questions/64391947/swiftui-prevent-onreceive-from-firing-on-load
                     initialized = false // avoild confetti on toggle lock

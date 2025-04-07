@@ -192,6 +192,28 @@
         }
       }
     },
+    "LockEffect.animals" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bouncing Animals"
+          }
+        }
+      }
+    },
+    "LockEffect.bubbles" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Floating Bubbles"
+          }
+        }
+      }
+    },
     "LockEffect.confettiCannon" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -215,50 +237,6 @@
         }
       }
     },
-    "LockEffect.bubbles" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Floating Bubbles"
-          }
-        }
-      }
-    },
-    "LockEffect.stars" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Twinkling Stars"
-          }
-        }
-      }
-    },
-    "LockEffect.animals" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bouncing Animals"
-          }
-        }
-      }
-    },
-    "LockEffect.rainbowTrail" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rainbow Trail"
-          }
-        }
-      }
-    },
     "LockEffect.none" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -278,6 +256,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无效果"
+          }
+        }
+      }
+    },
+    "LockEffect.rainbowTrail" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rainbow Trail"
           }
         }
       }
@@ -335,6 +324,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "读键盘"
+          }
+        }
+      }
+    },
+    "LockEffect.stars" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twinkling Stars"
           }
         }
       }
@@ -604,6 +604,9 @@
           }
         }
       }
+    },
+    "Use Personal Voice" : {
+
     },
     "Word Display Duration: %@s" : {
 

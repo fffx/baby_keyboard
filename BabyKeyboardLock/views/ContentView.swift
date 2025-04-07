@@ -91,7 +91,7 @@ struct ContentView: View {
             .scaledToFill()
             .disabled(!eventHandler.accessibilityPermissionGranted)
             .padding(.bottom, eventHandler.accessibilityPermissionGranted ? 20 : 5)
-            .onChange(of: eventHandler.isLocked) { newVal in
+            .onChange(of: eventHandler.isLocked) { oldVal, newVal in
                 playLockSound(isLocked: newVal)
             }.onAppear(){
                 if eventHandler.isLocked {
@@ -111,7 +111,7 @@ struct ContentView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .onChange(of: eventHandler.selectedLockEffect) { newVal in
+            .onChange(of: eventHandler.selectedLockEffect) { oldVal, newVal in
                 selectedLockEffect = newVal
             }
             
@@ -140,7 +140,7 @@ struct ContentView: View {
                     }
                 }
                 .toggleStyle(CheckboxToggleStyle())
-                .onChange(of: eventHandler.usePersonalVoice) { newVal in
+                .onChange(of: eventHandler.usePersonalVoice) { oldVal, newVal in
                     usePersonalVoice = newVal
                 }
             }
@@ -152,7 +152,7 @@ struct ContentView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .onChange(of: eventHandler.selectedTranslationLanguage) { newVal in
+                .onChange(of: eventHandler.selectedTranslationLanguage) { oldVal, newVal in
                     selectedTranslationLanguage = newVal
                 }
                 
@@ -169,7 +169,7 @@ struct ContentView: View {
                     })
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 150)
-                        .onChange(of: babyName) { newValue in
+                        .onChange(of: babyName) { oldValue, newValue in
                             RandomWordList.shared.setBabyName(newValue)
                         }
                 }
@@ -181,7 +181,7 @@ struct ContentView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .onChange(of: eventHandler.selectedWordSetType) { newVal in
+                .onChange(of: eventHandler.selectedWordSetType) { oldVal, newVal in
                     savedWordSetType = newVal.rawValue
                     if newVal == .mainWords && customWordSetsManager.wordSets.isEmpty {
                         // If switching to mainWords but no sets exist, show editor
@@ -240,7 +240,7 @@ struct ContentView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .onChange(of: eventHandler.selectedTranslationLanguage) { newVal in
+                .onChange(of: eventHandler.selectedTranslationLanguage) { oldVal, newVal in
                     selectedTranslationLanguage = newVal
                 }
                 
@@ -257,7 +257,7 @@ struct ContentView: View {
                     })
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 150)
-                        .onChange(of: babyName) { newValue in
+                        .onChange(of: babyName) { oldValue, newValue in
                             RandomWordList.shared.setBabyName(newValue)
                         }
                 }
@@ -315,7 +315,7 @@ struct ContentView: View {
         }
         .padding()
         .frame(width: 300, height: 400)
-        .onChange(of: eventHandler.isLocked) { newVal in
+        .onChange(of: eventHandler.isLocked) { oldVal, newVal in
             showOrCloseAnimationWindow(isLocked: newVal)
         }.onReceive(eventHandler.$isLocked) { newVal in
             showOrCloseAnimationWindow(isLocked: newVal)
