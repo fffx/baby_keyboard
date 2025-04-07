@@ -7,8 +7,7 @@
 
 import SwiftUI
 import AppKit
-
-
+import AVFoundation
 
 struct HoverableMenuStyle: MenuStyle {
     @State private var isHovered = false
@@ -37,6 +36,7 @@ struct ContentView: View {
     @AppStorage("selectedTranslationLanguage") var selectedTranslationLanguage: TranslationLanguage = .none
     @AppStorage("selectedWordSetType") var savedWordSetType: String = WordSetType.randomShortWords.rawValue
     @AppStorage("wordDisplayDuration") var wordDisplayDuration: Double = DEFAULT_WORD_DISPLAY_DURATION
+    @AppStorage("usePersonalVoice") var usePersonalVoice: Bool = false
     
     @State private var showWordSetEditor = false
     @State private var showRandomWordEditor = false
@@ -113,6 +113,36 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .onChange(of: eventHandler.selectedLockEffect) { newVal in
                 selectedLockEffect = newVal
+            }
+            
+            // Add Personal Voice option for effects that use speech
+            if eventHandler.selectedLockEffect == .speakTheKey || 
+               eventHandler.selectedLockEffect == .speakAKeyWord || 
+               eventHandler.selectedLockEffect == .speakRandomWord {
+                
+                Toggle(isOn: $eventHandler.usePersonalVoice) {
+                    HStack {
+                        Text("Use Personal Voice")
+                        
+                        Button(action: {
+                            let alert = NSAlert()
+                            alert.messageText = "About Personal Voice"
+                            alert.informativeText = "Personal Voice uses your own voice created in System Settings > Accessibility > Personal Voice. You need to create a Personal Voice before using this feature."
+                            alert.alertStyle = .informational
+                            alert.addButton(withTitle: "OK")
+                            alert.runModal()
+                        }) {
+                            Image(systemName: "info.circle")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                .toggleStyle(CheckboxToggleStyle())
+                .onChange(of: eventHandler.usePersonalVoice) { newVal in
+                    usePersonalVoice = newVal
+                }
             }
             
             if eventHandler.selectedLockEffect == .speakAKeyWord {
@@ -297,6 +327,9 @@ struct ContentView: View {
             
             // Load the baby's name
             babyName = RandomWordList.shared.babyName
+            
+            // Update personal voice setting
+            eventHandler.usePersonalVoice = usePersonalVoice
             
             debugPrint("onAppear --- ")
             // Check if main window exists but don't create an unused variable

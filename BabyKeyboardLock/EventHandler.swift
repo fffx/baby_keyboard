@@ -5,6 +5,7 @@ import ApplicationServices
 import CoreData
 import SwiftData
 import Combine
+import AVFoundation
 
 enum KeyCode: CGKeyCode, CaseIterable, Identifiable {
     case u = 0x20
@@ -40,6 +41,14 @@ class EventHandler: ObservableObject {
             eventEffectHandler.setWordSetType(selectedWordSetType)
         }
     }
+    @Published var usePersonalVoice: Bool = false {
+        didSet {
+            eventEffectHandler.usePersonalVoice = usePersonalVoice
+            if usePersonalVoice {
+                requestPersonalVoicePermission()
+            }
+        }
+    }
     @Published var isLocked = true {
         didSet {
             if isLocked {
@@ -48,6 +57,7 @@ class EventHandler: ObservableObject {
         }
     }
     @Published var accessibilityPermissionGranted = false
+    @Published var personalVoiceAvailable: Bool = false
     @Published var lastKeyString: String = "a" // fix onReceive won't work as expected for first key press
 
     private var lastEventTime: Date = Date()
@@ -80,6 +90,15 @@ class EventHandler: ObservableObject {
             self.selectedWordSetType = savedType
         }
         eventEffectHandler.setWordSetType(self.selectedWordSetType)
+        
+        // Initialize personal voice setting from UserDefaults
+        self.usePersonalVoice = UserDefaults.standard.bool(forKey: "usePersonalVoice")
+        eventEffectHandler.usePersonalVoice = self.usePersonalVoice
+        
+        // Check if personal voice is available
+        if self.usePersonalVoice {
+            checkPersonalVoiceAvailability()
+        }
         
         // Observe changes to the main words set
         NotificationCenter.default.publisher(for: .init("MainWordsUpdated"))
@@ -261,6 +280,52 @@ class EventHandler: ObservableObject {
             }
         }
         return trusted
+    }
+
+    private func requestPersonalVoicePermission() {
+        AVSpeechSynthesizer.requestPersonalVoiceAuthorization { status in
+            DispatchQueue.main.async {
+                if status == .authorized {
+                    self.personalVoiceAvailable = true
+                } else {
+                    // If not authorized, disable the feature
+                    self.personalVoiceAvailable = false
+                    if self.usePersonalVoice {
+                        // Only show message if user has explicitly enabled the feature
+                        let alert = NSAlert()
+                        alert.messageText = "Personal Voice Not Available"
+                        alert.informativeText = "Please enable Personal Voice in System Settings > Accessibility > Personal Voice and make sure you've created a Personal Voice."
+                        alert.alertStyle = .informational
+                        alert.addButton(withTitle: "OK")
+                        alert.runModal()
+                    }
+                }
+            }
+        }
+    }
+    
+    private func checkPersonalVoiceAvailability() {
+        // Check if any personal voices are available
+        let personalVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
+            return voice.voiceTraits.contains(.isPersonalVoice)
+        }
+        
+        DispatchQueue.main.async {
+            self.personalVoiceAvailable = !personalVoices.isEmpty
+            
+            // If no personal voices available but feature is enabled, show alert
+            if personalVoices.isEmpty && self.usePersonalVoice {
+                let alert = NSAlert()
+                alert.messageText = "No Personal Voice Found"
+                alert.informativeText = "You need to create a Personal Voice in System Settings > Accessibility > Personal Voice before using this feature."
+                alert.alertStyle = .informational
+                alert.addButton(withTitle: "OK")
+                alert.runModal()
+                
+                // Disable the feature since no voice is available
+                self.usePersonalVoice = false
+            }
+        }
     }
 
 }

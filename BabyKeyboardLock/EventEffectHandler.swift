@@ -281,6 +281,7 @@ class EventEffectHandler {
     private let synthesizer = NSSpeechSynthesizer()
     private let synth = AVSpeechSynthesizer()
     var translationLanguage: TranslationLanguage = .none
+    var usePersonalVoice: Bool = false
     
     func handle(event: CGEvent, eventType: CGEventType, selectedLockEffect: LockEffect) -> String {
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
@@ -508,7 +509,20 @@ class EventEffectHandler {
         
         let languageCode = language ?? Locale.preferredLanguages[0]
         
-        // https://stackoverflow.com/questions/37512621/avspeechsynthesizer-change-voice
+        // If personal voice is enabled and we're not using a translation, try to use it
+        if usePersonalVoice && language == nil {
+            // Check if we have any personal voices available
+            let personalVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
+                return voice.voiceTraits.contains(.isPersonalVoice)
+            }
+            
+            if let personalVoice = personalVoices.first {
+                utterance.voice = personalVoice
+                return utterance
+            }
+        }
+        
+        // Fall back to default voice selection if personal voice not available or not requested
         let allVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
             guard languageCode == voice.language else { return false}
             // debugPrint("speaking ------- \(voice.identifier)")
