@@ -6,9 +6,14 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: mxcl/xcodebuild@v3
         with:
           code-sign-certificate: ${{ secrets.CERTIFICATE_BASE64 }}
           code-sign-certificate-passphrase: ${{ secrets.CERTIFICATE_PASSPHRASE}}
           working-directory: BabyKeyboardLock
           scheme: BabyKeyboardLock
+          action: build
+          verbosity: xcpretty
+          upload-logs: always
+          configuration: release
