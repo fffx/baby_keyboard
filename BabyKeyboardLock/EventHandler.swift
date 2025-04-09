@@ -28,6 +28,11 @@ class EventHandler: ObservableObject {
     private var eventTap : CFMachPort?
     
     @Published var selectedLockEffect: LockEffect = .none
+    @Published var selectedTranslationLanguage: TranslationLanguage = .none {
+        didSet {
+            eventEffectHandler.translationLanguage = selectedTranslationLanguage
+        }
+    }
     @Published var isLocked = true {
         didSet {
             if isLocked {

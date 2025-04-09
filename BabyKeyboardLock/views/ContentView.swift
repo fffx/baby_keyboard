@@ -34,6 +34,7 @@ struct ContentView: View {
     
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
+    @AppStorage("selectedTranslationLanguage") var selectedTranslationLanguage: TranslationLanguage = .none
     
     @State var hoveringMoreButton: Bool = false
     var body: some View {
@@ -106,6 +107,17 @@ struct ContentView: View {
                 selectedLockEffect = newVal
             }
             
+            if eventHandler.selectedLockEffect == .speakAKeyWord {
+                Picker("Translation", selection: $eventHandler.selectedTranslationLanguage) {
+                    ForEach(TranslationLanguage.allCases) { language in
+                        Text(language.localizedString)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .onChange(of: eventHandler.selectedTranslationLanguage) { newVal in
+                    selectedTranslationLanguage = newVal
+                }
+            }
             
             Toggle(isOn: $lockKeyboardOnLaunch) {
                 Text("Lock keyboard on launch")

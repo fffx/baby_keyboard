@@ -18,6 +18,7 @@ struct BabyKeyboardLockApp: App {
     
     @AppStorage("lockKeyboardOnLaunch") var lockKeyboardOnLaunch = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
+    @AppStorage("selectedTranslationLanguage") var selectedTranslationLanguage: TranslationLanguage = .none
     @ObservedObject var eventHandler: EventHandler = EventHandler.shared
 
     var body: some Scene {
@@ -27,6 +28,7 @@ struct BabyKeyboardLockApp: App {
     init() {
         eventHandler.setLocked(isLocked: lockKeyboardOnLaunch)
         eventHandler.selectedLockEffect = selectedLockEffect
+        eventHandler.selectedTranslationLanguage = selectedTranslationLanguage
     }
 }
 
