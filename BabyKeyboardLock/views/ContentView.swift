@@ -84,38 +84,7 @@ struct ContentView: View {
     }
     
     var body: some View {
-       VStack(alignment: .leading, spacing: 22) {
-            HStack{
-                Spacer() // push the button to right
-                Menu() {
-                    Button("About") {
-                        AboutView().openInWindow(id: "About", sender: self, focus: true)
-                    }
-                    
-                    Button("Quit \(Bundle.applicationName)") {
-                        NSApp.terminate(nil)
-                    }
-                } label: {
-                    Label("", systemImage: "ellipsis").font(.callout)
-                        .onHover { _ in
-                            // TODO
-                        }
-                }
-                .menuStyle(HoverableMenuStyle())
-                .menuStyle(BorderlessButtonMenuStyle())
-                .apply {
-                    if #available(macOS 12.0, *) {
-                          $0.menuIndicator(.hidden)
-                      } else {
-                          $0
-                      }
-                }
-                .fixedSize()
-                .onHover { _ in
-                    hoveringMoreButton = true
-                }
-            }
-            
+        VStack(alignment: .leading, spacing: 22) {
             Toggle(isOn: $eventHandler.isLocked)
             {
                 Label(
@@ -350,6 +319,24 @@ struct ContentView: View {
                         .font(.footnote)
                         .fixedSize(horizontal: false, vertical: true)
                         .foregroundColor(.secondary)
+                    
+                    Divider()
+                        .padding(.vertical, 8)
+                    
+                    HStack {
+                        Button("About") {
+                            AboutView().openInWindow(id: "About", sender: self, focus: true)
+                        }
+                        .buttonStyle(.plain)
+                        
+                        Spacer()
+                        
+                        Button("Quit \(Bundle.applicationName)") {
+                            NSApp.terminate(nil)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.bottom, 4)
                 }
             }
             // Get the actual size of this content
