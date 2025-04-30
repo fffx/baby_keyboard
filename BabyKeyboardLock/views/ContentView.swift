@@ -41,6 +41,11 @@ struct ContentView: View {
     @ObservedObject var eventHandler: EventHandler = EventHandler.shared
     
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
+    @AppStorage("launchOnStartup") private var launchOnStartup: Bool = false {
+        didSet {
+            LaunchAtStartup.shared.setEnabled(launchOnStartup)
+        }
+    }
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
     @AppStorage("selectedTranslationLanguage") var selectedTranslationLanguage: TranslationLanguage = .none
     @AppStorage("selectedWordSetType") var savedWordSetType: String = WordSetType.randomShortWords.rawValue
@@ -345,6 +350,11 @@ struct ContentView: View {
                 }
                 .toggleStyle(CheckboxToggleStyle())
                 
+                Toggle(isOn: $launchOnStartup) {
+                    Text("Launch on startup")
+                }
+                .toggleStyle(CheckboxToggleStyle())
+                
                 Spacer()
                 
                 VStack(alignment: .leading, spacing: 4) {
@@ -398,6 +408,7 @@ struct ContentView: View {
             }
             babyName = RandomWordList.shared.babyName
             eventHandler.usePersonalVoice = usePersonalVoice
+            launchOnStartup = LaunchAtStartup.shared.isEnabled()
         }
         .onChange(of: eventHandler.isLocked) { oldVal, newVal in
             playLockSound(isLocked: newVal)

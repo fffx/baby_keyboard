@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -131,6 +132,9 @@
 
     },
     "Keyboard shortcut: Ctrl + Option + U" : {
+
+    },
+    "Launch on startup" : {
 
     },
     "Lock" : {
