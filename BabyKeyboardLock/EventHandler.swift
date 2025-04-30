@@ -156,12 +156,17 @@ class EventHandler: ObservableObject {
         }
         if processTrusted {
             self.accessibilityPermissionGranted = true
+            return // Stop checking once permission is granted
         }
-        DispatchQueue.global(qos: .background).async {
-          // Schedule the next check
-            let delay = DispatchTimeInterval.seconds(3)
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                self.checkAccessibilityPermission()
+        
+        // Only continue checking if permission hasn't been granted yet
+        if !self.accessibilityPermissionGranted {
+            DispatchQueue.global(qos: .background).async {
+                // Schedule the next check
+                let delay = DispatchTimeInterval.seconds(3)
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    self.checkAccessibilityPermission()
+                }
             }
         }
     }
