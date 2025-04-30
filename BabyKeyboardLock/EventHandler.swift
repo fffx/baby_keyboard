@@ -62,6 +62,7 @@ class EventHandler: ObservableObject {
 
     private var lastEventTime: Date = Date()
     @Published var throttleInterval: TimeInterval = 1.0 // seconds
+    @Published var confettiFadeTime: TimeInterval = 3.0 // seconds
     private func isThrottled() -> Bool {
         let now = Date()
         let timeSinceLastEvent = now.timeIntervalSince(lastEventTime)
@@ -88,6 +89,12 @@ class EventHandler: ObservableObject {
         self.throttleInterval = UserDefaults.standard.double(forKey: "throttleInterval")
         if self.throttleInterval == 0 { // If not set yet
             self.throttleInterval = 1.0
+        }
+        
+        // Initialize fade time from UserDefaults
+        self.confettiFadeTime = UserDefaults.standard.double(forKey: "confettiFadeTime")
+        if self.confettiFadeTime == 0 { // If not set yet
+            self.confettiFadeTime = 3.0
         }
         
         // Initialize wordSetType from UserDefaults

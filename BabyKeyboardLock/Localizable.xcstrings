@@ -58,6 +58,9 @@
     "Cancel" : {
 
     },
+    "Confetti fade time (seconds)" : {
+
+    },
     "Contains %lld words" : {
 
     },

@@ -47,6 +47,7 @@ struct ContentView: View {
     @AppStorage("wordDisplayDuration") var wordDisplayDuration: Double = DEFAULT_WORD_DISPLAY_DURATION
     @AppStorage("usePersonalVoice") var usePersonalVoice: Bool = false
     @AppStorage("throttleInterval") private var savedThrottleInterval: Double = 1.0
+    @AppStorage("confettiFadeTime") private var savedConfettiFadeTime: Double = 5.0
     
     @State private var showWordSetEditor = false
     @State private var showRandomWordEditor = false
@@ -134,9 +135,21 @@ struct ContentView: View {
                                     savedThrottleInterval = newValue
                                 }
                             Text(String(format: "%.1f", eventHandler.throttleInterval))
-                                .foregroundColor(.secondary)
-                                .font(.subheadline)
-                                .frame(width: 30)
+                                .frame(width: 35)
+                        }
+                        
+                        Text("Confetti fade time (seconds)")
+                            .foregroundColor(.secondary)
+                            .font(.subheadline)
+                            .padding(.top, 8)
+                        
+                        HStack {
+                            Slider(value: $eventHandler.confettiFadeTime, in: 1.0...10.0, step: 0.5)
+                                .onChange(of: eventHandler.confettiFadeTime) { _, newValue in
+                                    savedConfettiFadeTime = newValue
+                                }
+                            Text(String(format: "%.1f", eventHandler.confettiFadeTime))
+                                .frame(width: 35)
                         }
                     }
                 }
