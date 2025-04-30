@@ -184,11 +184,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         case .leftMouseUp:
             EventHandler.shared.setLocked(isLocked: !EventHandler.shared.isLocked)
         case .rightMouseUp:
-            if popover.isShown {
-                hidePopover()
-            } else {
+            // if popover.isShown {
+            //     hidePopover()
+            // } else {
                 showPopover()
-            }
+            // }
         default:
             return
         }
