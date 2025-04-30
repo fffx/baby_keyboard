@@ -46,6 +46,7 @@ struct ContentView: View {
     @AppStorage("selectedWordSetType") var savedWordSetType: String = WordSetType.randomShortWords.rawValue
     @AppStorage("wordDisplayDuration") var wordDisplayDuration: Double = DEFAULT_WORD_DISPLAY_DURATION
     @AppStorage("usePersonalVoice") var usePersonalVoice: Bool = false
+    @AppStorage("throttleInterval") private var savedThrottleInterval: Double = 1.0
     
     @State private var showWordSetEditor = false
     @State private var showRandomWordEditor = false
@@ -120,6 +121,25 @@ struct ContentView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+                
+                if eventHandler.selectedLockEffect == .confettiCannon {
+                    VStack(alignment: .leading) {
+                        Text("Delay between confetti (seconds)")
+                            .foregroundColor(.secondary)
+                            .font(.subheadline)
+                        
+                        HStack {
+                            Slider(value: $eventHandler.throttleInterval, in: 0.1...2.0, step: 0.1)
+                                .onChange(of: eventHandler.throttleInterval) { _, newValue in
+                                    savedThrottleInterval = newValue
+                                }
+                            Text(String(format: "%.1f", eventHandler.throttleInterval))
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+                                .frame(width: 30)
+                        }
+                    }
+                }
                 
                 if eventHandler.selectedLockEffect == .speakTheKey || 
                    eventHandler.selectedLockEffect == .speakAKeyWord || 

@@ -61,6 +61,9 @@
     "Contains %lld words" : {
 
     },
+    "Delay between confetti (seconds)" : {
+
+    },
     "Edit the words used in 'Main Words' set" : {
 
     },

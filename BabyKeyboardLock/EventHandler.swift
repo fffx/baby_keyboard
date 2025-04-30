@@ -61,7 +61,7 @@ class EventHandler: ObservableObject {
     @Published var lastKeyString: String = "a" // fix onReceive won't work as expected for first key press
 
     private var lastEventTime: Date = Date()
-    private let throttleInterval: TimeInterval = 1 // seconds
+    @Published var throttleInterval: TimeInterval = 1.0 // seconds
     private func isThrottled() -> Bool {
         let now = Date()
         let timeSinceLastEvent = now.timeIntervalSince(lastEventTime)
@@ -83,6 +83,12 @@ class EventHandler: ObservableObject {
             self.isLocked = false
         }
         self.lastKeyString = lastKeyString
+        
+        // Initialize throttle interval from UserDefaults
+        self.throttleInterval = UserDefaults.standard.double(forKey: "throttleInterval")
+        if self.throttleInterval == 0 { // If not set yet
+            self.throttleInterval = 1.0
+        }
         
         // Initialize wordSetType from UserDefaults
         if let savedTypeRaw = UserDefaults.standard.string(forKey: "selectedWordSetType"),
