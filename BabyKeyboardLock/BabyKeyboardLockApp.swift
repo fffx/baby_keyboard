@@ -56,7 +56,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.updateWindowFrames()
+            Task { @MainActor in
+                self?.updateWindowFrames()
+            }
         }
         
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)

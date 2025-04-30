@@ -46,9 +46,8 @@ extension View {
 }
 
 struct AnimationView: View {
-    @State private var counter: Int = 0
+    @State private var confettiStates: [Int: CGPoint] = [:] // Maps counter to position
     @State private var initialized = false
-    @State private var buttonPosition: CGPoint = .zero
     
     @State private var soundPool: [NSSound] = []
     @State private var sound: NSSound? = NSSound(named: "confetti-cannon")
@@ -58,33 +57,22 @@ struct AnimationView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                Button("") { counter += 1 }
-                    .background(Color.clear)
-                .buttonStyle(PlainButtonStyle())
-                .confettiCannon(
-                    counter: $counter,
-                    num: Int.random(in: 15...40),
-                    confettiSize: 15,
-                    rainHeight: 800,
-                    radius: 500
-                )
-                .position(x: buttonPosition.x, y: buttonPosition.y)
+                ForEach(Array(confettiStates.keys), id: \.self) { counter in
+                    ConfettiContainer(counter: counter, position: confettiStates[counter] ?? .zero)
+                }
             }
             .padding()
             .presentedWindowStyle(.hiddenTitleBar)
             .onAppear {
-                // windowSize = geometry.size
                 windowSize = NSScreen.main?.frame.size ?? CGSize(width: 800, height: 600)
                 debugPrint("\(AnimationWindowID)-------- windowSize: \(windowSize)")
             }
             .onChange(of: eventHandler.isLocked) { oldVal, newVal in
                 if !newVal {
-                    // TODO https://stackoverflow.com/questions/64391947/swiftui-prevent-onreceive-from-firing-on-load
-                    initialized = false // avoild confetti on toggle lock
+                    initialized = false
                 }
             }
             .onReceive(eventHandler.$lastKeyString) { _ in
-                debugPrint("\(AnimationWindowID)-------- initialized: \(initialized), locked \(eventHandler.isLocked)")
                 if !initialized {
                     self.initialized = true
                     return
@@ -96,13 +84,20 @@ struct AnimationView: View {
                 
                 guard let letter = eventHandler.lastKeyString.first, letter.isLetter || letter.isNumber else { return }
                 
-                counter += 1
-                debugPrint("counter increase -------- \(counter)")
                 let randomX = CGFloat.random(in: 0...geometry.size.width)
                 let randomY = CGFloat.random(in: 0...geometry.size.height)
                 
-                // Update the button's position
-                buttonPosition = CGPoint(x: randomX, y: randomY)
+                // Create new confetti with unique counter
+                let newCounter = Int.random(in: 0...Int.max)
+                confettiStates[newCounter] = CGPoint(x: randomX, y: randomY)
+                
+                // Remove this confetti state after animation is done
+                DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + eventHandler.confettiFadeTime) {
+                    DispatchQueue.main.async {
+                        confettiStates.removeValue(forKey: newCounter)
+                    }
+                }
+                
                 playSound()
             }
         }
@@ -116,5 +111,27 @@ struct AnimationView: View {
         guard let availableSound = soundPool.first(where: { !$0.isPlaying }) else { return }
         availableSound.play()
     }
+}
 
+// Separate view for each confetti animation
+struct ConfettiContainer: View {
+    let counter: Int
+    let position: CGPoint
+    @State private var triggerConfetti = 0
+    
+    var body: some View {
+        Color.clear
+            .confettiCannon(
+                counter: $triggerConfetti,
+                num: Int.random(in: 50...100),
+                confettiSize: 10,
+                rainHeight: 600,
+                radius: 400,
+                repetitions: 0
+            )
+            .position(position)
+            .onAppear {
+                triggerConfetti += 1
+            }
+    }
 }
