@@ -59,6 +59,9 @@
     "Cancel" : {
 
     },
+    "Category" : {
+
+    },
     "Confetti fade time (seconds)" : {
 
     },
@@ -352,9 +355,6 @@
         }
       }
     },
-    "Main words" : {
-
-    },
     "Main Words" : {
 
     },
@@ -387,6 +387,9 @@
 
     },
     "Save" : {
+
+    },
+    "Show Flashcards" : {
 
     },
     "Translation" : {
@@ -622,9 +625,6 @@
 
     },
     "Word Display Duration: %@s" : {
-
-    },
-    "Word Set" : {
 
     },
     "WordSetType.mainWords" : {

@@ -39,6 +39,8 @@ struct HoverableMenuStyle: MenuStyle {
 struct ContentView: View {
     @State private var animationWindow: NSWindow?
     @ObservedObject var eventHandler: EventHandler = EventHandler.shared
+    @State private var selectedCategory: EffectCategory = .none
+    @AppStorage("showFlashcards") private var showFlashcards: Bool = false
     
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
     @AppStorage("launchOnStartup") private var launchOnStartup: Bool = false {
@@ -121,47 +123,65 @@ struct ContentView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 
-                Picker("Effect", selection: $eventHandler.selectedLockEffect) {
-                    ForEach(LockEffect.allCases) { effect in
-                        Text(effect.localizedString)
+                // Category selector
+                Picker("Category", selection: $selectedCategory) {
+                    ForEach(EffectCategory.allCases) { category in
+                        Text(category.rawValue).tag(category)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .pickerStyle(.segmented)
+                .padding(.bottom, 10)
                 
-                if eventHandler.selectedLockEffect == .confettiCannon {
-                    VStack(alignment: .leading) {
-                        Text("Delay between confetti (seconds)")
-                            .foregroundColor(.secondary)
-                            .font(.subheadline)
-                        
-                        HStack {
-                            Slider(value: $eventHandler.throttleInterval, in: 0.1...2.0, step: 0.1)
-                                .onChange(of: eventHandler.throttleInterval) { _, newValue in
-                                    savedThrottleInterval = newValue
-                                }
-                            Text(String(format: "%.1f", eventHandler.throttleInterval))
-                                .frame(width: 35)
+                // Effect selector based on category
+                if selectedCategory != .none {
+                    Picker("Effect", selection: $eventHandler.selectedLockEffect) {
+                        ForEach(LockEffect.allCases.filter { $0.category == selectedCategory }) { effect in
+                            Text(effect.localizedString).tag(effect)
                         }
-                        
-                        Text("Confetti fade time (seconds)")
-                            .foregroundColor(.secondary)
-                            .font(.subheadline)
-                            .padding(.top, 8)
-                        
-                        HStack {
-                            Slider(value: $eventHandler.confettiFadeTime, in: 1.0...10.0, step: 0.5)
-                                .onChange(of: eventHandler.confettiFadeTime) { _, newValue in
-                                    savedConfettiFadeTime = newValue
-                                }
-                            Text(String(format: "%.1f", eventHandler.confettiFadeTime))
-                                .frame(width: 35)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                // Visual effects settings
+                if selectedCategory == .visual {
+                    if eventHandler.selectedLockEffect == .confettiCannon {
+                        Group {
+                            Text("Delay between confetti (seconds)")
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+                            
+                            HStack {
+                                Slider(value: $eventHandler.throttleInterval, in: 0.1...2.0, step: 0.1)
+                                    .onChange(of: eventHandler.throttleInterval) { _, newValue in
+                                        savedThrottleInterval = newValue
+                                    }
+                                Text(String(format: "%.1f", eventHandler.throttleInterval))
+                                    .frame(width: 35)
+                            }
+                            
+                            Text("Confetti fade time (seconds)")
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+                                .padding(.top, 8)
+                            
+                            HStack {
+                                Slider(value: $eventHandler.confettiFadeTime, in: 1.0...10.0, step: 0.5)
+                                    .onChange(of: eventHandler.confettiFadeTime) { _, newValue in
+                                        savedConfettiFadeTime = newValue
+                                    }
+                                Text(String(format: "%.1f", eventHandler.confettiFadeTime))
+                                    .frame(width: 35)
+                            }
                         }
                     }
                 }
                 
-                if eventHandler.selectedLockEffect == .speakTheKey || 
-                   eventHandler.selectedLockEffect == .speakAKeyWord || 
-                   eventHandler.selectedLockEffect == .speakRandomWord {
+                // Words mode settings
+                if selectedCategory == .words {
+                    Toggle(isOn: $showFlashcards) {
+                        Text("Show Flashcards")
+                    }
+                    .toggleStyle(CheckboxToggleStyle())
                     
                     Toggle(isOn: $eventHandler.usePersonalVoice) {
                         HStack {
@@ -186,9 +206,8 @@ struct ContentView: View {
                     .onChange(of: eventHandler.usePersonalVoice) { oldVal, newVal in
                         usePersonalVoice = newVal
                     }
-                }
-                
-                if eventHandler.selectedLockEffect == .speakAKeyWord {
+                    
+                    // Translation picker
                     Picker("Translation", selection: $eventHandler.selectedTranslationLanguage) {
                         ForEach(TranslationLanguage.allCases) { language in
                             Text(language.localizedString)
@@ -216,113 +235,6 @@ struct ContentView: View {
                                 RandomWordList.shared.setBabyName(newValue)
                             }
                     }
-                    
-                    // Word set selection
-                    Picker("Word Set", selection: $eventHandler.selectedWordSetType) {
-                        ForEach(WordSetType.allCases) { type in
-                            Text(type.localizedString)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .onChange(of: eventHandler.selectedWordSetType) { oldVal, newVal in
-                        savedWordSetType = newVal.rawValue
-                        if newVal == .mainWords && customWordSetsManager.wordSets.isEmpty {
-                            // If switching to mainWords but no sets exist, show editor
-                            showWordSetEditor = true
-                        }
-                    }
-                    
-                    if eventHandler.selectedWordSetType == .mainWords {
-                        HStack {
-                            Text("Main words")
-                                .foregroundColor(.secondary)
-                                .font(.subheadline)
-                            
-                            Spacer()
-                            
-                            Button(action: {
-                                showWordSetEditor = true
-                            }) {
-                                Image(systemName: "pencil")
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                        }
-                        
-                        if let currentSet = customWordSetsManager.currentWordSet {
-                            Text("Contains \(currentSet.words.count) words")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    // Word display duration settings - moved outside the if block to always appear in speakAKeyWord mode
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text("Word Display Duration: \(String(format: "%.1f", wordDisplayDuration))s")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        HStack {
-                            Text("1s")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            
-                            Slider(value: $wordDisplayDuration, in: 1...10, step: 0.5)
-                            
-                            Text("10s")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .padding(.top, 5)
-                }
-                
-                if eventHandler.selectedLockEffect == .speakRandomWord {
-                    Picker("Translation", selection: $eventHandler.selectedTranslationLanguage) {
-                        ForEach(TranslationLanguage.allCases) { language in
-                            Text(language.localizedString)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .onChange(of: eventHandler.selectedTranslationLanguage) { oldVal, newVal in
-                        selectedTranslationLanguage = newVal
-                    }
-                    
-                    // Baby's name input field
-                    HStack {
-                        Text("Baby's Name")
-                            .foregroundColor(.secondary)
-                            .font(.subheadline)
-                        
-                        Spacer()
-                        
-                        TextField("Enter name", text: $babyName, onCommit: {
-                            // Do nothing, prevents form submission behavior
-                        })
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .frame(width: 150)
-                            .onChange(of: babyName) { oldValue, newValue in
-                                RandomWordList.shared.setBabyName(newValue)
-                            }
-                    }
-                    
-                    HStack {
-                        Text("Random words")
-                            .foregroundColor(.secondary)
-                            .font(.subheadline)
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            showRandomWordEditor = true
-                        }) {
-                            Image(systemName: "pencil")
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    }
-                    
-                    Text("Contains \(RandomWordList.shared.words.count) words")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
                     
                     // Word display duration settings
                     VStack(alignment: .leading, spacing: 5) {
@@ -343,6 +255,28 @@ struct ContentView: View {
                         }
                     }
                     .padding(.top, 5)
+                    
+                    // Random words editor button
+                    if eventHandler.selectedLockEffect == .speakRandomWord {
+                        HStack {
+                            Text("Random words")
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                showRandomWordEditor = true
+                            }) {
+                                Image(systemName: "pencil")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                        
+                        Text("Contains \(RandomWordList.shared.words.count) words")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 }
                 
                 Toggle(isOn: $lockKeyboardOnLaunch) {
@@ -409,6 +343,14 @@ struct ContentView: View {
             babyName = RandomWordList.shared.babyName
             eventHandler.usePersonalVoice = usePersonalVoice
             launchOnStartup = LaunchAtStartup.shared.isEnabled()
+            
+            // Set initial category based on current effect
+            selectedCategory = eventHandler.selectedLockEffect.category
+            
+            // Set speak random word as default for word mode
+            if selectedCategory == .words && eventHandler.selectedLockEffect == .speakAKeyWord {
+                eventHandler.selectedLockEffect = .speakRandomWord
+            }
         }
         .onChange(of: eventHandler.isLocked) { oldVal, newVal in
             playLockSound(isLocked: newVal)
@@ -427,6 +369,16 @@ struct ContentView: View {
             // Force height recalculation
             DispatchQueue.main.async {
                 updateWindowForHeight(preferredHeight)
+            }
+        }
+        .onChange(of: selectedCategory) { oldValue, newValue in
+            // When changing category, select appropriate default effect
+            if newValue == .none {
+                eventHandler.selectedLockEffect = .none
+            } else if newValue == .visual {
+                eventHandler.selectedLockEffect = .confettiCannon
+            } else if newValue == .words {
+                eventHandler.selectedLockEffect = .speakRandomWord
             }
         }
         .sheet(isPresented: $showWordSetEditor) {

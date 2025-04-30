@@ -7,13 +7,14 @@ struct WordDisplayView: View {
     @State private var translation: String = ""
     @State private var showWord: Bool = false
     @AppStorage("wordDisplayDuration") private var wordDisplayDuration: Double = DEFAULT_WORD_DISPLAY_DURATION
+    @AppStorage("showFlashcards") private var showFlashcards: Bool = false
     
     // For more reliable timeout handling
     @State private var hideWorkItem: DispatchWorkItem? = nil
     
     var body: some View {
         GeometryReader { geometry in
-            if showWord && !word.isEmpty {
+            if showWord && !word.isEmpty && showFlashcards {
                 ZStack {
                     // White background
                     Rectangle()
@@ -79,24 +80,18 @@ struct WordDisplayView: View {
                 }
                 
                 // Show the word with animation
-                withAnimation {
-                    self.showWord = true
+                withAnimation(.easeIn(duration: 0.3)) {
+                    showWord = true
                 }
                 
-                // Set up a new hide timer
-                let newHideWorkItem = DispatchWorkItem {
-                    withAnimation {
-                        self.showWord = false
+                // Hide the word after the display duration
+                let workItem = DispatchWorkItem {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        showWord = false
                     }
                 }
-                
-                self.hideWorkItem = newHideWorkItem
-                
-                // Schedule hiding after configured duration
-                DispatchQueue.main.asyncAfter(
-                    deadline: .now() + wordDisplayDuration,
-                    execute: newHideWorkItem
-                )
+                hideWorkItem = workItem
+                DispatchQueue.main.asyncAfter(deadline: .now() + wordDisplayDuration, execute: workItem)
             }
         }
         .onReceive(Just(wordDisplayDuration)) { newDuration in

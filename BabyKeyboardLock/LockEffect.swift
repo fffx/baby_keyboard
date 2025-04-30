@@ -6,7 +6,15 @@
 //
 import SwiftUI
 
-enum LockEffect: String, CaseIterable, Identifiable{
+enum EffectCategory: String, CaseIterable, Identifiable {
+    case none = "None"
+    case visual = "Visual Effects"
+    case words = "Words"
+    
+    var id: Self { self }
+}
+
+enum LockEffect: String, CaseIterable, Identifiable {
     case none = "LockEffect.none"
     case confettiCannon = "LockEffect.confettiCannon"
     case speakTheKey = "LockEffect.speakTheKey"
@@ -19,12 +27,27 @@ enum LockEffect: String, CaseIterable, Identifiable{
     case rainbowTrail = "LockEffect.rainbowTrail"
     // TODO add random
     
-    var id: Self {
-        return self
+    var id: Self { self }
+    
+    var category: EffectCategory {
+        switch self {
+        case .none:
+            return .none
+        case .confettiCannon, .bubbles, .stars, .animals, .rainbowTrail:
+            return .visual
+        case .speakTheKey, .speakAKeyWord, .speakRandomWord:
+            return .words
+        }
     }
     
     var localizedString: String {
-        NSLocalizedString(self.rawValue, comment: "Lock effect option")
+        let base = NSLocalizedString(self.rawValue, comment: "Lock effect option")
+        switch self {
+        case .bubbles, .stars, .animals, .rainbowTrail:
+            return base + " (BETA)"
+        default:
+            return base
+        }
     }
 }
 
