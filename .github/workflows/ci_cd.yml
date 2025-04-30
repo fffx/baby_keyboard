@@ -1,0 +1,22 @@
+name: App build
+on: push
+
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Switch xcode to latest-stable
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: actions/checkout@v4
+      - uses: mxcl/xcodebuild@v3
+        with:
+          code-sign-certificate: ${{ secrets.CERTIFICATE_BASE64 }}
+          code-sign-certificate-passphrase: ${{ secrets.CERTIFICATE_PASSPHRASE}}
+          scheme: BabyKeyboardLock
+          action: build
+          verbosity: xcpretty
+          upload-logs: always
+          configuration: release
