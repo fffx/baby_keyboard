@@ -40,10 +40,24 @@ struct BabyKeyboardLockApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
     private var popover: NSPopover!
-    private var cancellables = Set<AnyCancellable>() // Add this property
+    private var cancellables = Set<AnyCancellable>()
+    private var screenObserver: Any?
+    
+    deinit {
+        if let observer = screenObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
+    
     @MainActor func applicationDidFinishLaunching(_ notification: Notification) {
-//        NSApplication.shared.setActivationPolicy(.regular)
-//        NSApplication.shared.activate(ignoringOtherApps: true)
+        // Add screen configuration change observer
+        screenObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didChangeScreenParametersNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updateWindowFrames()
+        }
         
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         
@@ -177,6 +191,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         default:
             return
+        }
+    }
+    
+    private func updateWindowFrames() {
+        guard let mainScreen = NSScreen.main else { return }
+        let frame = NSRect(x: 0, y: 0, width: mainScreen.frame.width, height: mainScreen.frame.height)
+        
+        // Update all transparent windows
+        NSApp.windows.forEach { window in
+            if let identifier = window.identifier?.rawValue,
+               [AnimationWindowID, WordDisplayWindowID, VisualEffectsWindowID].contains(identifier) {
+                window.setFrame(frame, display: true)
+            }
         }
     }
 }

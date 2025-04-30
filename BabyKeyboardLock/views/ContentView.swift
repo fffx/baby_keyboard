@@ -561,7 +561,7 @@ struct WordSetEditorView: View {
                 }
                 .disabled(words.isEmpty)
             }
-        }
+        } 
         .padding()
         .frame(width: 400, height: 400)
         .onAppear {
@@ -574,7 +574,7 @@ struct WordSetEditorView: View {
     private func addWord() {
         guard !newEnglishWord.isEmpty && !newTranslation.isEmpty else { return }
         
-        let newWord = CustomWordPair(english: newEnglishWord, translation: newTranslation)
+        let newWord = CustomWordPair(english: newEnglishWord, translation: newTranslation) 
         words.append(newWord)
         
         // Clear the input fields

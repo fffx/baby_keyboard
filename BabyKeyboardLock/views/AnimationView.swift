@@ -27,7 +27,7 @@ private struct FullscreenTransparentWindowBackground: NSViewRepresentable {
             window.backgroundColor = .clear
             window.ignoresMouseEvents = true
             window.level = .screenSaver
-            window.collectionBehavior = [.fullScreenAuxiliary]
+            window.collectionBehavior = [.fullScreenAuxiliary, .canJoinAllSpaces]
             window.setFrame(.init(origin: .zero, size: NSScreen.main!.frame.size), display: true)
             window.standardWindowButton(.closeButton)?.isHidden = true
             window.standardWindowButton(.miniaturizeButton)?.isHidden = true
