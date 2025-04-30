@@ -477,7 +477,7 @@ class EventEffectHandler {
             
             // Return a random word if we have any
             if let randomWord = possibleWords.randomElement() {
-                debugPrint("getWord from main words set ------- \(key) -- \(randomWord)")
+                debugLog("getWord from main words set ------- \(key) -- \(randomWord)")
                 return randomWord
             }
             return key
@@ -498,7 +498,7 @@ class EventEffectHandler {
         
         // Return a random word if we have any
         if let randomWord = possibleWords.randomElement() {
-            debugPrint("getWord ------- \(key) -- \(randomWord)")
+            debugLog("getWord ------- \(key) -- \(randomWord)")
             return randomWord
         }
         
@@ -576,3 +576,11 @@ class EventEffectHandler {
         wordSetType = type
     }
 }
+
+#if DEBUG
+func debugLog(_ message: String) {
+    debugPrint(message)
+}
+#else
+func debugLog(_ message: String) {}
+#endif
