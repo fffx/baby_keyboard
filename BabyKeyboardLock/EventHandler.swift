@@ -168,7 +168,12 @@ class EventHandler: ObservableObject {
     
     func stop(){
         isLocked = false
+        if let tap = eventTap {
+            CGEvent.tapEnable(tap: tap, enable: false)
+            eventTap = nil
+        }
         CFRunLoopStop(CFRunLoopGetCurrent())
+        eventLoopStarted = false
     }
     
     func startEventLoop() {
@@ -185,6 +190,7 @@ class EventHandler: ObservableObject {
     }
     
     private func setupEventTap() {
+        // Combine all event types we want to monitor
         let eventMask = CGEventMask(
             (1 << CGEventType.keyDown.rawValue) |
             (1 << CGEventType.keyUp.rawValue) |
@@ -197,12 +203,10 @@ class EventHandler: ObservableObject {
             options: .defaultTap,
             eventsOfInterest: eventMask,
             callback: globalKeyEventHandler,
-            userInfo: UnsafeMutableRawPointer(Unmanaged
-                .passUnretained(self)
-                .toOpaque())
+            userInfo: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
         )
         
-        guard eventTap != nil else {
+        guard let eventTap = eventTap else {
             fatalError("Failed to create event tap")
         }
         
@@ -212,15 +216,14 @@ class EventHandler: ObservableObject {
             0
         )
         CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
-        CGEvent.tapEnable(tap: eventTap!, enable: true)
+        CGEvent.tapEnable(tap: eventTap, enable: true)
     }
     
     func handleKeyEvent(
         proxy: CGEventTapProxy,
         type: CGEventType,
         event: CGEvent
-    ) -> Unmanaged<CGEvent>?{
-
+    ) -> Unmanaged<CGEvent>? {
         // Handle tap disable events first
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
             debugPrint("Event tap disabled, attempting to re-enable...")
@@ -230,45 +233,37 @@ class EventHandler: ObservableObject {
             return Unmanaged.passRetained(event)
         }
         
-        debugPrint("--- keyup/down: \(type == .keyDown || type == .keyUp), keyboardEventKeyboardType: \(event.getIntegerValueField(.keyboardEventKeyboardType))")
-        // disable media keys, power button
-        if isLocked && event.getIntegerValueField(.keyboardEventKeyboardType) == 0 {
-            return nil
-        }
-        guard type == .keyDown || type == .keyUp else {
+        // Early return if keyboard is not locked
+        if !isLocked {
             return Unmanaged.passRetained(event)
         }
         
-        let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
-        let controlFlag = event.flags.contains(.maskControl)
-        let optionFlag = event.flags.contains(.maskAlternate)
-        let eventType = type == .keyDown ? "pressed" : "released"
-        debugPrint("Key Code: \0x\(String(keyCode, radix: 16)),\t" +
-                 "Control Flag: \(controlFlag),\t" +
-                 "Event Type: (\(type.rawValue)) \(eventType)")
-        // Toggle with Ctrl + Option + U
-        if optionFlag && controlFlag && keyCode == KeyCode.u.rawValue && type == .keyDown {
-            debugPrint("Keyboard locked: \(isLocked)")
-            self.isLocked = isLocked ? false : true
-            CFRunLoopStop(CFRunLoopGetCurrent())
+        // Handle keyboard events first
+        if type == .keyDown || type == .keyUp {
+            let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+            let controlFlag = event.flags.contains(.maskControl)
+            let optionFlag = event.flags.contains(.maskAlternate)
             
-            return nil
-        }
+            // Toggle keyboard lock with Ctrl + Option + U
+            if optionFlag && controlFlag && keyCode == KeyCode.u.rawValue && type == .keyDown {
+                debugPrint("Keyboard locked: \(isLocked)")
+                self.isLocked = isLocked ? false : true
+                CFRunLoopStop(CFRunLoopGetCurrent())
+                return nil
+            }
 
-        if isLocked {
-            
+            // Handle normal keyboard events when locked
             if type != .keyUp { return nil }
-            
             if isThrottled() { return nil }
             
             self.lastKeyString = eventEffectHandler.handle(
                 event: event, eventType: type, selectedLockEffect: selectedLockEffect
             )
-            debugPrint("keyup------- \(lastKeyString), str: \(lastKeyString)")
+            debugPrint("keyup------- \(lastKeyString)")
             return nil
-        } else {
-            return Unmanaged.passRetained(event)
         }
+        
+        return Unmanaged.passRetained(event)
     }
     
     func requestAccessibilityPermissions() -> Bool {
