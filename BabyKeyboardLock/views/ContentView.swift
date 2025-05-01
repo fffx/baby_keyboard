@@ -41,7 +41,8 @@ struct ContentView: View {
     @ObservedObject var eventHandler: EventHandler = EventHandler.shared
     @State private var selectedCategory: EffectCategory = .none
     @AppStorage("showFlashcards") private var showFlashcards: Bool = false
-    
+    @AppStorage("flashcardStyle") private var flashcardStyle: FlashcardStyle = .none
+
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
     @AppStorage("launchOnStartup") private var launchOnStartup: Bool = false {
         didSet {
@@ -187,13 +188,10 @@ struct ContentView: View {
                         Text("Flashcard Style")
                             .foregroundColor(.secondary)
                             .font(.subheadline)
-                        
-                        FlashcardStylePicker(selectedStyle: .init(
-                            get: { UserDefaults.standard.flashcardStyle },
-                            set: { UserDefaults.standard.flashcardStyle = $0 }
-                        ))
+
+                        FlashcardStylePicker(selectedStyle: $flashcardStyle)
                     }
-                    
+
                     Toggle(isOn: $eventHandler.usePersonalVoice) {
                         HStack {
                             Text("Use Personal Voice")

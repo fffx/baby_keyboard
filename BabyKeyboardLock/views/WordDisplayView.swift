@@ -35,7 +35,7 @@ struct WordDisplayView: View {
                                 .scaledToFit()
                                 .frame(height: 150)
                         }
-                        
+
                         // Main word
                         Text(word.uppercased())
                             .font(.system(size: 48, weight: .bold))
