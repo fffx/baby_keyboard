@@ -15,6 +15,9 @@ class RandomWordList {
     private(set) var words: [RandomWord] = []
     private(set) var babyName: String = ""
     
+    // todo: rework the random picker and translation system - unify with other components (word list, flashcards, etc)
+    // at least - use common translation system and flashcard images
+    // todo: add baby name translation field as well
     init() {
         loadWords()
         loadBabyName()
@@ -26,15 +29,18 @@ class RandomWordList {
                 RandomWord(english: "arm", translation: "рука"),
                 RandomWord(english: "leg", translation: "нога"),
                 RandomWord(english: "nose", translation: "нос"),
-                RandomWord(english: "eye", translation: "глаз")
+                RandomWord(english: "eye", translation: "глаз"),
+                RandomWord(english: "family", translation: "семья"),
+                RandomWord(english: "dog", translation: "собака"),
+                RandomWord(english: "cat", translation: "кошка"),
             ]
             saveWords()
         }
     }
     
     func getRandomWord() -> RandomWord? {
-        // If baby name is set, include it in the random selection with 25% probability
-        if !babyName.isEmpty && Int.random(in: 1...4) == 1 {
+        // If baby name is set, include it in the random selection with 12% probability
+        if !babyName.isEmpty && Int.random(in: 1...8) == 1 {
             return RandomWord(english: babyName, translation: babyName)
         }
         
