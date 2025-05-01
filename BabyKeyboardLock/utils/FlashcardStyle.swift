@@ -14,16 +14,6 @@ enum FlashcardStyle: String, CaseIterable {
         default: return rawValue.capitalized
         }
     }
-    
-    var icon: String {
-        switch self {
-        case .none: return "xmark.circle"
-        case .crayon: return "pencil.and.outline"
-        case .doodle: return "scribble"
-        case .pencil: return "pencil.line"
-        case .simple: return "square.on.circle"
-        }
-    }
 }
 
 extension UserDefaults {
