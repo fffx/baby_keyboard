@@ -8,6 +8,7 @@ struct WordDisplayView: View {
     @State private var showWord: Bool = false
     @AppStorage("wordDisplayDuration") private var wordDisplayDuration: Double = DEFAULT_WORD_DISPLAY_DURATION
     @AppStorage("showFlashcards") private var showFlashcards: Bool = false
+    @AppStorage("flashcardStyle") private var flashcardStyle: FlashcardStyle = .none
     @State private var windowSize: CGSize = .zero
     
     // For more reliable timeout handling
@@ -22,9 +23,19 @@ struct WordDisplayView: View {
                         .fill(Color.white)
                         .cornerRadius(20)
                         .shadow(radius: 10)
-                        .frame(width: min(geometry.size.width * 0.8, 500), height: 200)
+                        .frame(width: min(geometry.size.width * 0.8, 500), height: 300)
                     
                     VStack(spacing: 20) {
+                        // Flashcard image if available
+                        if flashcardStyle != .none,
+                           let image = RandomWord(english: word, translation: translation)
+                            .flashcardImage(style: flashcardStyle) {
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 150)
+                        }
+                        
                         // Main word
                         Text(word.uppercased())
                             .font(.system(size: 48, weight: .bold))
@@ -38,7 +49,7 @@ struct WordDisplayView: View {
                         }
                     }
                     .padding()
-                    .frame(width: min(geometry.size.width * 0.8, 500), height: 200)
+                    .frame(width: min(geometry.size.width * 0.8, 500), height: 300)
                 }
                 .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 .transition(.opacity)

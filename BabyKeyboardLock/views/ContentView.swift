@@ -183,6 +183,17 @@ struct ContentView: View {
                     }
                     .toggleStyle(CheckboxToggleStyle())
                     
+                    if showFlashcards {
+                        Text("Flashcard Style")
+                            .foregroundColor(.secondary)
+                            .font(.subheadline)
+                        
+                        FlashcardStylePicker(selectedStyle: .init(
+                            get: { UserDefaults.standard.flashcardStyle },
+                            set: { UserDefaults.standard.flashcardStyle = $0 }
+                        ))
+                    }
+                    
                     Toggle(isOn: $eventHandler.usePersonalVoice) {
                         HStack {
                             Text("Use Personal Voice")
@@ -331,7 +342,7 @@ struct ContentView: View {
             )
         }
         .padding(20)
-        .frame(width: 320)
+        .frame(width: 600)
         .onAppear {
             debugPrint("ContentView appeared with height: \(preferredHeight)")
             updateWindowForHeight(preferredHeight)
@@ -394,7 +405,7 @@ struct ContentView: View {
         guard height > 0 else { return }
         
         if let window = NSApp.windows.first(where: { $0.title == Bundle.applicationName || $0.title.isEmpty }) {
-            let contentSize = NSSize(width: 320, height: height)
+            let contentSize = NSSize(width: 380, height: height)
             let frameSize = window.frameRect(forContentRect: NSRect(origin: .zero, size: contentSize)).size
             
             // Preserve the window's x and y position
