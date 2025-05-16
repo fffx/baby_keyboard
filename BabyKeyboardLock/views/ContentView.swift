@@ -56,6 +56,7 @@ struct ContentView: View {
     @AppStorage("usePersonalVoice") var usePersonalVoice: Bool = false
     @AppStorage("throttleInterval") private var savedThrottleInterval: Double = 1.0
     @AppStorage("confettiFadeTime") private var savedConfettiFadeTime: Double = 5.0
+    @AppStorage("wordTranslationDelay") private var savedWordTranslationDelay: Double = 0.8
     
     @State private var showWordSetEditor = false
     @State private var showRandomWordEditor = false
@@ -340,7 +341,7 @@ struct ContentView: View {
             )
         }
         .padding(20)
-        .frame(width: 600)
+        .frame(width: 400)
         .onAppear {
             debugPrint("ContentView appeared with height: \(preferredHeight)")
             updateWindowForHeight(preferredHeight)

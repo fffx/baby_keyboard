@@ -49,6 +49,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    /// <#Description#>
+    /// - Parameter notification: <#notification description#>
     @MainActor func applicationDidFinishLaunching(_ notification: Notification) {
         // Add screen configuration change observer
         screenObserver = NotificationCenter.default.addObserver(
@@ -60,7 +62,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.updateWindowFrames()
             }
         }
-        
+
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         
         if let statusButton = statusItem.button {

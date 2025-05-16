@@ -328,7 +328,7 @@ class EventEffectHandler {
                 synth.speak(englishUtterance)
                 
                 // Then with a slight delay, speak the translation
-                DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + 0.8) {
+                DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + EventHandler.shared.wordTranslationDelay) {
                     let translationUtterance: AVSpeechUtterance
                     
                     switch self.translationLanguage {
@@ -389,7 +389,7 @@ class EventEffectHandler {
                 synth.speak(englishUtterance)
                 
                 // Then with a slight delay, speak the translation
-                DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + 0.8) {
+                DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + EventHandler.shared.wordTranslationDelay) {
                     let translationUtterance: AVSpeechUtterance
                     
                     switch self.translationLanguage {

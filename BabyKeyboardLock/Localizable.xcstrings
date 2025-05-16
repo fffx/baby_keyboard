@@ -42,7 +42,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Please grant accessibility permissions to [%@] in:\n[System Settings]\n    > [Secuerity & Privacy] \n        > [Accessibility] (scroll down)"
+            "value" : "Please grant accessibility permissions to [%@] in:\n[System Settings]\n    > [Security & Privacy] \n        > [Accessibility] (scroll down)"
           }
         },
         "zh-Hans" : {
