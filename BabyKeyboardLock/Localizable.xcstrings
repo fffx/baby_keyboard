@@ -71,6 +71,9 @@
     "Delay between confetti (seconds)" : {
 
     },
+    "Delay between words (seconds)" : {
+
+    },
     "Edit the words used in 'Main Words' set" : {
 
     },

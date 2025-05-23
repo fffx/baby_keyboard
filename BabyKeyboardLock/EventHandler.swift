@@ -55,19 +55,23 @@ class EventHandler: ObservableObject {
     @Published var lastKeyString: String = "a" // fix onReceive won't work as expected for first key press
 
     private var lastEventTime: Date = Date()
-    @Published var throttleInterval: TimeInterval = 1.0 // seconds
+    @Published var throttleInterval: TimeInterval = 1.0 // seconds (for visual effects)
+    @Published var wordsThrottleInterval: TimeInterval = 1.5 // seconds (for word effects)
     @Published var confettiFadeTime: TimeInterval = 3.0 // seconds
     @Published var wordTranslationDelay: TimeInterval = 0.8 // seconds
     
-    private func isThrottled() -> Bool {
+    private func isThrottled(effectType: LockEffect) -> Bool {
         let now = Date()
         let timeSinceLastEvent = now.timeIntervalSince(lastEventTime)
+        
+        // Use different throttle intervals based on effect category
+        let currentThrottleInterval = effectType.category == .words ? wordsThrottleInterval : throttleInterval
       
-        if timeSinceLastEvent >= throttleInterval {
+        if timeSinceLastEvent >= currentThrottleInterval {
             lastEventTime = now
             return false
         }
-        debugPrint("Throttled >>>>> timeSinceLastEvent: \(timeSinceLastEvent)")
+        debugPrint("Throttled >>>>> timeSinceLastEvent: \(timeSinceLastEvent), threshold: \(currentThrottleInterval)")
         return true
     }
     
@@ -85,6 +89,12 @@ class EventHandler: ObservableObject {
         self.throttleInterval = UserDefaults.standard.double(forKey: "throttleInterval")
         if self.throttleInterval == 0 { // If not set yet
             self.throttleInterval = 1.0
+        }
+        
+        // Initialize words throttle interval from UserDefaults
+        self.wordsThrottleInterval = UserDefaults.standard.double(forKey: "wordsThrottleInterval")
+        if self.wordsThrottleInterval == 0 { // If not set yet
+            self.wordsThrottleInterval = 1.5
         }
         
         // Initialize fade time from UserDefaults
@@ -270,7 +280,7 @@ class EventHandler: ObservableObject {
 
             // Handle normal keyboard events when locked
             if type != .keyUp { return nil }
-            if isThrottled() { return nil }
+            if isThrottled(effectType: selectedLockEffect) { return nil }
             
             self.lastKeyString = eventEffectHandler.handle(
                 event: event, eventType: type, selectedLockEffect: selectedLockEffect
