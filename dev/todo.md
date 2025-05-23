@@ -42,3 +42,35 @@ Done
   - [x] add configurable timing for word display on screen with slider (1-10 seconds)
   - [x] fix display duration for word display to ensure words disappear after configured time
 - [x] add a custom field for baby's name
+
+# Content Display Optimization Issues (from log analysis)
+
+## High Priority - Window/Layout Issues
+- [x] Fix excessive window height readjustments (FIXED: added debouncing and larger thresholds)
+- [ ] Resolve layout constraint conflicts in status bar (NSLayoutConstraint conflicts)
+- [x] Streamline `updateWindowForHeight` method to avoid size mismatch cycles (FIXED: improved WindowManager)
+- [x] Fix "Size mismatch, trying again with animation" infinite loops (FIXED: better thresholds)
+- [x] Debounce height calculations in ContentView - too many "Content height changed to" calls (FIXED: increased threshold to 10px)
+- [x] Remove duplicate window sizing logic between ContentView and GeometryReader (FIXED: consolidated in WindowManager)
+
+## Medium Priority - Performance & Redundancy
+- [x] Optimize throttling messages - reduce verbose "Throttled >>>>> timeSinceLastEvent" logging (FIXED: less frequent logging)
+- [x] Consolidate multiple "Resetting all visual effects" calls (FIXED: only log when actually resetting)
+- [ ] Fix picker selection validation ("Picker: the selection X is invalid")
+- [ ] Prevent duplicate event handler initialization  
+- [x] Cache window references instead of searching NSApp.windows repeatedly (FIXED: WindowManager caches window)
+- [ ] Optimize fullscreen window creation - created at startup but constantly resized
+
+## Low Priority - Audio System Issues
+- [ ] Fix "Cannot use AVSpeechSynthesizerBufferCallback with Personal Voices" warnings
+- [ ] Handle voice service asset query failures gracefully
+- [ ] Reduce "Error reading languages in for local resources" frequency
+- [x] Fix "Already playing" NSSound warnings (FIXED: improved sound pool with stop/reuse logic)
+- [x] Optimize sound pool management in AnimationView (FIXED: larger pool with reuse strategy)
+
+## Code Structure Improvements
+- [ ] Move window management logic into dedicated WindowManager class
+- [ ] Create consistent height calculation strategy across all views
+- [ ] Implement proper SwiftUI state management to prevent layout fighting
+- [ ] Add window frame caching to avoid repeated calculations
+- [ ] Create unified visual effects coordinator to prevent state conflicts

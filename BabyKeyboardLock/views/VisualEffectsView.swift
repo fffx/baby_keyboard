@@ -28,10 +28,14 @@ struct VisualEffectsView: View {
     @State private var rainbowOpacities: [Double] = []
     
     private func resetAllEffects() {
-        // Clear all animation states
+        // Clear all animation states only if they're not already empty
+        let hadContent = !rainbowPoints.isEmpty || !rainbowOpacities.isEmpty
         rainbowPoints = []
         rainbowOpacities = []
-        debugPrint("Resetting all visual effects")
+        
+        if hadContent {
+            debugPrint("Resetting all visual effects")
+        }
     }
     
     var body: some View {

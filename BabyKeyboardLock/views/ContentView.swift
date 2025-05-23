@@ -36,6 +36,90 @@ struct HoverableMenuStyle: MenuStyle {
     }
 }
 
+// MARK: - Window Manager Helper
+class WindowManager: ObservableObject {
+    static let shared = WindowManager()
+    
+    private var cachedMainWindow: NSWindow?
+    private var lastUpdateTime: Date = Date()
+    private let debounceInterval: TimeInterval = 0.1
+    private var pendingHeight: CGFloat?
+    private var updateWorkItem: DispatchWorkItem?
+    
+    private init() {}
+    
+    func updateWindowHeight(_ height: CGFloat, force: Bool = false) {
+        guard height > 0 else { return }
+        
+        let now = Date()
+        let timeSinceLastUpdate = now.timeIntervalSince(lastUpdateTime)
+        
+        // Cancel any pending update
+        updateWorkItem?.cancel()
+        
+        // Store the pending height
+        pendingHeight = height
+        
+        // If forced or enough time has passed, update immediately
+        if force || timeSinceLastUpdate >= debounceInterval {
+            performUpdate(height)
+        } else {
+            // Debounce the update with longer delay to prevent rapid updates
+            let workItem = DispatchWorkItem { [weak self] in
+                if let pendingHeight = self?.pendingHeight {
+                    self?.performUpdate(pendingHeight)
+                }
+            }
+            updateWorkItem = workItem
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: workItem)
+        }
+    }
+    
+    private func performUpdate(_ height: CGFloat) {
+        lastUpdateTime = Date()
+        pendingHeight = nil
+        
+        let window = getMainWindow()
+        guard let window = window else {
+            return // Don't log this error, it's too noisy
+        }
+        
+        let contentSize = NSSize(width: 380, height: height)
+        let frameSize = window.frameRect(forContentRect: NSRect(origin: .zero, size: contentSize)).size
+        
+        // Check if resize is actually needed
+        if abs(window.frame.size.height - frameSize.height) < 5 {
+            return // Skip unnecessary resize with larger threshold
+        }
+        
+        debugPrint("Updating window to height: \(height)")
+        
+        var newFrame = window.frame
+        newFrame.size = frameSize
+        
+        // Use immediate resize for better performance
+        window.setFrame(newFrame, display: true, animate: false)
+        window.contentView?.setFrameSize(contentSize)
+    }
+    
+    private func getMainWindow() -> NSWindow? {
+        // Cache the main window reference for better performance
+        if let cached = cachedMainWindow, cached.isVisible {
+            return cached
+        }
+        
+        let window = NSApp.windows.first(where: { 
+            $0.title == Bundle.applicationName || $0.title.isEmpty 
+        })
+        cachedMainWindow = window
+        return window
+    }
+    
+    func invalidateCache() {
+        cachedMainWindow = nil
+    }
+}
+
 struct ContentView: View {
     @State private var animationWindow: NSWindow?
     @ObservedObject var eventHandler: EventHandler = EventHandler.shared
@@ -55,15 +139,18 @@ struct ContentView: View {
     @AppStorage("wordDisplayDuration") var wordDisplayDuration: Double = DEFAULT_WORD_DISPLAY_DURATION
     @AppStorage("usePersonalVoice") var usePersonalVoice: Bool = false
     @AppStorage("throttleInterval") private var savedThrottleInterval: Double = 1.0
+    @AppStorage("wordsThrottleInterval") private var savedWordsThrottleInterval: Double = 1.5
     @AppStorage("confettiFadeTime") private var savedConfettiFadeTime: Double = 5.0
     @AppStorage("wordTranslationDelay") private var savedWordTranslationDelay: Double = 0.8
     
     @State private var showWordSetEditor = false
     @State private var showRandomWordEditor = false
     @StateObject private var customWordSetsManager = CustomWordSetsManager.shared
+    @StateObject private var windowManager = WindowManager.shared
     
     @State var hoveringMoreButton: Bool = false
     @State private var babyName: String = ""
+    @State private var lastCalculatedHeight: CGFloat = 0
     
     // Calculate preferred content size based on effect type
     private var preferredHeight: CGFloat {
@@ -90,8 +177,17 @@ struct ContentView: View {
             height += 180 // Translation picker, edit button
         }
         
-        debugPrint("Calculated preferred height: \(height) for effect: \(eventHandler.selectedLockEffect)")
         return height
+    }
+    
+    private func calculateAndUpdateHeight() {
+        let newHeight = preferredHeight
+        // Only log and update if height actually changed
+        if abs(newHeight - lastCalculatedHeight) > 5 {
+            debugPrint("Calculated preferred height: \(newHeight) for effect: \(eventHandler.selectedLockEffect)")
+            lastCalculatedHeight = newHeight
+            windowManager.updateWindowHeight(newHeight, force: true)
+        }
     }
     
     var body: some View {
@@ -136,8 +232,9 @@ struct ContentView: View {
                 
                 // Effect selector based on category
                 if selectedCategory != .none {
+                    let availableEffects = LockEffect.allCases.filter { $0.category == selectedCategory }
                     Picker("Effect", selection: $eventHandler.selectedLockEffect) {
-                        ForEach(LockEffect.allCases.filter { $0.category == selectedCategory }) { effect in
+                        ForEach(availableEffects) { effect in
                             Text(effect.localizedString).tag(effect)
                         }
                     }
@@ -215,6 +312,21 @@ struct ContentView: View {
                     .toggleStyle(CheckboxToggleStyle())
                     .onChange(of: eventHandler.usePersonalVoice) { oldVal, newVal in
                         usePersonalVoice = newVal
+                    }
+                    
+                    // Words throttle setting
+                    Text("Delay between words (seconds)")
+                        .foregroundColor(.secondary)
+                        .font(.subheadline)
+                        .padding(.top, 8)
+                    
+                    HStack {
+                        Slider(value: $eventHandler.wordsThrottleInterval, in: 0.1...3.0, step: 0.1)
+                            .onChange(of: eventHandler.wordsThrottleInterval) { _, newValue in
+                                savedWordsThrottleInterval = newValue
+                            }
+                        Text(String(format: "%.1f", eventHandler.wordsThrottleInterval))
+                            .frame(width: 35)
                     }
                     
                     // Translation picker
@@ -326,15 +438,21 @@ struct ContentView: View {
                     .padding(.bottom, 4)
                 }
             }
-            // Get the actual size of this content
+            // Get the actual size of this content with better debouncing
             .background(
                 GeometryReader { geo in
                     Color.clear
                         .preference(key: ContentHeightKey.self, value: geo.size.height)
                         .onPreferenceChange(ContentHeightKey.self) { height in
-                            debugPrint("Content height changed to: \(height)")
-                            DispatchQueue.main.async {
-                                updateWindowForHeight(height + 160) // Add padding and space for top elements
+                            let totalHeight = height + 160 // Add padding and space for top elements
+                            // Only update if height changed significantly and enough time has passed
+                            if abs(totalHeight - lastCalculatedHeight) > 10 && height > 50 {
+                                debugPrint("Content height changed to: \(height)")
+                                lastCalculatedHeight = totalHeight
+                                // Add small delay to let SwiftUI finish its layout calculations
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    windowManager.updateWindowHeight(totalHeight)
+                                }
                             }
                         }
                 }
@@ -343,10 +461,7 @@ struct ContentView: View {
         .padding(20)
         .frame(width: 400)
         .onAppear {
-            debugPrint("ContentView appeared with height: \(preferredHeight)")
-            updateWindowForHeight(preferredHeight)
-            
-            // Update initial values
+            // Set initial values first
             if let type = WordSetType(rawValue: savedWordSetType) {
                 eventHandler.selectedWordSetType = type
             }
@@ -361,6 +476,14 @@ struct ContentView: View {
             if selectedCategory == .words && eventHandler.selectedLockEffect == .speakAKeyWord {
                 eventHandler.selectedLockEffect = .speakRandomWord
             }
+            
+            // Delay window sizing to after UI stabilizes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                let initialHeight = preferredHeight
+                debugPrint("ContentView appeared with height: \(initialHeight)")
+                lastCalculatedHeight = initialHeight
+                windowManager.updateWindowHeight(initialHeight, force: true)
+            }
         }
         .onChange(of: eventHandler.isLocked) { oldVal, newVal in
             playLockSound(isLocked: newVal)
@@ -371,24 +494,25 @@ struct ContentView: View {
         .onChange(of: eventHandler.selectedLockEffect) { oldVal, newVal in
             selectedLockEffect = newVal
             // Force height recalculation immediately since preference might not trigger
-            DispatchQueue.main.async {
-                updateWindowForHeight(preferredHeight)
-            }
+            calculateAndUpdateHeight()
         }
         .onChange(of: eventHandler.accessibilityPermissionGranted) { _, _ in
             // Force height recalculation
-            DispatchQueue.main.async {
-                updateWindowForHeight(preferredHeight)
-            }
+            calculateAndUpdateHeight()
         }
         .onChange(of: selectedCategory) { oldValue, newValue in
             // When changing category, select appropriate default effect
+            let availableEffects = LockEffect.allCases.filter { $0.category == newValue }
+            
             if newValue == .none {
                 eventHandler.selectedLockEffect = .none
-            } else if newValue == .visual {
-                eventHandler.selectedLockEffect = .confettiCannon
-            } else if newValue == .words {
-                eventHandler.selectedLockEffect = .speakRandomWord
+            } else if !availableEffects.contains(eventHandler.selectedLockEffect) {
+                // Current effect doesn't match category, select a default
+                if newValue == .visual {
+                    eventHandler.selectedLockEffect = .confettiCannon
+                } else if newValue == .words {
+                    eventHandler.selectedLockEffect = .speakRandomWord
+                }
             }
         }
         .sheet(isPresented: $showWordSetEditor) {
@@ -399,41 +523,7 @@ struct ContentView: View {
         }
     }
     
-    private func updateWindowForHeight(_ height: CGFloat) {
-        debugPrint("Updating window to height: \(height)")
-        guard height > 0 else { return }
-        
-        if let window = NSApp.windows.first(where: { $0.title == Bundle.applicationName || $0.title.isEmpty }) {
-            let contentSize = NSSize(width: 380, height: height)
-            let frameSize = window.frameRect(forContentRect: NSRect(origin: .zero, size: contentSize)).size
-            
-            // Preserve the window's x and y position
-            var newFrame = window.frame
-            newFrame.size = frameSize
-            
-            // Force immediate resize without animation for more reliable results
-            window.setFrame(newFrame, display: true)
-            
-            // Also update contentSize directly
-            window.contentView?.setFrameSize(contentSize)
-            
-            // Log after resize
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                debugPrint("Window size after direct resize: \(window.frame.size.height)")
-                
-                // If size doesn't match, try again with animation
-                if abs(window.frame.size.height - frameSize.height) > 5 {
-                    debugPrint("Size mismatch, trying again with animation")
-                    NSAnimationContext.runAnimationGroup { context in
-                        context.duration = 0.2
-                        window.animator().setFrame(newFrame, display: true)
-                    }
-                }
-            }
-        } else {
-            debugPrint("Could not find window to resize")
-        }
-    }
+
     
     private func playLockSound(isLocked: Bool) {
         if isLocked {
