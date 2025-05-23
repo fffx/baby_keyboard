@@ -1,5 +1,5 @@
 - [ ] Optimize performance 
-  - [ ] - remove tracking when inactive
+  - [x] - remove tracking when inactive - DONE: event tap passes through all events immediately when unlocked
   - [ ] something else?
   - [ ] fix lag? why is the app slow? 
 

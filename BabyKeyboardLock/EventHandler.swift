@@ -49,13 +49,7 @@ class EventHandler: ObservableObject {
             }
         }
     }
-    @Published var isLocked = true {
-        didSet {
-            if isLocked {
-                startEventLoop()
-            }
-        }
-    }
+    @Published var isLocked = true
     @Published var accessibilityPermissionGranted = false
     @Published var personalVoiceAvailable: Bool = false
     @Published var lastKeyString: String = "a" // fix onReceive won't work as expected for first key press
@@ -141,12 +135,9 @@ class EventHandler: ObservableObject {
     func setLocked(isLocked: Bool) {
         if (isLocked && accessibilityPermissionGranted) {
             self.isLocked = true
-            startEventLoop()
         } else {
             self.isLocked = false
         }
-        
-        
     }
 
     func checkAccessibilityPermission(){
@@ -259,12 +250,12 @@ class EventHandler: ObservableObject {
             return Unmanaged.passRetained(event)
         }
         
-        // Early return if keyboard is not locked
-        if !isLocked {
+        // If not locked, pass through ALL events immediately without any processing
+        guard isLocked else {
             return Unmanaged.passRetained(event)
         }
         
-        // Handle keyboard events first
+        // Handle keyboard events only when locked
         if type == .keyDown || type == .keyUp {
             let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
             let controlFlag = event.flags.contains(.maskControl)
@@ -273,8 +264,7 @@ class EventHandler: ObservableObject {
             // Toggle keyboard lock with Ctrl + Option + U
             if optionFlag && controlFlag && keyCode == KeyCode.u.rawValue && type == .keyDown {
                 debugPrint("Keyboard locked: \(isLocked)")
-                self.isLocked = isLocked ? false : true
-                CFRunLoopStop(CFRunLoopGetCurrent())
+                self.isLocked = false
                 return nil
             }
 
