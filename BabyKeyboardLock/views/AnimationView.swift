@@ -105,20 +105,11 @@ struct AnimationView: View {
     }
     
     private func playSound() {
-        guard let originalSound = sound else { return }
-        
-        if soundPool.isEmpty {
-            soundPool = Array(repeating: originalSound, count: 8).map { $0.copy() as! NSSound }
+        if sound != nil && soundPool.isEmpty {
+            soundPool = Array(repeating: sound!, count: 5).map { $0.copy() as! NSSound }
         }
-        
-        // Find an available sound or stop the oldest one
-        if let availableSound = soundPool.first(where: { !$0.isPlaying }) {
-            availableSound.play()
-        } else {
-            // All sounds are playing, stop the first one and use it
-            soundPool[0].stop()
-            soundPool[0].play()
-        }
+        guard let availableSound = soundPool.first(where: { !$0.isPlaying }) else { return }
+        availableSound.play()
     }
 }
 

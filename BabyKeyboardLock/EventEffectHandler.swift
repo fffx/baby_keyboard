@@ -282,27 +282,14 @@ class EventEffectHandler {
     var translationLanguage: TranslationLanguage = .none
     var usePersonalVoice: Bool = false
     
-    // Add property for throttling
-    private var lastEventTime: TimeInterval?
-    
     func handle(event: CGEvent, eventType: CGEventType, selectedLockEffect: LockEffect) -> String {
         // Get the key string
         let keyStr = getKeyString(event: event)
         
-        // Add throttling for sound effects
-        let now = Date().timeIntervalSince1970
-        if let lastEvent = lastEventTime, now - lastEvent < 0.5 {
-            debugLog("Throttled sound event - value: \(String(format: "%.2f", now - lastEvent))")
-            return keyStr
-        }
-        lastEventTime = now
-        
         switch selectedLockEffect {
         case .none:
-            // Only play sound if not already playing
-            if let sound = NSSound(named: "bottle"), !sound.isPlaying {
-                sound.play()
-            }
+            // Simple sound playing without checking if already playing
+            NSSound(named: "bottle")?.play()
             return keyStr
         case .confettiCannon:
             // Show confetti
