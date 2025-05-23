@@ -71,7 +71,7 @@ class EventHandler: ObservableObject {
             lastEventTime = now
             return false
         }
-        debugPrint("Throttled >>>>> timeSinceLastEvent: \(timeSinceLastEvent), threshold: \(currentThrottleInterval)")
+        debugPrint("Throttled >>>>> timeSinceLastEvent: \(String(format: "%.2f", timeSinceLastEvent)), threshold: \(String(format: "%.2f", currentThrottleInterval))")
         return true
     }
     

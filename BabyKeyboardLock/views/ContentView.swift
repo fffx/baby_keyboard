@@ -446,7 +446,7 @@ struct ContentView: View {
                         .onPreferenceChange(ContentHeightKey.self) { height in
                             let totalHeight = height + 160 // Add padding and space for top elements
                             // Only update if height changed significantly and enough time has passed
-                            if abs(totalHeight - lastCalculatedHeight) > 10 && height > 50 {
+                            if abs(totalHeight - lastCalculatedHeight) > 20 && height > 50 {
                                 debugPrint("Content height changed to: \(height)")
                                 lastCalculatedHeight = totalHeight
                                 // Add small delay to let SwiftUI finish its layout calculations
@@ -501,19 +501,20 @@ struct ContentView: View {
             calculateAndUpdateHeight()
         }
         .onChange(of: selectedCategory) { oldValue, newValue in
-            // When changing category, select appropriate default effect
+            // When changing category, only switch if current effect is incompatible
             let availableEffects = LockEffect.allCases.filter { $0.category == newValue }
             
             if newValue == .none {
                 eventHandler.selectedLockEffect = .none
             } else if !availableEffects.contains(eventHandler.selectedLockEffect) {
-                // Current effect doesn't match category, select a default
+                // Current effect doesn't match category, preserve user preference if possible
                 if newValue == .visual {
                     eventHandler.selectedLockEffect = .confettiCannon
                 } else if newValue == .words {
                     eventHandler.selectedLockEffect = .speakRandomWord
                 }
             }
+            // If current effect is compatible with new category, keep it unchanged
         }
         .sheet(isPresented: $showWordSetEditor) {
             WordSetEditorView()

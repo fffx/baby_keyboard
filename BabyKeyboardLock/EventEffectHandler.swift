@@ -292,7 +292,7 @@ class EventEffectHandler {
         // Add throttling for sound effects
         let now = Date().timeIntervalSince1970
         if let lastEvent = lastEventTime, now - lastEvent < 0.5 {
-            debugLog("Throttled event - too soon after last one")
+            debugLog("Throttled sound event - value: \(String(format: "%.2f", now - lastEvent))")
             return keyStr
         }
         lastEventTime = now

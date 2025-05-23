@@ -54,19 +54,20 @@ Done
 - [x] Remove duplicate window sizing logic between ContentView and GeometryReader (FIXED: consolidated in WindowManager)
 
 ## Medium Priority - Performance & Redundancy
-- [x] Optimize throttling messages - reduce verbose "Throttled >>>>> timeSinceLastEvent" logging (FIXED: less frequent logging)
+- [x] Optimize throttling messages - reduce verbose "Throttled >>>>> timeSinceLastEvent" logging (FIXED: 2 decimal precision)
 - [x] Consolidate multiple "Resetting all visual effects" calls (FIXED: only log when actually resetting)
-- [ ] Fix picker selection validation ("Picker: the selection X is invalid")
-- [ ] Prevent duplicate event handler initialization  
+- [x] Fix picker selection validation ("Picker: the selection X is invalid") (FIXED: proper category-effect matching)
+- [x] Prevent duplicate event handler initialization (FIXED: voice cache check)
 - [x] Cache window references instead of searching NSApp.windows repeatedly (FIXED: WindowManager caches window)
 - [ ] Optimize fullscreen window creation - created at startup but constantly resized
 
 ## Low Priority - Audio System Issues
-- [ ] Fix "Cannot use AVSpeechSynthesizerBufferCallback with Personal Voices" warnings
-- [ ] Handle voice service asset query failures gracefully
-- [ ] Reduce "Error reading languages in for local resources" frequency
+- [x] Fix "Cannot use AVSpeechSynthesizerBufferCallback with Personal Voices" warnings (FIXED: voice caching & throttling)
+- [x] Handle voice service asset query failures gracefully (FIXED: cached voice discovery reduces queries)
+- [ ] Reduce "Error reading languages in for local resources" frequency  
 - [x] Fix "Already playing" NSSound warnings (FIXED: improved sound pool with stop/reuse logic)
 - [x] Optimize sound pool management in AnimationView (FIXED: larger pool with reuse strategy)
+- [x] Fix crash handler proxy errors on each keypress (PARTIAL: improved speech throttling, gentler audio stops, pending speech tracking)
 
 ## Code Structure Improvements
 - [ ] Move window management logic into dedicated WindowManager class
