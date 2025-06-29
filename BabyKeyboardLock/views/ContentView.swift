@@ -142,6 +142,7 @@ struct ContentView: View {
     @AppStorage("wordsThrottleInterval") private var savedWordsThrottleInterval: Double = 1.5
     @AppStorage("confettiFadeTime") private var savedConfettiFadeTime: Double = 5.0
     @AppStorage("wordTranslationDelay") private var savedWordTranslationDelay: Double = 0.8
+    @AppStorage("flashcardImageSize") private var flashcardImageSize: Double = 150.0
     
     @State private var showWordSetEditor = false
     @State private var showRandomWordEditor = false
@@ -398,6 +399,28 @@ struct ContentView: View {
                         Text("Contains \(RandomWordList.shared.words.count) words")
                             .font(.caption)
                             .foregroundColor(.secondary)
+                        
+                        // Image size slider for random word mode
+                        if showFlashcards && flashcardStyle != .none {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text("Image Size: \(Int(flashcardImageSize))px")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                
+                                HStack {
+                                    Text("50px")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                    
+                                    Slider(value: $flashcardImageSize, in: 50...1000, step: 50)
+                                    
+                                    Text("1000px")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .padding(.top, 8)
+                        }
                     }
                 }
                 

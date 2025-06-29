@@ -28,6 +28,12 @@
     "10s" : {
 
     },
+    "50px" : {
+
+    },
+    "1000px" : {
+
+    },
     "About" : {
 
     },
@@ -138,6 +144,9 @@
 
     },
     "https://keyboardlock.app" : {
+
+    },
+    "Image Size: %lldpx" : {
 
     },
     "Keyboard shortcut: Ctrl + Option + U" : {
