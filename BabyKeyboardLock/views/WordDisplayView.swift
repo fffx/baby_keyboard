@@ -19,25 +19,25 @@ struct WordDisplayView: View {
     private var backgroundSize: CGSize {
         let hasImage = flashcardStyle != .none
         let hasTranslation = !translation.isEmpty
-        
-        // Base dimensions
-        let baseWidth: CGFloat = 500
-        var baseHeight: CGFloat = 200 // Base height for text
-        
-        // Add image height if present
+
+        // Padding/buffer values
+        let horizontalPadding: CGFloat = 100
+        let verticalPadding: CGFloat = 60 // for top/bottom
+        let wordTextHeight: CGFloat = 60
+        let translationTextHeight: CGFloat = hasTranslation ? 40 : 0
+
         if hasImage {
-            baseHeight += flashcardImageSize + 40 // Image + spacing
+            let width = flashcardImageSize + 2 * horizontalPadding
+            let height = flashcardImageSize + verticalPadding + wordTextHeight + translationTextHeight
+            // Ensure minimums for small images
+            return CGSize(
+                width: max(width, 400),
+                height: max(height, 250)
+            )
+        } else {
+            // No image, just use minimums
+            return CGSize(width: 400, height: hasTranslation ? 250 : 200)
         }
-        
-        // Add translation height if present
-        if hasTranslation {
-            baseHeight += 50 // Translation text height
-        }
-        
-        // Ensure minimum height
-        baseHeight = max(baseHeight, 200)
-        
-        return CGSize(width: baseWidth, height: baseHeight)
     }
     
     var body: some View {
