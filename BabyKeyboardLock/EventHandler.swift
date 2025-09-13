@@ -165,6 +165,10 @@ class EventHandler: ObservableObject {
         }
         if processTrusted {
             self.accessibilityPermissionGranted = true
+            // Ensure the event loop starts after permission is granted
+            if !self.eventLoopStarted {
+                self.startEventLoop()
+            }
             return // Stop checking once permission is granted
         }
         
@@ -199,7 +203,7 @@ class EventHandler: ObservableObject {
             CGEvent.tapEnable(tap: tap, enable: false)
             eventTap = nil
         }
-        CFRunLoopStop(CFRunLoopGetCurrent())
+        // Do not stop the main run loop; just mark our loop as stopped
         eventLoopStarted = false
     }
     
@@ -208,12 +212,9 @@ class EventHandler: ObservableObject {
         if(!accessibilityPermissionGranted) { return }
         lock.lock()
         defer { lock.unlock() }
-        
-        setupEventTap() // Setup event tap to capture key events
-        DispatchQueue.main.async {
-            self.eventLoopStarted = true
-            CFRunLoopRun()  // Start the run loop to handle events in a background thread
-        }
+
+        setupEventTap() // Setup event tap to capture key events on the current (main) run loop
+        self.eventLoopStarted = true
     }
     
     private func setupEventTap() {
@@ -394,4 +395,3 @@ func globalKeyEventHandler(
     let mySelf = Unmanaged<EventHandler>.fromOpaque(refcon).takeUnretainedValue()
     return mySelf.handleKeyEvent(proxy: proxy, type: type, event: event)
 }
-

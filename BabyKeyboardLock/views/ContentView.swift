@@ -216,10 +216,25 @@ struct ContentView: View {
             
             Group {
                 if !eventHandler.accessibilityPermissionGranted {
-                    Text("accessibility_permission_grant_hint \(Bundle.applicationName)")
-                        .opacity(eventHandler.accessibilityPermissionGranted ? 0 : 1)
-                        .font(.callout)
-                        .fixedSize(horizontal: false, vertical: true)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("This app needs Accessibility access to work.")
+                            .font(.callout)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        HStack(spacing: 8) {
+                            Button("Grant Accessibility Access") {
+                                NSApp.activate(ignoringOtherApps: true)
+                                _ = eventHandler.requestAccessibilityPermissions()
+                            }
+
+                            Button("Open System Settings…") {
+                                NSApp.activate(ignoringOtherApps: true)
+                                if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                                    NSWorkspace.shared.open(url)
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 // Category selector
@@ -544,6 +559,13 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showRandomWordEditor) {
             RandomWordEditorView()
+        }
+        .onAppear {
+            // On first show, trigger the standard Accessibility prompt if needed
+            if !eventHandler.accessibilityPermissionGranted {
+                NSApp.activate(ignoringOtherApps: true)
+                _ = eventHandler.requestAccessibilityPermissions()
+            }
         }
     }
     
