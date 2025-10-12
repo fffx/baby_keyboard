@@ -38,6 +38,7 @@
 
     },
     "accessibility_permission_grant_hint %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -141,6 +142,9 @@
 
     },
     "For more information please visit our website" : {
+
+    },
+    "Grant Accessibility Access" : {
 
     },
     "https://keyboardlock.app" : {
@@ -373,6 +377,9 @@
     "Main Words" : {
 
     },
+    "Open System Settings…" : {
+
+    },
     "Quit %@" : {
       "localizations" : {
         "de" : {
@@ -408,6 +415,9 @@
 
     },
     "Style" : {
+
+    },
+    "This app needs Accessibility access to work." : {
 
     },
     "Translation" : {

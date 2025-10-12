@@ -143,12 +143,13 @@ struct ContentView: View {
     @AppStorage("confettiFadeTime") private var savedConfettiFadeTime: Double = 5.0
     @AppStorage("wordTranslationDelay") private var savedWordTranslationDelay: Double = 0.8
     @AppStorage("flashcardImageSize") private var flashcardImageSize: Double = 150.0
-    
+
     @State private var showWordSetEditor = false
     @State private var showRandomWordEditor = false
     @StateObject private var customWordSetsManager = CustomWordSetsManager.shared
+    @StateObject private var randomWordList = RandomWordList.shared
     @StateObject private var windowManager = WindowManager.shared
-    
+
     @State var hoveringMoreButton: Bool = false
     @State private var babyName: String = ""
     @State private var lastCalculatedHeight: CGFloat = 0
@@ -397,12 +398,20 @@ struct ContentView: View {
                     // Random words editor button
                     if eventHandler.selectedLockEffect == .speakRandomWord {
                         HStack {
-                            Text("Random words")
-                                .foregroundColor(.secondary)
-                                .font(.subheadline)
-                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Random words")
+                                    .foregroundColor(.secondary)
+                                    .font(.subheadline)
+                                Text("Set: \(randomWordList.currentWordSetName)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Text("\(randomWordList.words.count) words")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+
                             Spacer()
-                            
+
                             Button(action: {
                                 showRandomWordEditor = true
                             }) {
@@ -410,10 +419,6 @@ struct ContentView: View {
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
-                        
-                        Text("Contains \(RandomWordList.shared.words.count) words")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
                         
                         // Image size slider for random word mode
                         if showFlashcards && flashcardStyle != .none {
