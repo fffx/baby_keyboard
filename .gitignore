@@ -10,3 +10,9 @@ DerivedData/
 .idea
 .specstory
 dev
+archives
+
+# AI instruction files (generated)
+CLAUDE.md
+GEMINI.md
+.cursorrules
