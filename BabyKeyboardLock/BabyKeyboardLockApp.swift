@@ -159,15 +159,39 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func showPopover(){
-        if let button = statusItem.button {
+        if let button = statusItem.button, let screen = NSScreen.main {
             // Get the actual menu bar height
             let menuBarHeight = NSStatusBar.system.thickness
-            
+
+            // Get button position in screen coordinates
+            let buttonFrame = button.window?.convertToScreen(button.convert(button.bounds, to: nil)) ?? .zero
+
+            // Calculate popover width (matches ContentView width)
+            let popoverWidth: CGFloat = 540  // 500 + some padding for popover chrome
+
+            // Check if popover would extend beyond right edge of screen
+            let rightEdge = buttonFrame.midX + (popoverWidth / 2)
+            let screenRight = screen.frame.maxX
+
             // Create properly adjusted bounds
             var adjustedBounds = button.bounds
+            var horizontalAdjustment: CGFloat = 0
+
+            // If popover would go off-screen on the right, shift the anchor point to the left
+            if rightEdge > screenRight {
+                horizontalAdjustment = -(rightEdge - screenRight + 20)  // Add 20px margin from screen edge
+                adjustedBounds.origin.x += horizontalAdjustment
+            }
+
+            // Check if popover would extend beyond left edge of screen
+            let leftEdge = buttonFrame.midX - (popoverWidth / 2) + horizontalAdjustment
+            if leftEdge < screen.frame.minX {
+                adjustedBounds.origin.x += abs(leftEdge - screen.frame.minX) + 20
+            }
+
             adjustedBounds.origin.y -= menuBarHeight * 0.1
             popover.show(relativeTo: adjustedBounds, of: button, preferredEdge: .minY)
-            
+
             // Make the popover's window active
             if let window = popover.contentViewController?.view.window {
                 window.makeKey()

@@ -1,18 +1,10 @@
 - a
-    - `key: 909fc7a3`
-    - Expose 'baby name' probability parameter in settings in random word mode
-- b
     - `key: 50b4d16b`
     - Bugfix settings window width (too narrow right now)
-- c
-    - `key: c4353c4b`
-    - for the random word mode
-        - add a selector for wordset
-    - add some extended wordset that is nice for the baby to acquire
-- d
+- b
     - `key: 0fdc1f59`
     - Add an input field for a second language name of a child
-- e
+- c
     - `key: d803f29f`
     - Can we use apple photos people for 'mother' and 'baby'?
     - I want to wire like specific persons
@@ -24,26 +16,40 @@
         - use that
         - else
             - raise notimpelented
-- f
+- d
     - `key: 490a0894`
       Load images from user folder instead of including resources in the package. Bonus: Auto-generate words for images and use that set in text
-- g
+- e
     - `key: 8e21dce0`
     - Gamify keyboard locker somehow
-- h
+    - Idea 1: Add a new mode, where the baby has to type the word correctly for it to appear on the screen and be
+      pronounced
+    - When baby types the letters correctly - make them appear on screen (e.g. if she types 'M' - show 'M', then add
+      'A' etc.). Allow any words from selected word sets.
+      Some nice animation when the word is completed correctly
+    - Add a setting checkbox "reset on error".
+- f
     - `key: 20234a42`
     - Make it a website
-- i
+- g
     - `key: 3286692c`
     - Add more images
     - use planned llm utils to bulk-generate the set
 ## Done
-- [x] j
+- [x] h
     - `key: 1c5e8a35`
     - Deploy an app to the macbook (build archive)
-- [x] k
+- [x] i
     - `key: aa3d0459`
     - Add 'random' image mode - that takes images from all styles randomly
-- [x] l
+- [x] j
     - `key: cc781683`
     - Add a script / button to install locally
+- [x] k
+    - `key: 909fc7a3`
+    - Expose 'baby name' probability parameter in settings in random word mode
+- [x] l
+    - `key: c4353c4b`
+    - for the random word mode
+        - add a selector for wordset
+    - add some extended wordset that is nice for the baby to acquire
