@@ -9,7 +9,9 @@ DerivedData/
 
 .idea
 .specstory
-dev
+dev/*
+!dev/notes/
+
 archives
 build
 

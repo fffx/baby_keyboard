@@ -1,0 +1,49 @@
+- a
+    - `key: 909fc7a3`
+    - Expose 'baby name' probability parameter in settings in random word mode
+- b
+    - `key: 50b4d16b`
+    - Bugfix settings window width (too narrow right now)
+- c
+    - `key: c4353c4b`
+    - for the random word mode
+        - add a selector for wordset
+    - add some extended wordset that is nice for the baby to acquire
+- d
+    - `key: 0fdc1f59`
+    - Add an input field for a second language name of a child
+- e
+    - `key: d803f29f`
+    - Can we use apple photos people for 'mother' and 'baby'?
+    - I want to wire like specific persons
+        - by name?
+        - Or how?
+        - I guess they have some contact id, but i don't want to have to enter that
+    - Maybe search + select
+    - Or, for now, if there's a single person in contacts with that name
+        - use that
+        - else
+            - raise notimpelented
+- f
+    - `key: 490a0894`
+      Load images from user folder instead of including resources in the package. Bonus: Auto-generate words for images and use that set in text
+- g
+    - `key: 8e21dce0`
+    - Gamify keyboard locker somehow
+- h
+    - `key: 20234a42`
+    - Make it a website
+- i
+    - `key: 3286692c`
+    - Add more images
+    - use planned llm utils to bulk-generate the set
+## Done
+- [x] j
+    - `key: 1c5e8a35`
+    - Deploy an app to the macbook (build archive)
+- [x] k
+    - `key: aa3d0459`
+    - Add 'random' image mode - that takes images from all styles randomly
+- [x] l
+    - `key: cc781683`
+    - Add a script / button to install locally
