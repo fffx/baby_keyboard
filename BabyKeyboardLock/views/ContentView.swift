@@ -84,7 +84,7 @@ class WindowManager: ObservableObject {
             return // Don't log this error, it's too noisy
         }
         
-        let contentSize = NSSize(width: 380, height: height)
+        let contentSize = NSSize(width: 500, height: height)
         let frameSize = window.frameRect(forContentRect: NSRect(origin: .zero, size: contentSize)).size
         
         // Check if resize is actually needed
@@ -152,6 +152,7 @@ struct ContentView: View {
 
     @State var hoveringMoreButton: Bool = false
     @State private var babyName: String = ""
+    @State private var babyNameProbability: Double = 0.125
     @State private var lastCalculatedHeight: CGFloat = 0
     
     // Calculate preferred content size based on effect type
@@ -173,10 +174,10 @@ struct ContentView: View {
         if eventHandler.selectedLockEffect == .speakAKeyWord {
             height += 300 // Translation picker, baby name, word set selection, edit buttons
         }
-        
+
         // Add space for random word options
         if eventHandler.selectedLockEffect == .speakRandomWord {
-            height += 180 // Translation picker, edit button
+            height += 240 // Translation picker, baby name, baby name probability, edit button
         }
         
         return height
@@ -362,9 +363,9 @@ struct ContentView: View {
                         Text("Baby's Name")
                             .foregroundColor(.secondary)
                             .font(.subheadline)
-                        
+
                         Spacer()
-                        
+
                         TextField("Enter name", text: $babyName, onCommit: {
                             // Do nothing, prevents form submission behavior
                         })
@@ -374,7 +375,32 @@ struct ContentView: View {
                                 RandomWordList.shared.setBabyName(newValue)
                             }
                     }
-                    
+
+                    // Baby name probability slider (only for random word mode)
+                    if eventHandler.selectedLockEffect == .speakRandomWord {
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("Baby Name Frequency: \(String(format: "%.0f%%", babyNameProbability * 100))")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+
+                            HStack {
+                                Text("0%")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+
+                                Slider(value: $babyNameProbability, in: 0...1, step: 0.01)
+                                    .onChange(of: babyNameProbability) { _, newValue in
+                                        RandomWordList.shared.setBabyNameProbability(newValue)
+                                    }
+
+                                Text("100%")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .padding(.top, 5)
+                    }
+
                     // Word display duration settings
                     VStack(alignment: .leading, spacing: 5) {
                         Text("Word Display Duration: \(String(format: "%.1f", wordDisplayDuration))s")
@@ -399,15 +425,18 @@ struct ContentView: View {
                     if eventHandler.selectedLockEffect == .speakRandomWord {
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Random words")
+                                Text("Word Sets")
                                     .foregroundColor(.secondary)
                                     .font(.subheadline)
-                                Text("Set: \(randomWordList.currentWordSetName)")
+                                Text("\(randomWordList.enabledSetIndices.count) enabled (\(randomWordList.words.count) words)")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
-                                Text("\(randomWordList.words.count) words")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                                if !randomWordList.enabledWordSetNames.isEmpty && randomWordList.enabledWordSetNames != "None" {
+                                    Text(randomWordList.enabledWordSetNames)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .lineLimit(2)
+                                }
                             }
 
                             Spacer()
@@ -502,13 +531,14 @@ struct ContentView: View {
             )
         }
         .padding(20)
-        .frame(width: 400)
+        .frame(width: 500)
         .onAppear {
             // Set initial values first
             if let type = WordSetType(rawValue: savedWordSetType) {
                 eventHandler.selectedWordSetType = type
             }
             babyName = RandomWordList.shared.babyName
+            babyNameProbability = RandomWordList.shared.babyNameProbability
             eventHandler.usePersonalVoice = usePersonalVoice
             launchOnStartup = LaunchAtStartup.shared.isEnabled()
             
