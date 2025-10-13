@@ -159,42 +159,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func showPopover(){
-        if let button = statusItem.button, let screen = NSScreen.main {
-            // Get the actual menu bar height
-            let menuBarHeight = NSStatusBar.system.thickness
+        if let button = statusItem.button {
+            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
 
-            // Get button position in screen coordinates
-            let buttonFrame = button.window?.convertToScreen(button.convert(button.bounds, to: nil)) ?? .zero
-
-            // Calculate popover width (matches ContentView width)
-            let popoverWidth: CGFloat = 540  // 500 + some padding for popover chrome
-
-            // Check if popover would extend beyond right edge of screen
-            let rightEdge = buttonFrame.midX + (popoverWidth / 2)
-            let screenRight = screen.frame.maxX
-
-            // Create properly adjusted bounds
-            var adjustedBounds = button.bounds
-            var horizontalAdjustment: CGFloat = 0
-
-            // If popover would go off-screen on the right, shift the anchor point to the left
-            if rightEdge > screenRight {
-                horizontalAdjustment = -(rightEdge - screenRight + 20)  // Add 20px margin from screen edge
-                adjustedBounds.origin.x += horizontalAdjustment
-            }
-
-            // Check if popover would extend beyond left edge of screen
-            let leftEdge = buttonFrame.midX - (popoverWidth / 2) + horizontalAdjustment
-            if leftEdge < screen.frame.minX {
-                adjustedBounds.origin.x += abs(leftEdge - screen.frame.minX) + 20
-            }
-
-            adjustedBounds.origin.y -= menuBarHeight * 0.1
-            popover.show(relativeTo: adjustedBounds, of: button, preferredEdge: .minY)
-
-            // Make the popover's window active
-            if let window = popover.contentViewController?.view.window {
+            // Make the popover's window active and adjust position to keep it on screen
+            if let window = popover.contentViewController?.view.window,
+               let screen = NSScreen.main {
                 window.makeKey()
+
+                // Small delay to let the popover position itself first
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                    var windowFrame = window.frame
+                    let visibleFrame = screen.visibleFrame
+
+                    // Check if window extends beyond right edge of screen
+                    if windowFrame.maxX > visibleFrame.maxX {
+                        windowFrame.origin.x = visibleFrame.maxX - windowFrame.width - 10
+                    }
+
+                    // Check if window extends beyond left edge of screen
+                    if windowFrame.minX < visibleFrame.minX {
+                        windowFrame.origin.x = visibleFrame.minX + 10
+                    }
+
+                    // Apply the adjusted position
+                    window.setFrame(windowFrame, display: true, animate: false)
+                }
             }
         }
     }

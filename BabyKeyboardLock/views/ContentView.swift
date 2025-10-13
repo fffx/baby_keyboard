@@ -107,9 +107,23 @@ class WindowManager: ObservableObject {
         if let cached = cachedMainWindow, cached.isVisible {
             return cached
         }
-        
-        let window = NSApp.windows.first(where: { 
-            $0.title == Bundle.applicationName || $0.title.isEmpty 
+
+        // Look for popover or main content window
+        // Popovers have empty titles and special window classes
+        let window = NSApp.windows.first(where: { window in
+            // Check if it's the main app window by title
+            if window.title == Bundle.applicationName {
+                return true
+            }
+            // Check if it's a popover window (empty title, has content)
+            if window.title.isEmpty && window.contentView != nil {
+                // Verify it's not one of our transparent windows
+                if let identifier = window.identifier?.rawValue {
+                    return ![AnimationWindowID, WordDisplayWindowID, VisualEffectsWindowID].contains(identifier)
+                }
+                return true
+            }
+            return false
         })
         cachedMainWindow = window
         return window
@@ -541,15 +555,21 @@ struct ContentView: View {
             babyNameProbability = RandomWordList.shared.babyNameProbability
             eventHandler.usePersonalVoice = usePersonalVoice
             launchOnStartup = LaunchAtStartup.shared.isEnabled()
-            
+
             // Set initial category based on current effect
             selectedCategory = eventHandler.selectedLockEffect.category
-            
+
             // Set speak random word as default for word mode
             if selectedCategory == .words && eventHandler.selectedLockEffect == .speakAKeyWord {
                 eventHandler.selectedLockEffect = .speakRandomWord
             }
-            
+
+            // Request accessibility permissions if needed
+            if !eventHandler.accessibilityPermissionGranted {
+                NSApp.activate(ignoringOtherApps: true)
+                _ = eventHandler.requestAccessibilityPermissions()
+            }
+
             // Delay window sizing to after UI stabilizes
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 let initialHeight = preferredHeight
@@ -594,13 +614,6 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showRandomWordEditor) {
             RandomWordEditorView()
-        }
-        .onAppear {
-            // On first show, trigger the standard Accessibility prompt if needed
-            if !eventHandler.accessibilityPermissionGranted {
-                NSApp.activate(ignoringOtherApps: true)
-                _ = eventHandler.requestAccessibilityPermissions()
-            }
         }
     }
     
