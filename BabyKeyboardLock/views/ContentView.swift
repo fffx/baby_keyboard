@@ -99,7 +99,6 @@ class WindowManager: ObservableObject {
         
         // Use immediate resize for better performance
         window.setFrame(newFrame, display: true, animate: false)
-        window.contentView?.setFrameSize(contentSize)
     }
     
     private func getMainWindow() -> NSWindow? {

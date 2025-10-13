@@ -83,7 +83,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .store(in: &cancellables)
         
         self.popover = NSPopover()
-        // self.popover.contentSize = NSSize(width: 300, height: 400)
+         self.popover.contentSize = NSSize(width: 500, height: 400)
         // self.popover.appearance = NSAppearance(named: .accessibilityHighContrastVibrantLight)
         self.popover.behavior = .transient
         let rootView = ContentView(eventHandler: EventHandler.shared)
