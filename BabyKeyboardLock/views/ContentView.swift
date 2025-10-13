@@ -165,6 +165,7 @@ struct ContentView: View {
 
     @State var hoveringMoreButton: Bool = false
     @State private var babyName: String = ""
+    @State private var babyNameTranslation: String = ""
     @State private var babyNameProbability: Double = 0.125
     @State private var lastCalculatedHeight: CGFloat = 0
     
@@ -185,12 +186,12 @@ struct ContentView: View {
         
         // Add space for word-related options
         if eventHandler.selectedLockEffect == .speakAKeyWord {
-            height += 300 // Translation picker, baby name, word set selection, edit buttons
+            height += 330 // Translation picker, baby name + translation, word set selection, edit buttons
         }
 
         // Add space for random word options
         if eventHandler.selectedLockEffect == .speakRandomWord {
-            height += 240 // Translation picker, baby name, baby name probability, edit button
+            height += 270 // Translation picker, baby name + translation, baby name probability, edit button
         }
         
         return height
@@ -371,22 +372,41 @@ struct ContentView: View {
                         selectedTranslationLanguage = newVal
                     }
                     
-                    // Baby's name input field
-                    HStack {
-                        Text("Baby's Name")
-                            .foregroundColor(.secondary)
-                            .font(.subheadline)
+                    // Baby's name input fields
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Baby's Name")
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
 
-                        Spacer()
+                            Spacer()
 
-                        TextField("Enter name", text: $babyName, onCommit: {
-                            // Do nothing, prevents form submission behavior
-                        })
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .frame(width: 150)
-                            .onChange(of: babyName) { oldValue, newValue in
-                                RandomWordList.shared.setBabyName(newValue)
-                            }
+                            TextField("Enter name", text: $babyName, onCommit: {
+                                // Do nothing, prevents form submission behavior
+                            })
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .frame(width: 150)
+                                .onChange(of: babyName) { oldValue, newValue in
+                                    RandomWordList.shared.setBabyName(newValue)
+                                }
+                        }
+
+                        HStack {
+                            Text("Second Language Name")
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+
+                            Spacer()
+
+                            TextField("Enter translation", text: $babyNameTranslation, onCommit: {
+                                // Do nothing, prevents form submission behavior
+                            })
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .frame(width: 150)
+                                .onChange(of: babyNameTranslation) { oldValue, newValue in
+                                    RandomWordList.shared.setBabyNameTranslation(newValue)
+                                }
+                        }
                     }
 
                     // Baby name probability slider (only for random word mode)
@@ -551,6 +571,7 @@ struct ContentView: View {
                 eventHandler.selectedWordSetType = type
             }
             babyName = RandomWordList.shared.babyName
+            babyNameTranslation = RandomWordList.shared.babyNameTranslation
             babyNameProbability = RandomWordList.shared.babyNameProbability
             eventHandler.usePersonalVoice = usePersonalVoice
             launchOnStartup = LaunchAtStartup.shared.isEnabled()
