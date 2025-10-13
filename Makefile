@@ -9,43 +9,16 @@ update: deploy
 
 # Clean build artifacts
 clean:
-	@echo "🧹 Cleaning build artifacts..."
-	@rm -rf build/
+	@./scripts/clean.sh
 
 # Build archive
 archive: clean
-	@echo "📦 Building archive..."
-	@xcodebuild clean archive \
-		-project BabyKeyboardLock.xcodeproj \
-		-scheme BabyKeyboardLock \
-		-configuration Release \
-		-archivePath ./build/BabyKeyboardLock.xcarchive
+	@./scripts/archive.sh
 
 # Export archive
 export:
-	@echo "📤 Exporting app..."
-	@mkdir -p build
-	@cat > build/ExportOptions.plist << 'PLIST'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>method</key>
-	<string>mac-application</string>
-	<key>signingStyle</key>
-	<string>automatic</string>
-	<key>stripSwiftSymbols</key>
-	<true/>
-</dict>
-</plist>
-PLIST
-	@xcodebuild -exportArchive \
-		-archivePath ./build/BabyKeyboardLock.xcarchive \
-		-exportPath ./build/export \
-		-exportOptionsPlist ./build/ExportOptions.plist
+	@./scripts/export.sh
 
 # Install to Applications folder
 install:
-	@echo "📲 Installing to /Applications/..."
-	@cp -R ./build/export/BabyKeyboardLock.app /Applications/
-	@echo "✨ Installation complete!"
+	@./scripts/install.sh
