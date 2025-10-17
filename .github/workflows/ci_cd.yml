@@ -1,4 +1,5 @@
 name: App build
+workflow_dispatch:
 on: push
 
 
