@@ -13,11 +13,47 @@
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
-default_platform(:ios)
+default_platform(:mac)
 
-platform :ios do
-  desc "Description of what the lane does"
-  lane :custom_lane do
-    # add actions here: https://docs.fastlane.tools/actions
-  end
+# https://claude.ai/chat/b998d08f-35f1-4aa1-ac75-3d6b162e0912
+# todo figure out how to import certificate with Match (a secret repository?)
+lane :setup_signing do
+  keychain_name = "fastlane_tmp_keychain"
+  keychain_password = SecureRandom.uuid
+  create_keychain(
+    name: keychain_name,
+    password: keychain_password,
+    default_keychain: true,
+    unlock: true,
+    timeout: 3600,
+    lock_when_sleeps: false
+  )
+
+  # Decode and import certificate
+  cert_path = "#{Dir.tmpdir}/cert.p12"
+  File.write(cert_path, Base64.decode64(ENV["CERTIFICATE_BASE64"]))
+
+  import_certificate(
+    certificate_path: cert_path,
+    certificate_password: ENV["CERTIFICATE_PASSWORD"],
+    keychain_name: keychain_name,
+    keychain_password: keychain_password
+  )
+
+  File.delete(cert_path) if File.exist?(cert_path)
+end
+
+desc "Build and archive macOS app"
+lane :build do
+  gym(
+    scheme: "BabyKeyboardLock",
+    configuration: "Release",
+    output_directory: "./build",
+    export_method: "mac-application",  # or "mac-application", "developer-id", "app-store"
+    clean: true
+  )
+end
+
+lane :test do
+  run_tests(scheme: "BabyKeyboardLock")
 end
