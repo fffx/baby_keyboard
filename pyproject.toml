@@ -1,8 +1,66 @@
 [project]
-name = "baby-keyboard"
-version = "0.1.0"
-description = "Add your description here"
+name = "calmmage"
+# update project folder structure for project_manager and project_discoverer
+version = "2025.7.27"
+description = "Personal GitHub repo for tools, projects, and personal website"
 readme = "README.md"
-requires-python = ">=3.14"
-dependencies = []
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Development Status :: 4 - Beta",
+    "Environment :: Other Environment",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+]
 
+authors = [
+    {name = "Petr Lavrov", email = "me@petrlavrov.com"},
+]
+requires-python = ">=3.13,<3.14"
+
+dependencies = [
+]
+
+
+[dependency-groups]
+extras = [
+    "calmlib @ git+https://github.com/calmmage/calmlib.git@dev",
+]
+
+dev = [
+]
+
+test = [
+    "isort<7.0.0,>=6.0.0",
+    "pyright<2.0.0,>=1.1.401",
+    "pytest>=6",
+    "pytest-asyncio<2.0.0,>=1.0.0",
+    "pytest-cov<7.0.0,>=6.1.1",
+    "pytest-mock<4.0.0,>=3.14.1",
+    "pytest-mongodb",
+    "pyupgrade<4.0.0,>=3.20.0",
+    "ruff<1.0.0,>=0.11.12",
+    "vulture<3.0,>=2.14",
+]
+
+docs = [
+    #mkdocs = ">=1.6"
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.25",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["scripts"]
+
+# todo: arrange packages properly
+# 1) by group - e.g. main, extras, dev, test, docs
+# 2) by type - e.g. cli, api, data, databases, etc.
+# 2.1) alternative - alphabetically in each group
