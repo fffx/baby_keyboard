@@ -33,9 +33,9 @@
     - Add more images
     - use planned llm utils to bulk-generate the set (look at ~/calmmage/experiments/llm/dev/notes)
     - also, first, think if / where can i get nice image collections for basic words on the web
-    - there should be default 'alphabet' images, right? 
+    - there should be default 'alphabet' images, right?
     - also there should probably some nice art projects with stylized alphabet images
-      (i mean not only aphabet of course - but in general basic simple words)
+      (i mean not only alphabet of course - but in general basic simple words)
 ## Done
 - [x] g
     - `key: cc781683`

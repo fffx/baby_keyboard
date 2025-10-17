@@ -167,6 +167,7 @@ struct ContentView: View {
     @State private var babyName: String = ""
     @State private var babyNameTranslation: String = ""
     @State private var babyNameProbability: Double = 0.125
+    @State private var babyImagePath: String = ""
     @State private var lastCalculatedHeight: CGFloat = 0
     
     // Calculate preferred content size based on effect type
@@ -191,7 +192,7 @@ struct ContentView: View {
 
         // Add space for random word options
         if eventHandler.selectedLockEffect == .speakRandomWord {
-            height += 270 // Translation picker, baby name + translation, baby name probability, edit button
+            height += 310 // Translation picker, baby name + translation + image, baby name probability, edit button
         }
         
         return height
@@ -407,6 +408,38 @@ struct ContentView: View {
                                     RandomWordList.shared.setBabyNameTranslation(newValue)
                                 }
                         }
+
+                        HStack {
+                            Text("Baby's Image")
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+
+                            Spacer()
+
+                            if !babyImagePath.isEmpty {
+                                Text(URL(fileURLWithPath: babyImagePath).lastPathComponent)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                    .frame(maxWidth: 100)
+                            }
+
+                            Button(action: selectBabyImage) {
+                                Text(babyImagePath.isEmpty ? "Select Image" : "Change")
+                            }
+                            .buttonStyle(.plain)
+
+                            if !babyImagePath.isEmpty {
+                                Button(action: {
+                                    babyImagePath = ""
+                                    RandomWordList.shared.setBabyImagePath("")
+                                }) {
+                                    Image(systemName: "xmark.circle")
+                                        .foregroundColor(.secondary)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
                     }
 
                     // Baby name probability slider (only for random word mode)
@@ -573,6 +606,7 @@ struct ContentView: View {
             babyName = RandomWordList.shared.babyName
             babyNameTranslation = RandomWordList.shared.babyNameTranslation
             babyNameProbability = RandomWordList.shared.babyNameProbability
+            babyImagePath = RandomWordList.shared.babyImagePath
             eventHandler.usePersonalVoice = usePersonalVoice
             launchOnStartup = LaunchAtStartup.shared.isEnabled()
 
@@ -639,12 +673,28 @@ struct ContentView: View {
     
 
     
+    private func selectBabyImage() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.allowedContentTypes = [.image]
+        panel.message = "Select an image for your baby"
+
+        panel.begin { response in
+            if response == .OK, let url = panel.url {
+                babyImagePath = url.path
+                RandomWordList.shared.setBabyImagePath(url.path)
+            }
+        }
+    }
+
     private func playLockSound(isLocked: Bool) {
         if isLocked {
             NSSound(named: "light-switch-on")?.play()
         } else {
             guard let nsSound = NSSound(named: "light-switch-off") else { return }
-            
+
             nsSound.play()
         }
     }

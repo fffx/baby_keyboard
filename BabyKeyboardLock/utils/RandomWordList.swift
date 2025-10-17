@@ -21,12 +21,14 @@ class RandomWordList: ObservableObject {
     private let babyNameKey = "babyName"
     private let babyNameTranslationKey = "babyNameTranslation"
     private let babyNameProbabilityKey = "babyNameProbability"
+    private let babyImagePathKey = "babyImagePath"
 
     @Published var wordSets: [RandomWordSet] = []
     @Published var enabledSetIndices: Set<Int> = []
     private(set) var babyName: String = ""
     private(set) var babyNameTranslation: String = ""
     @Published var babyNameProbability: Double = 0.125 // Default 12.5% (1 in 8)
+    @Published var babyImagePath: String = ""
 
     var words: [RandomWord] {
         var allWords: [RandomWord] = []
@@ -67,6 +69,7 @@ class RandomWordList: ObservableObject {
         loadBabyName()
         loadBabyNameTranslation()
         loadBabyNameProbability()
+        loadBabyImagePath()
         loadEnabledSets()
         if wordSets.isEmpty {
             // Create default word sets
@@ -375,6 +378,12 @@ class RandomWordList: ObservableObject {
         saveBabyNameProbability()
     }
 
+    func setBabyImagePath(_ path: String) {
+        babyImagePath = path
+        saveBabyImagePath()
+        NotificationCenter.default.post(name: .init("BabyImageUpdated"), object: nil)
+    }
+
     func resetToDefaults() {
         // Reset wordsets to defaults
         wordSets = createDefaultWordSets()
@@ -462,5 +471,13 @@ class RandomWordList: ObservableObject {
         } else {
             babyNameProbability = savedProbability
         }
+    }
+
+    private func saveBabyImagePath() {
+        UserDefaults.standard.set(babyImagePath, forKey: babyImagePathKey)
+    }
+
+    private func loadBabyImagePath() {
+        babyImagePath = UserDefaults.standard.string(forKey: babyImagePathKey) ?? ""
     }
 } 

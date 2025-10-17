@@ -57,13 +57,23 @@ struct WordDisplayView: View {
                     
                     VStack(spacing: 20) {
                         // Flashcard image if available
-                        if flashcardStyle != .none,
-                           let image = RandomWord(english: word, translation: translation)
-                            .flashcardImage(style: flashcardStyle) {
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: min(flashcardImageSize, maxHeight - 150)) // Ensure image fits within background
+                        if flashcardStyle != .none {
+                            // Check if this is the baby's name and if a custom image is set
+                            let isBabyName = word.lowercased() == RandomWordList.shared.babyName.lowercased()
+                            let babyImagePath = RandomWordList.shared.babyImagePath
+
+                            if isBabyName && !babyImagePath.isEmpty, let nsImage = NSImage(contentsOfFile: babyImagePath) {
+                                Image(nsImage: nsImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: min(flashcardImageSize, maxHeight - 150))
+                            } else if let image = RandomWord(english: word, translation: translation)
+                                .flashcardImage(style: flashcardStyle) {
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: min(flashcardImageSize, maxHeight - 150)) // Ensure image fits within background
+                            }
                         }
 
                         // Main word
