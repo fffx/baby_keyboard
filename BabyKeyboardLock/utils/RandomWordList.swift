@@ -7,6 +7,12 @@ struct RandomWord: Codable, Hashable, Identifiable {
     let translation: String
 }
 
+struct CustomWordImage: Codable, Hashable, Identifiable {
+    var id = UUID()
+    let word: String  // The word this image is for
+    let imagePath: String  // Path to the custom image
+}
+
 struct RandomWordSet: Codable, Hashable, Identifiable {
     var id = UUID()
     let name: String
@@ -23,6 +29,8 @@ class RandomWordList: ObservableObject {
     private let babyNameProbabilityKey = "babyNameProbability"
     private let babyImagePathKey = "babyImagePath"
     private let babyImageBookmarkKey = "babyImageBookmark"
+    private let customWordImagesKey = "customWordImages"
+    private let customWordImageBookmarksKey = "customWordImageBookmarks"
 
     @Published var wordSets: [RandomWordSet] = []
     @Published var enabledSetIndices: Set<Int> = []
@@ -31,6 +39,8 @@ class RandomWordList: ObservableObject {
     @Published var babyNameProbability: Double = 0.125 // Default 12.5% (1 in 8)
     @Published var babyImagePath: String = ""
     private var babyImageBookmark: Data?
+    @Published var customWordImages: [CustomWordImage] = []
+    private var customWordImageBookmarks: [String: Data] = [:] // word -> bookmark data
 
     var words: [RandomWord] {
         var allWords: [RandomWord] = []
@@ -72,6 +82,7 @@ class RandomWordList: ObservableObject {
         loadBabyNameTranslation()
         loadBabyNameProbability()
         loadBabyImagePath()
+        loadCustomWordImages()
         loadEnabledSets()
         if wordSets.isEmpty {
             // Create default word sets
@@ -90,6 +101,8 @@ class RandomWordList: ObservableObject {
 	      let basicSet = RandomWordSet(name: "Basic Words", words: [
             RandomWord(english: "mama", translation: "мама"),
             RandomWord(english: "papa", translation: "папа"),
+            RandomWord(english: "grandma", translation: "бабушка"),
+            RandomWord(english: "grandpa", translation: "дедушка"),
             RandomWord(english: "arm", translation: "рука"),
             RandomWord(english: "leg", translation: "нога"),
             RandomWord(english: "nose", translation: "нос"),
@@ -542,5 +555,107 @@ class RandomWordList: ObservableObject {
     private func loadBabyImagePath() {
         babyImagePath = UserDefaults.standard.string(forKey: babyImagePathKey) ?? ""
         babyImageBookmark = UserDefaults.standard.data(forKey: babyImageBookmarkKey)
+    }
+
+    // MARK: - Custom Word Images Management
+
+    func setCustomWordImage(word: String, url: URL) {
+        // Remove existing image for this word if any
+        customWordImages.removeAll { $0.word.lowercased() == word.lowercased() }
+
+        // Add new image
+        let customImage = CustomWordImage(word: word, imagePath: url.path)
+        customWordImages.append(customImage)
+
+        // Create security-scoped bookmark
+        do {
+            let bookmarkData = try url.bookmarkData(
+                options: .withSecurityScope,
+                includingResourceValuesForKeys: nil,
+                relativeTo: nil
+            )
+            customWordImageBookmarks[word.lowercased()] = bookmarkData
+            saveCustomWordImageBookmarks()
+        } catch {
+            debugPrint("Failed to create bookmark for custom image: \(error)")
+        }
+
+        saveCustomWordImages()
+        NotificationCenter.default.post(name: .init("CustomWordImagesUpdated"), object: nil)
+    }
+
+    func removeCustomWordImage(word: String) {
+        customWordImages.removeAll { $0.word.lowercased() == word.lowercased() }
+        customWordImageBookmarks.removeValue(forKey: word.lowercased())
+        saveCustomWordImages()
+        saveCustomWordImageBookmarks()
+        NotificationCenter.default.post(name: .init("CustomWordImagesUpdated"), object: nil)
+    }
+
+    func getCustomImageURL(for word: String) -> URL? {
+        let lowercasedWord = word.lowercased()
+
+        // Try to resolve from security-scoped bookmark first
+        if let bookmarkData = customWordImageBookmarks[lowercasedWord] {
+            var isStale = false
+            do {
+                let url = try URL(
+                    resolvingBookmarkData: bookmarkData,
+                    options: .withSecurityScope,
+                    relativeTo: nil,
+                    bookmarkDataIsStale: &isStale
+                )
+
+                if isStale {
+                    debugPrint("Custom image bookmark is stale for '\(word)', recreating...")
+                    // Try to recreate the bookmark
+                    if let newBookmarkData = try? url.bookmarkData(
+                        options: .withSecurityScope,
+                        includingResourceValuesForKeys: nil,
+                        relativeTo: nil
+                    ) {
+                        customWordImageBookmarks[lowercasedWord] = newBookmarkData
+                        saveCustomWordImageBookmarks()
+                    }
+                }
+
+                return url
+            } catch {
+                debugPrint("Failed to resolve custom image bookmark for '\(word)': \(error)")
+            }
+        }
+
+        // Fallback to path-based access
+        if let customImage = customWordImages.first(where: { $0.word.lowercased() == lowercasedWord }) {
+            if !customImage.imagePath.isEmpty {
+                return URL(fileURLWithPath: customImage.imagePath)
+            }
+        }
+
+        return nil
+    }
+
+    private func saveCustomWordImages() {
+        if let encoded = try? JSONEncoder().encode(customWordImages) {
+            UserDefaults.standard.set(encoded, forKey: customWordImagesKey)
+        }
+    }
+
+    private func loadCustomWordImages() {
+        if let savedImages = UserDefaults.standard.data(forKey: customWordImagesKey),
+           let decodedImages = try? JSONDecoder().decode([CustomWordImage].self, from: savedImages) {
+            customWordImages = decodedImages
+        }
+
+        if let savedBookmarks = UserDefaults.standard.data(forKey: customWordImageBookmarksKey),
+           let decodedBookmarks = try? JSONDecoder().decode([String: Data].self, from: savedBookmarks) {
+            customWordImageBookmarks = decodedBookmarks
+        }
+    }
+
+    private func saveCustomWordImageBookmarks() {
+        if let encoded = try? JSONEncoder().encode(customWordImageBookmarks) {
+            UserDefaults.standard.set(encoded, forKey: customWordImageBookmarksKey)
+        }
     }
 } 

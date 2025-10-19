@@ -5,6 +5,14 @@
 - [x] b
     - `key: 909fc7a3`
     - Expose 'baby name' probability parameter in settings in random word mode
+- [x] i
+    - `key: c4353c4b`
+    - for the random word mode
+        - add a selector for wordset
+    - add some extended wordset that is nice for the baby to acquire
+- [x] n
+    - `key: 50b4d16b`
+    - Bugfix settings window width (too narrow right now)
 ## 2025-10-12
 - [x] c
     - `key: 1c5e8a35`

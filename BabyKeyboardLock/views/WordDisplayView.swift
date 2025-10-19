@@ -58,20 +58,28 @@ struct WordDisplayView: View {
                     VStack(spacing: 20) {
                         // Flashcard image if available
                         if flashcardStyle != .none {
-                            // Check if this is the baby's name and if a custom image is set
-                            let isBabyName = word.lowercased() == RandomWordList.shared.babyName.lowercased()
-
-                            if isBabyName, let babyImage = loadBabyImage() {
+                            // First check for custom image (for any word including baby's name)
+                            if let customImage = loadCustomImage(for: word) {
+                                Image(nsImage: customImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: min(flashcardImageSize, maxHeight - 150))
+                            }
+                            // Fallback to baby image if it's the baby's name (backward compatibility)
+                            else if word.lowercased() == RandomWordList.shared.babyName.lowercased(),
+                                    let babyImage = loadBabyImage() {
                                 Image(nsImage: babyImage)
                                     .resizable()
                                     .scaledToFit()
                                     .frame(height: min(flashcardImageSize, maxHeight - 150))
-                            } else if let image = RandomWord(english: word, translation: translation)
+                            }
+                            // Finally try generated flashcard images
+                            else if let image = RandomWord(english: word, translation: translation)
                                 .flashcardImage(style: flashcardStyle) {
                                 image
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: min(flashcardImageSize, maxHeight - 150)) // Ensure image fits within background
+                                    .frame(height: min(flashcardImageSize, maxHeight - 150))
                             }
                         }
 
@@ -221,6 +229,25 @@ struct WordDisplayView: View {
         // Stop accessing if we started
         if didStartAccessing {
             babyImageURL.stopAccessingSecurityScopedResource()
+        }
+
+        return image
+    }
+
+    private func loadCustomImage(for word: String) -> NSImage? {
+        guard let imageURL = RandomWordList.shared.getCustomImageURL(for: word) else {
+            return nil
+        }
+
+        // Start accessing security-scoped resource
+        let didStartAccessing = imageURL.startAccessingSecurityScopedResource()
+
+        // Load the image
+        let image = NSImage(contentsOf: imageURL)
+
+        // Stop accessing if we started
+        if didStartAccessing {
+            imageURL.stopAccessingSecurityScopedResource()
         }
 
         return image

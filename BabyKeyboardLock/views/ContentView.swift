@@ -159,6 +159,7 @@ struct ContentView: View {
 
     @State private var showWordSetEditor = false
     @State private var showRandomWordEditor = false
+    @State private var showCustomWordImageEditor = false
     @StateObject private var customWordSetsManager = CustomWordSetsManager.shared
     @StateObject private var randomWordList = RandomWordList.shared
     @StateObject private var windowManager = WindowManager.shared
@@ -440,6 +441,34 @@ struct ContentView: View {
                                 .buttonStyle(.plain)
                             }
                         }
+
+                        Divider()
+                            .padding(.vertical, 8)
+
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Other Custom Images")
+                                    .foregroundColor(.secondary)
+                                    .font(.subheadline)
+                                Text("Add images for mama, papa, family, etc.")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                if !randomWordList.customWordImages.isEmpty {
+                                    Text("\(randomWordList.customWordImages.count) custom image(s)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+
+                            Spacer()
+
+                            Button(action: {
+                                showCustomWordImageEditor = true
+                            }) {
+                                Image(systemName: "photo.on.rectangle.angled")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
                     }
 
                     // Baby name probability slider (only for random word mode)
@@ -669,6 +698,9 @@ struct ContentView: View {
         .sheet(isPresented: $showRandomWordEditor) {
             RandomWordEditorView()
         }
+        .sheet(isPresented: $showCustomWordImageEditor) {
+            CustomWordImageEditorView()
+        }
     }
     
 
@@ -831,6 +863,147 @@ struct WordSetEditorView: View {
     
     private func deleteWord(at offsets: IndexSet) {
         words.remove(atOffsets: offsets)
+    }
+}
+
+struct CustomWordImageEditorView: View {
+    @Environment(\.presentationMode) var presentationMode
+    @StateObject private var randomWordList = RandomWordList.shared
+    @State private var customImages: [CustomWordImage] = []
+    @State private var newWord: String = ""
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Custom Word Images")
+                .font(.headline)
+
+            Text("Add custom images for specific words (e.g., 'mama', 'papa', family members)")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            List {
+                ForEach(customImages) { customImage in
+                    HStack {
+                        Text(customImage.word)
+                            .font(.body)
+                        Spacer()
+                        Text(URL(fileURLWithPath: customImage.imagePath).lastPathComponent)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                            .frame(maxWidth: 150)
+
+                        Button(action: {
+                            selectImageForWord(customImage.word)
+                        }) {
+                            Image(systemName: "photo")
+                        }
+                        .buttonStyle(PlainButtonStyle())
+
+                        Button(action: {
+                            randomWordList.removeCustomWordImage(word: customImage.word)
+                            loadCustomImages()
+                        }) {
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+            .listStyle(PlainListStyle())
+            .frame(height: 200)
+
+            HStack {
+                TextField("Word (e.g., mama, papa)", text: $newWord)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                Button(action: {
+                    if !newWord.isEmpty {
+                        selectImageForWord(newWord)
+                    }
+                }) {
+                    Image(systemName: "plus")
+                }
+                .disabled(newWord.isEmpty)
+            }
+
+            Divider()
+                .padding(.vertical, 8)
+
+            HStack {
+                Text("Quick Add:")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+
+                Button("Mama") {
+                    addQuickWord("mama")
+                }
+                .buttonStyle(.plain)
+
+                Button("Papa") {
+                    addQuickWord("papa")
+                }
+                .buttonStyle(.plain)
+
+                Button("Grandma") {
+                    addQuickWord("grandma")
+                }
+                .buttonStyle(.plain)
+
+                Button("Grandpa") {
+                    addQuickWord("grandpa")
+                }
+                .buttonStyle(.plain)
+            }
+
+            HStack {
+                Spacer()
+
+                Button("Done") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+        }
+        .padding()
+        .frame(width: 550, height: 450)
+        .onAppear {
+            loadCustomImages()
+        }
+    }
+
+    private func loadCustomImages() {
+        customImages = randomWordList.customWordImages
+    }
+
+    private func addQuickWord(_ word: String) {
+        // Check if word already exists
+        if customImages.contains(where: { $0.word.lowercased() == word.lowercased() }) {
+            // Just select new image
+            selectImageForWord(word)
+        } else {
+            newWord = word
+            selectImageForWord(word)
+        }
+    }
+
+    private func selectImageForWord(_ word: String) {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.allowedContentTypes = [.image]
+        panel.message = "Select an image for '\(word)'"
+
+        panel.begin { response in
+            if response == .OK, let url = panel.url {
+                randomWordList.setCustomWordImage(word: word, url: url)
+                loadCustomImages()
+                newWord = ""
+            }
+        }
     }
 }
 
