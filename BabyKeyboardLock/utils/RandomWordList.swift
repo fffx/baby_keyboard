@@ -22,6 +22,7 @@ class RandomWordList: ObservableObject {
     private let babyNameTranslationKey = "babyNameTranslation"
     private let babyNameProbabilityKey = "babyNameProbability"
     private let babyImagePathKey = "babyImagePath"
+    private let babyImageBookmarkKey = "babyImageBookmark"
 
     @Published var wordSets: [RandomWordSet] = []
     @Published var enabledSetIndices: Set<Int> = []
@@ -29,6 +30,7 @@ class RandomWordList: ObservableObject {
     private(set) var babyNameTranslation: String = ""
     @Published var babyNameProbability: Double = 0.125 // Default 12.5% (1 in 8)
     @Published var babyImagePath: String = ""
+    private var babyImageBookmark: Data?
 
     var words: [RandomWord] {
         var allWords: [RandomWord] = []
@@ -384,6 +386,66 @@ class RandomWordList: ObservableObject {
         NotificationCenter.default.post(name: .init("BabyImageUpdated"), object: nil)
     }
 
+    func setBabyImageURL(_ url: URL) {
+        babyImagePath = url.path
+
+        // Create security-scoped bookmark for sandboxed access
+        do {
+            let bookmarkData = try url.bookmarkData(
+                options: .withSecurityScope,
+                includingResourceValuesForKeys: nil,
+                relativeTo: nil
+            )
+            babyImageBookmark = bookmarkData
+            UserDefaults.standard.set(bookmarkData, forKey: babyImageBookmarkKey)
+        } catch {
+            debugPrint("Failed to create bookmark for baby image: \(error)")
+            babyImageBookmark = nil
+        }
+
+        saveBabyImagePath()
+        NotificationCenter.default.post(name: .init("BabyImageUpdated"), object: nil)
+    }
+
+    func getBabyImageURL() -> URL? {
+        // Try to resolve from security-scoped bookmark first
+        if let bookmarkData = babyImageBookmark {
+            var isStale = false
+            do {
+                let url = try URL(
+                    resolvingBookmarkData: bookmarkData,
+                    options: .withSecurityScope,
+                    relativeTo: nil,
+                    bookmarkDataIsStale: &isStale
+                )
+
+                if isStale {
+                    debugPrint("Baby image bookmark is stale, recreating...")
+                    // Try to recreate the bookmark
+                    if let newBookmarkData = try? url.bookmarkData(
+                        options: .withSecurityScope,
+                        includingResourceValuesForKeys: nil,
+                        relativeTo: nil
+                    ) {
+                        babyImageBookmark = newBookmarkData
+                        UserDefaults.standard.set(newBookmarkData, forKey: babyImageBookmarkKey)
+                    }
+                }
+
+                return url
+            } catch {
+                debugPrint("Failed to resolve baby image bookmark: \(error)")
+            }
+        }
+
+        // Fallback to path-based access (for non-sandboxed or development)
+        if !babyImagePath.isEmpty {
+            return URL(fileURLWithPath: babyImagePath)
+        }
+
+        return nil
+    }
+
     func resetToDefaults() {
         // Reset wordsets to defaults
         wordSets = createDefaultWordSets()
@@ -479,5 +541,6 @@ class RandomWordList: ObservableObject {
 
     private func loadBabyImagePath() {
         babyImagePath = UserDefaults.standard.string(forKey: babyImagePathKey) ?? ""
+        babyImageBookmark = UserDefaults.standard.data(forKey: babyImageBookmarkKey)
     }
 } 

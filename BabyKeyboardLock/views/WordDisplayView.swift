@@ -60,10 +60,9 @@ struct WordDisplayView: View {
                         if flashcardStyle != .none {
                             // Check if this is the baby's name and if a custom image is set
                             let isBabyName = word.lowercased() == RandomWordList.shared.babyName.lowercased()
-                            let babyImagePath = RandomWordList.shared.babyImagePath
 
-                            if isBabyName && !babyImagePath.isEmpty, let nsImage = NSImage(contentsOfFile: babyImagePath) {
-                                Image(nsImage: nsImage)
+                            if isBabyName, let babyImage = loadBabyImage() {
+                                Image(nsImage: babyImage)
                                     .resizable()
                                     .scaledToFit()
                                     .frame(height: min(flashcardImageSize, maxHeight - 150))
@@ -193,11 +192,11 @@ struct WordDisplayView: View {
     private func updateWindowSize() {
         guard let mainScreen = NSScreen.main else { return }
         let newSize = mainScreen.frame.size
-        
+
         // Only update if size actually changed
         if newSize != windowSize {
             windowSize = newSize
-            
+
             // Update window frame
             DispatchQueue.main.async {
                 if let window = NSApp.windows.first(where: { $0.identifier?.rawValue == WordDisplayWindowID }) {
@@ -206,5 +205,24 @@ struct WordDisplayView: View {
                 }
             }
         }
+    }
+
+    private func loadBabyImage() -> NSImage? {
+        guard let babyImageURL = RandomWordList.shared.getBabyImageURL() else {
+            return nil
+        }
+
+        // Start accessing security-scoped resource
+        let didStartAccessing = babyImageURL.startAccessingSecurityScopedResource()
+
+        // Load the image
+        let image = NSImage(contentsOf: babyImageURL)
+
+        // Stop accessing if we started
+        if didStartAccessing {
+            babyImageURL.stopAccessingSecurityScopedResource()
+        }
+
+        return image
     }
 } 

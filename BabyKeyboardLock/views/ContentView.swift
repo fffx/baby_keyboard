@@ -684,7 +684,7 @@ struct ContentView: View {
         panel.begin { response in
             if response == .OK, let url = panel.url {
                 babyImagePath = url.path
-                RandomWordList.shared.setBabyImagePath(url.path)
+                RandomWordList.shared.setBabyImageURL(url)
             }
         }
     }
