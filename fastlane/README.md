@@ -21,23 +21,18 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 
 
-### archive
+### build
 
 ```sh
-[bundle exec] fastlane archive
+[bundle exec] fastlane build
 ```
 
 Build and archive macOS app
 
-----
-
-
-## Mac
-
-### mac test
+### test
 
 ```sh
-[bundle exec] fastlane mac test
+[bundle exec] fastlane test
 ```
 
 

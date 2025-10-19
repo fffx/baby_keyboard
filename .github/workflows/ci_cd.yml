@@ -28,4 +28,11 @@ jobs:
       - name: Install dependencies
         run: bundle install
       - name: Build and archive macOS app
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
         run: bundle exec fastlane build
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: build/BabyKeyboardLock-${{ github.ref_name }}.zip
