@@ -1,0 +1,63 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:mac)
+
+lane :setup_signing do
+  keychain_name = "fastlane_tmp_keychain"
+  keychain_password = SecureRandom.uuid
+  create_keychain(
+    name: keychain_name,
+    password: keychain_password,
+    default_keychain: true,
+    unlock: true,
+    timeout: 3600,
+    lock_when_sleeps: false
+  )
+
+  # Decode and import certificate
+  cert_path = "#{Dir.tmpdir}/cert.p12"
+  File.write(cert_path, Base64.decode64(ENV["CERTIFICATE_BASE64"]))
+
+  import_certificate(
+    certificate_path: cert_path,
+    certificate_password: ENV["CERTIFICATE_PASSWORD"],
+    keychain_name: keychain_name,
+    keychain_password: keychain_password
+  )
+
+  File.delete(cert_path) if File.exist?(cert_path)
+end
+
+desc "Build and archive macOS app"
+lane :build do
+  gym(
+    scheme: "BabyKeyboardLock",
+    configuration: "Release",
+    output_directory: "./build",
+    export_method: "mac-application",  # or "mac-application", "developer-id", "app-store"
+    clean: true
+  )
+
+  tag = ENV["GITHUB_REF_NAME"] || git_branch()
+  zip(
+    path: "build/BabyKeyboardLock.app",
+    output_path: "build/BabyKeyboardLock-#{tag}.zip"
+  )
+end
+
+lane :test do
+  run_tests(scheme: "BabyKeyboardLock")
+end
