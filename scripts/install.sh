@@ -5,4 +5,7 @@ set -euo pipefail
 
 echo "📲 Installing to /Applications/..."
 cp -R ./build/export/BabyKeyboardLock.app /Applications/
+
 echo "✨ Installation complete!"
+echo ""
+echo "💡 If the app won't open, run: make fix-signature"

@@ -1,4 +1,4 @@
-.PHONY: deploy update clean archive export install
+.PHONY: deploy update clean archive export install fix-signature
 
 # Main target - build and deploy the app
 deploy: archive export install
@@ -22,3 +22,7 @@ export:
 # Install to Applications folder
 install:
 	@./scripts/install.sh
+
+# Fix signature issues (resets accessibility permissions!)
+fix-signature:
+	@./scripts/fix-signature.sh
