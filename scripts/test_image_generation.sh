@@ -16,10 +16,8 @@ uv run python scripts/generate_with_nano_banana.py \
 echo ""
 echo "2) Downloading Quick Draw dataset for a few categories..."
 uv run python -c "
-import sys
 from pathlib import Path
-sys.path.insert(0, str(Path.home() / 'calmmage' / 'calmlib'))
-from datasets.quickdraw_downloader import QuickDrawDownloader
+from calmlib.datasets.quickdraw_downloader import QuickDrawDownloader
 
 downloader = QuickDrawDownloader(Path('quickdraw_data'))
 downloader.download_category('cat')

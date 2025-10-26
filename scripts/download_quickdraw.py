@@ -5,14 +5,9 @@ Download Google Quick Draw dataset images for baby flashcards.
 Uses calmlib.datasets.quickdraw_downloader utilities.
 """
 
-import sys
 from pathlib import Path
 
-# Add calmlib to path
-calmlib_path = Path.home() / "calmmage" / "calmlib"
-sys.path.insert(0, str(calmlib_path))
-
-from datasets.quickdraw_downloader import QuickDrawDownloader, BABY_FRIENDLY_CATEGORIES
+from calmlib.datasets.quickdraw_downloader import QuickDrawDownloader, BABY_FRIENDLY_CATEGORIES
 
 
 def main():

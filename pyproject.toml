@@ -1,8 +1,11 @@
+[tool.uv]
+package = false
+
 [project]
 name = "Baby-Keyboard-Scripts"
 # update project folder structure for project_manager and project_discoverer
 version = "0.1.0"
-description = "Personal GitHub repo for tools, projects, and personal website"
+description = "Scripts for Baby Keyboard Lock image generation"
 readme = "README.md"
 classifiers = [
     "Programming Language :: Python",
@@ -21,17 +24,21 @@ requires-python = ">=3.13,<3.14"
 dependencies = [
     "aiogram>=2.15",
     "async-lru>=2.0.5",
+    "fiftyone>=1.9.0",
     "keyring>=25.6.0",
     "loguru>=0.7.3",
+    "numpy>=2.3.4",
+    "pillow>=12.0.0",
     "pydantic>=2.12.3",
     "pydantic-settings>=2.11.0",
     "telethon>=1.41.2",
+    "tqdm>=4.66.0",
 ]
 
 
 [dependency-groups]
 extras = [
-    "calmlib @ git+https://github.com/calmmage/calmlib.git@dev",
+    "calmlib @ git+https://github.com/calmmage/calmlib.git",
 ]
 
 dev = [

@@ -1,9 +1,57 @@
 .PHONY: deploy update clean archive export install fix-signature
-.PHONY: test-images test-quickdraw test-generate download-quickdraw generate-all-images
+.PHONY: test-images test-quickdraw test-generate download-quickdraw generate-all-images images-main
 
 # Main target - build and deploy the app
 deploy: archive export install
 	@echo "✅ BabyKeyboardLock deployed successfully to /Applications/"
+
+# Main image workflow - all 4 steps with confirmation
+images-main:
+	@echo "=== IMAGE GENERATION WORKFLOW ==="
+	@echo ""
+	@echo "This will run 4 steps:"
+	@echo "  1. Test downloading Quick Draw dataset (3 categories)"
+	@echo "  2. Test generating images with nano-banana (3 images)"
+	@echo "  3. Download full Quick Draw dataset (all baby-friendly categories)"
+	@echo "  4. Generate all missing flashcard images"
+	@echo ""
+	@read -p "Step 1: Test Quick Draw download? [y/n/skip] " response; \
+	if [ "$$response" = "y" ]; then \
+		$(MAKE) test-quickdraw; \
+	elif [ "$$response" = "skip" ]; then \
+		echo "⏭️  Skipped step 1"; \
+	else \
+		echo "❌ Cancelled"; exit 1; \
+	fi
+	@echo ""
+	@read -p "Step 2: Test nano-banana generation? [y/n/skip] " response; \
+	if [ "$$response" = "y" ]; then \
+		$(MAKE) test-generate; \
+	elif [ "$$response" = "skip" ]; then \
+		echo "⏭️  Skipped step 2"; \
+	else \
+		echo "❌ Cancelled"; exit 1; \
+	fi
+	@echo ""
+	@read -p "Step 3: Download full Quick Draw dataset? [y/n/skip] " response; \
+	if [ "$$response" = "y" ]; then \
+		$(MAKE) download-quickdraw; \
+	elif [ "$$response" = "skip" ]; then \
+		echo "⏭️  Skipped step 3"; \
+	else \
+		echo "❌ Cancelled"; exit 1; \
+	fi
+	@echo ""
+	@read -p "Step 4: Generate all missing images? [y/n/skip] " response; \
+	if [ "$$response" = "y" ]; then \
+		$(MAKE) generate-all-images; \
+	elif [ "$$response" = "skip" ]; then \
+		echo "⏭️  Skipped step 4"; \
+	else \
+		echo "❌ Cancelled"; exit 1; \
+	fi
+	@echo ""
+	@echo "=== ✅ WORKFLOW COMPLETE ==="
 
 # Alias for deploy - update the installed app
 update: deploy
