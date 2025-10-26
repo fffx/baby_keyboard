@@ -277,7 +277,8 @@ class EventEffectHandler {
     
     private var wordSetType: WordSetType = .randomShortWords
     private let customWordSetsManager = CustomWordSetsManager.shared
-    
+    private let typingGameState = TypingGameState.shared
+
     private let synth = AVSpeechSynthesizer()
     var translationLanguage: TranslationLanguage = .none
     var usePersonalVoice: Bool = false
@@ -407,10 +408,77 @@ class EventEffectHandler {
             }
             
             return englishWord
-        case .bubbles, .stars, .animals, .rainbowTrail:
-            // Visual effects only - no sound
-            return keyStr
-        }
+        case .typingGame:
+            // Typing game mode - validate key press and provide feedback
+
+            // Initialize game if needed (first key press or word completed)
+            if typingGameState.currentWord.isEmpty || typingGameState.isWordComplete {
+                typingGameState.selectNewWord(wordSetType: wordSetType, translationLanguage: translationLanguage)
+            }
+
+            // Validate the key press
+            let validationResult = typingGameState.validateKeyPress(keyStr)
+
+            switch validationResult {
+            case .correct:
+                // Play success sound and speak the letter
+                NSSound(named: "bottle")?.play()
+                
+                synth.stopSpeaking(at: .immediate)
+                let utterance = createUtterance(for: keyStr)
+                synth.speak(utterance)
+                
+                return typingGameState.typedSoFar
+                
+            case .incorrect:
+                // Play error sound
+                NSSound(named: NSSound.Name("Basso"))?.play()
+                
+                // Return the typed progress (may be reset if resetOnError is true)
+                return typingGameState.typedSoFar
+                
+            case .wordComplete:
+                // Play celebration sound and speak the complete word
+                NSSound(named: "Glass")?.play()
+                
+                synth.stopSpeaking(at: .immediate)
+                let wordUtterance = createUtterance(for: typingGameState.currentWord)
+                synth.speak(wordUtterance)
+                
+                // If translation is available, speak it after a delay
+                if translationLanguage != .none && !typingGameState.currentWordTranslation.isEmpty {
+                    DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + EventHandler.shared.wordTranslationDelay) {
+                        let translationUtterance: AVSpeechUtterance
+                        
+                        switch self.translationLanguage {
+                        case .french:
+                            translationUtterance = self.createUtterance(for: self.typingGameState.currentWordTranslation, language: "fr-FR")
+                        case .russian:
+                            translationUtterance = self.createUtterance(for: self.typingGameState.currentWordTranslation, language: "ru-RU")
+                        case .german:
+                            translationUtterance = self.createUtterance(for: self.typingGameState.currentWordTranslation, language: "de-DE")
+                        case .spanish:
+                            translationUtterance = self.createUtterance(for: self.typingGameState.currentWordTranslation, language: "es-ES")
+                        case .italian:
+                            translationUtterance = self.createUtterance(for: self.typingGameState.currentWordTranslation, language: "it-IT")
+                        case .japanese:
+                            translationUtterance = self.createUtterance(for: self.typingGameState.currentWordTranslation, language: "ja-JP")
+                        case .chinese:
+                            translationUtterance = self.createUtterance(for: self.typingGameState.currentWordTranslation, language: "zh-CN")
+                        case .none:
+                            return
+                        }
+                        
+                        self.synth.speak(translationUtterance)
+                    }
+                }
+                
+                return typingGameState.currentWord
+            }
+            case .bubbles, .stars, .animals, .rainbowTrail:
+                // Visual effects only - no sound
+                return keyStr
+       }
     }
     
     func getString(event: CGEvent, eventType: CGEventType) -> String? {

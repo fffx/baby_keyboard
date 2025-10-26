@@ -453,6 +453,17 @@
         }
       }
     },
+    "LockEffect.typingGame" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Typing Game"
+          }
+        }
+      }
+    },
     "Main Words" : {
 
     },
@@ -514,6 +525,17 @@
     },
     "Reset" : {
 
+    },
+    "Reset on error" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset on error"
+          }
+        }
+      }
     },
     "Reset to Defaults" : {
 

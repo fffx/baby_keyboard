@@ -195,7 +195,12 @@ struct ContentView: View {
         if eventHandler.selectedLockEffect == .speakRandomWord {
             height += 310 // Translation picker, baby name + translation + image, baby name probability, edit button
         }
-        
+
+        // Add space for game mode options
+        if eventHandler.selectedLockEffect == .typingGame {
+            height += 200 // Reset on error toggle, word set selector, flashcard options
+        }
+
         return height
     }
     
@@ -567,7 +572,65 @@ struct ContentView: View {
                         }
                     }
                 }
-                
+
+                // Game mode settings
+                if selectedCategory == .games {
+                    Toggle(isOn: Binding(
+                        get: { TypingGameState.shared.resetOnError },
+                        set: { TypingGameState.shared.setResetOnError($0) }
+                    )) {
+                        Text("Reset on error")
+                    }
+                    .toggleStyle(CheckboxToggleStyle())
+
+                    // Word set selection
+                    Picker("Word Set", selection: $eventHandler.selectedWordSetType) {
+                        ForEach(WordSetType.allCases) { type in
+                            Text(type.localizedString).tag(type)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .onChange(of: eventHandler.selectedWordSetType) { _, newValue in
+                        savedWordSetType = newValue.rawValue
+                    }
+
+                    // Show flashcards toggle
+                    Toggle(isOn: $showFlashcards) {
+                        Text("Show Flashcards")
+                    }
+                    .toggleStyle(CheckboxToggleStyle())
+
+                    if showFlashcards {
+                        Text("Flashcard Style")
+                            .foregroundColor(.secondary)
+                            .font(.subheadline)
+
+                        FlashcardStylePicker(selectedStyle: $flashcardStyle)
+
+                        // Image size slider
+                        if flashcardStyle != .none {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text("Image Size: \(Int(flashcardImageSize))px")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+
+                                HStack {
+                                    Text("50px")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+
+                                    Slider(value: $flashcardImageSize, in: 50...1000, step: 50)
+
+                                    Text("1000px")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .padding(.top, 8)
+                        }
+                    }
+                }
+
                 Toggle(isOn: $lockKeyboardOnLaunch) {
                     Text("Lock keyboard on launch")
                 }
@@ -679,7 +742,7 @@ struct ContentView: View {
         .onChange(of: selectedCategory) { oldValue, newValue in
             // When changing category, only switch if current effect is incompatible
             let availableEffects = LockEffect.allCases.filter { $0.category == newValue }
-            
+
             if newValue == .none {
                 eventHandler.selectedLockEffect = .none
             } else if !availableEffects.contains(eventHandler.selectedLockEffect) {
@@ -688,6 +751,8 @@ struct ContentView: View {
                     eventHandler.selectedLockEffect = .confettiCannon
                 } else if newValue == .words {
                     eventHandler.selectedLockEffect = .speakRandomWord
+                } else if newValue == .games {
+                    eventHandler.selectedLockEffect = .typingGame
                 }
             }
             // If current effect is compatible with new category, keep it unchanged

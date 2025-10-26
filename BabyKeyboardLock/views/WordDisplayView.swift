@@ -42,7 +42,12 @@ struct WordDisplayView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            if showWord && !word.isEmpty && showFlashcards {
+            // Show typing game view for typing game mode
+            if eventHandler.isLocked && eventHandler.selectedLockEffect == .typingGame {
+                TypingGameView()
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+            }
+            else if showWord && !word.isEmpty && showFlashcards {
                 let bgSize = backgroundSize
                 let maxWidth = min(geometry.size.width * 0.9, bgSize.width)
                 let maxHeight = min(geometry.size.height * 0.9, bgSize.height)

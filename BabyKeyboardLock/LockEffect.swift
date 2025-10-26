@@ -10,7 +10,8 @@ enum EffectCategory: String, CaseIterable, Identifiable {
     case none = "None"
     case visual = "Visual Effects"
     case words = "Words"
-    
+    case games = "Games"
+
     var id: Self { self }
 }
 
@@ -20,13 +21,15 @@ enum LockEffect: String, CaseIterable, Identifiable {
     case speakTheKey = "LockEffect.speakTheKey"
     case speakAKeyWord = "LockEffect.speakAKeyWord"
     case speakRandomWord = "LockEffect.speakRandomWord"
+    // Game modes
+    case typingGame = "LockEffect.typingGame"
     // New visual effects
     case bubbles = "LockEffect.bubbles"
     case stars = "LockEffect.stars"
     case animals = "LockEffect.animals"
     case rainbowTrail = "LockEffect.rainbowTrail"
     // TODO add random
-    
+
     var id: Self { self }
     
     var category: EffectCategory {
@@ -37,6 +40,8 @@ enum LockEffect: String, CaseIterable, Identifiable {
             return .visual
         case .speakTheKey, .speakAKeyWord, .speakRandomWord:
             return .words
+        case .typingGame:
+            return .games
         }
     }
     
