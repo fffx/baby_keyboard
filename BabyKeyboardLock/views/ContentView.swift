@@ -12,7 +12,7 @@ import AppKit
 
 struct HoverableMenuStyle: MenuStyle {
     @State private var isHovered = false
-    
+
     func makeBody(configuration: Configuration) -> some View {
         Menu(configuration)
             .padding(5)
@@ -31,11 +31,11 @@ struct HoverableMenuStyle: MenuStyle {
 struct ContentView: View {
     @State private var animationWindow: NSWindow?
     @ObservedObject var eventHandler: EventHandler = EventHandler.shared
-    
+
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
     @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
     @AppStorage("selectedTranslationLanguage") var selectedTranslationLanguage: TranslationLanguage = .none
-    
+
     @State var hoveringMoreButton: Bool = false
     var body: some View {
        VStack(alignment: .leading, spacing: 20) {
@@ -45,7 +45,7 @@ struct ContentView: View {
                     Button("About") {
                         AboutView().openInWindow(id: "About", sender: self, focus: true)
                     }
-                    
+
                     Button("Quit \(Bundle.applicationName)") {
                         NSApp.terminate(nil)
                     }
@@ -69,7 +69,7 @@ struct ContentView: View {
                     hoveringMoreButton = true
                 }
             }
-            
+
             Toggle(isOn: $eventHandler.isLocked)
             {
                 Label(
@@ -90,7 +90,7 @@ struct ContentView: View {
                     playLockSound(isLocked: true)
                 }
             }
-            
+
             if !eventHandler.accessibilityPermissionGranted {
                 Text("accessibility_permission_grant_hint \(Bundle.applicationName)")
                     .opacity(eventHandler.accessibilityPermissionGranted ? 0 : 1)
@@ -106,7 +106,7 @@ struct ContentView: View {
             .onChange(of: eventHandler.selectedLockEffect) { newVal in
                 selectedLockEffect = newVal
             }
-            
+
             if eventHandler.selectedLockEffect == .speakAKeyWord {
                 Picker("Translation", selection: $eventHandler.selectedTranslationLanguage) {
                     ForEach(TranslationLanguage.allCases) { language in
@@ -118,13 +118,13 @@ struct ContentView: View {
                     selectedTranslationLanguage = newVal
                 }
             }
-            
+
             Toggle(isOn: $lockKeyboardOnLaunch) {
                 Text("Lock keyboard on launch")
             }
             .toggleStyle(CheckboxToggleStyle())
             // .frame(maxWidth: .infinity, alignment: .leading)
-            
+
             Spacer()
             Text("unlock_shortcut_hint")
                 .font(.footnote)
@@ -137,23 +137,23 @@ struct ContentView: View {
         }.onReceive(eventHandler.$isLocked) { newVal in
             showOrCloseAnimationWindow(isLocked: newVal)
         }.onAppear() {
-            debugPrint("onAppear --- ")
+            debugLog("onAppear --- ")
             guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == MainWindowID }) else { return}
-            
-            
+
+
         }
     }
-    
+
     private func playLockSound(isLocked: Bool) {
         if isLocked {
             NSSound(named: "light-switch-on")?.play()
         } else {
             guard let nsSound = NSSound(named: "light-switch-off") else { return }
-            
+
             nsSound.play()
         }
     }
-    
+
     private func showOrCloseAnimationWindow(isLocked: Bool) {
         if (!isLocked) {
             NSApp.windows.forEach { window in
@@ -163,12 +163,12 @@ struct ContentView: View {
             }
             return
         }
-           
+
         if animationWindow != nil {
             animationWindow?.orderFront(self)
             return
         }
-        
+
         animationWindow = AnimationView()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .edgesIgnoringSafeArea(.all)
@@ -184,7 +184,7 @@ struct ContentView: View {
             }
             .openInWindow(id: AnimationWindowID, sender: self)
     }
-    
+
 }
 
 #Preview {

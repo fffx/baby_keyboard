@@ -5,6 +5,13 @@ import ApplicationServices
 import CoreData
 import SwiftData
 
+// Debug print helper - only prints in DEBUG builds
+func debugLog(_ message: String) {
+    #if DEBUG
+    print(message)
+    #endif
+}
+
 enum KeyCode: CGKeyCode, CaseIterable, Identifiable {
     case u = 0x20
     case delete = 0x33
@@ -15,7 +22,7 @@ enum KeyCode: CGKeyCode, CaseIterable, Identifiable {
     case escape = 0x35
     case tab = 0x30
     case enter = 0x24
-    
+
     var id: Self {
         return self
     }
@@ -26,7 +33,7 @@ class EventHandler: ObservableObject {
     let eventEffectHandler = EventEffectHandler()
     private var eventLoopStarted = false
     private var eventTap : CFMachPort?
-    
+
     @Published var selectedLockEffect: LockEffect = .none
     @Published var selectedTranslationLanguage: TranslationLanguage = .none {
         didSet {
@@ -48,17 +55,17 @@ class EventHandler: ObservableObject {
     private func isThrottled() -> Bool {
         let now = Date()
         let timeSinceLastEvent = now.timeIntervalSince(lastEventTime)
-      
+
         if timeSinceLastEvent >= throttleInterval {
             lastEventTime = now
             return false
         }
-        debugPrint("Throttled >>>>> timeSinceLastEvent: \(timeSinceLastEvent)")
+        debugLog("Throttled >>>>> timeSinceLastEvent: \(timeSinceLastEvent)")
         return true
     }
-    
+
     static let shared = EventHandler()
-    
+
     init(isLocked: Bool = true) {
         self.isLocked = isLocked
         self.accessibilityPermissionGranted = requestAccessibilityPermissions()
@@ -67,7 +74,7 @@ class EventHandler: ObservableObject {
         }
         self.lastKeyString = lastKeyString
     }
-    
+
     func setLocked(isLocked: Bool) {
         if (isLocked && accessibilityPermissionGranted) {
             self.isLocked = true
@@ -75,14 +82,14 @@ class EventHandler: ObservableObject {
         } else {
             self.isLocked = false
         }
-        
-        
+
+
     }
 
     func checkAccessibilityPermission(){
-        debugPrint("------ Checking Accessibility Permission ------")
+        debugLog("------ Checking Accessibility Permission ------")
         if eventTap != nil && !CGEvent.tapIsEnabled(tap: eventTap!) {
-            print("Event tap disabled, attempting restart...")
+            debugLog("Event tap disabled, attempting restart...")
             setupEventTap()
         }
         let processTrusted = AXIsProcessTrusted()
@@ -103,45 +110,45 @@ class EventHandler: ObservableObject {
             }
         }
     }
-    
+
     func run() {
         checkAccessibilityPermission()
-        
+
         if requestAccessibilityPermissions() {
             startEventLoop()
         } else {
             self.accessibilityPermissionGranted = false
             self.isLocked = false
-            debugPrint("Please grant accessibility permissions in System Preferences")
+            debugLog("Please grant accessibility permissions in System Preferences")
             // exit(EXIT_SUCCESS)
         }
     }
-    
+
     func stop(){
         isLocked = false
         CFRunLoopStop(CFRunLoopGetCurrent())
     }
-    
+
     func startEventLoop() {
         if(eventLoopStarted) { return }
         if(!accessibilityPermissionGranted) { return }
         lock.lock()
         defer { lock.unlock() }
-        
+
         setupEventTap() // Setup event tap to capture key events
         DispatchQueue.main.async {
             self.eventLoopStarted = true
             CFRunLoopRun()  // Start the run loop to handle events in a background thread
         }
     }
-    
+
     private func setupEventTap() {
         let eventMask = CGEventMask(
             (1 << CGEventType.keyDown.rawValue) |
             (1 << CGEventType.keyUp.rawValue) |
             (1 << 14) // seacrh and voice key
         )
-        
+
         eventTap = CGEvent.tapCreate(
             tap: .cghidEventTap,
             place: .headInsertEventTap,
@@ -152,11 +159,11 @@ class EventHandler: ObservableObject {
                 .passUnretained(self)
                 .toOpaque())
         )
-        
+
         guard eventTap != nil else {
             fatalError("Failed to create event tap")
         }
-        
+
         let runLoopSource = CFMachPortCreateRunLoopSource(
             kCFAllocatorDefault,
             eventTap,
@@ -165,7 +172,7 @@ class EventHandler: ObservableObject {
         CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
         CGEvent.tapEnable(tap: eventTap!, enable: true)
     }
-    
+
     func handleKeyEvent(
         proxy: CGEventTapProxy,
         type: CGEventType,
@@ -174,14 +181,14 @@ class EventHandler: ObservableObject {
 
         // Handle tap disable events first
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
-            debugPrint("Event tap disabled, attempting to re-enable...")
+            debugLog("Event tap disabled, attempting to re-enable...")
             if let tap = eventTap {
                 CGEvent.tapEnable(tap: tap, enable: true)
             }
             return Unmanaged.passRetained(event)
         }
-        
-        debugPrint("--- keyup/down: \(type == .keyDown || type == .keyUp), keyboardEventKeyboardType: \(event.getIntegerValueField(.keyboardEventKeyboardType))")
+
+        debugLog("--- keyup/down: \(type == .keyDown || type == .keyUp), keyboardEventKeyboardType: \(event.getIntegerValueField(.keyboardEventKeyboardType))")
         // disable media keys, power button
         if isLocked && event.getIntegerValueField(.keyboardEventKeyboardType) == 0 {
             return nil
@@ -189,39 +196,39 @@ class EventHandler: ObservableObject {
         guard type == .keyDown || type == .keyUp else {
             return Unmanaged.passRetained(event)
         }
-        
+
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
         let controlFlag = event.flags.contains(.maskControl)
         let optionFlag = event.flags.contains(.maskAlternate)
         let eventType = type == .keyDown ? "pressed" : "released"
-        debugPrint("Key Code: \0x\(String(keyCode, radix: 16)),\t" +
+        debugLog("Key Code: \0x\(String(keyCode, radix: 16)),\t" +
                  "Control Flag: \(controlFlag),\t" +
                  "Event Type: (\(type.rawValue)) \(eventType)")
         // Toggle with Ctrl + Option + U
         if optionFlag && controlFlag && keyCode == KeyCode.u.rawValue && type == .keyDown {
-            debugPrint("Keyboard locked: \(isLocked)")
+            debugLog("Keyboard locked: \(isLocked)")
             self.isLocked = isLocked ? false : true
             CFRunLoopStop(CFRunLoopGetCurrent())
-            
+
             return nil
         }
 
         if isLocked {
-            
+
             if type != .keyUp { return nil }
-            
+
             if isThrottled() { return nil }
-            
+
             self.lastKeyString = eventEffectHandler.handle(
                 event: event, eventType: type, selectedLockEffect: selectedLockEffect
             )
-            debugPrint("keyup------- \(lastKeyString), str: \(lastKeyString)")
+            debugLog("keyup------- \(lastKeyString), str: \(lastKeyString)")
             return nil
         } else {
             return Unmanaged.passRetained(event)
         }
     }
-    
+
     func requestAccessibilityPermissions() -> Bool {
         let trusted = AXIsProcessTrusted()
         if !trusted {

@@ -22,7 +22,7 @@ private struct FullscreenTransparentWindowBackground: NSViewRepresentable {
         let view = NSView()
         DispatchQueue.main.async {
             guard let window = view.window else { return }
-            
+
             window.isOpaque = false
             window.backgroundColor = .clear
             window.ignoresMouseEvents = true
@@ -35,7 +35,7 @@ private struct FullscreenTransparentWindowBackground: NSViewRepresentable {
         }
         return view
     }
-    
+
     func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
@@ -49,12 +49,13 @@ struct AnimationView: View {
     @State private var counter: Int = 0
     @State private var initialized = false
     @State private var buttonPosition: CGPoint = .zero
-    
+
     @State private var soundPool: [NSSound] = []
     @State private var sound: NSSound? = NSSound(named: "confetti-cannon")
     @State private var windowSize: CGSize = .zero
+    @State private var lastCleanupTime: Date = Date()
     @ObservedObject var eventHandler: EventHandler = EventHandler.shared
-    
+
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -75,46 +76,66 @@ struct AnimationView: View {
             .onAppear {
                 // windowSize = geometry.size
                 windowSize = NSScreen.main?.frame.size ?? CGSize(width: 800, height: 600)
-                debugPrint("\(AnimationWindowID)-------- windowSize: \(windowSize)")
+                debugLog("\(AnimationWindowID)-------- windowSize: \(windowSize)")
             }
             .onChange(of: eventHandler.isLocked) { newVal in
                 if !newVal {
                     // TODO https://stackoverflow.com/questions/64391947/swiftui-prevent-onreceive-from-firing-on-load
                     initialized = false // avoild confetti on toggle lock
+                    cleanupSoundPool() // Clean up when unlocking
                 }
             }
             .onReceive(eventHandler.$lastKeyString) { _ in
-                debugPrint("\(AnimationWindowID)-------- initialized: \(initialized), locked \(eventHandler.isLocked)")
+                debugLog("\(AnimationWindowID)-------- initialized: \(initialized), locked \(eventHandler.isLocked)")
                 if !initialized {
                     self.initialized = true
                     return
                 }
                 if(!eventHandler.isLocked) { return }
-                
+
                 // ##### Confetti handler
                 if eventHandler.selectedLockEffect != .confettiConnon { return }
-                
+
                 guard let letter = eventHandler.lastKeyString.first, letter.isLetter || letter.isNumber else { return }
-                
+
                 counter += 1
-                debugPrint("counter increase -------- \(counter)")
+                debugLog("counter increase -------- \(counter)")
                 let randomX = CGFloat.random(in: 0...geometry.size.width)
                 let randomY = CGFloat.random(in: 0...geometry.size.height)
-                
+
                 // Update the button's position
                 buttonPosition = CGPoint(x: randomX, y: randomY)
                 playSound()
+
+                // Periodic cleanup every 5 minutes
+                periodicCleanup()
             }
         }
         .fullscreenTransparentWindow()
     }
-    
+
     private func playSound() {
         if sound != nil && soundPool.isEmpty {
             soundPool = Array(repeating: sound!, count: 5).map { $0.copy() as! NSSound }
         }
         guard let availableSound = soundPool.first(where: { !$0.isPlaying }) else { return }
         availableSound.play()
+    }
+
+    private func cleanupSoundPool() {
+        // Stop all sounds and clear the pool
+        soundPool.forEach { $0.stop() }
+        soundPool.removeAll()
+        debugLog("Sound pool cleaned up")
+    }
+
+    private func periodicCleanup() {
+        let now = Date()
+        // Clean up every 5 minutes to prevent memory buildup
+        if now.timeIntervalSince(lastCleanupTime) > 300 {
+            lastCleanupTime = now
+            soundPool.removeAll(where: { !$0.isPlaying })
+        }
     }
 
 }

@@ -14,7 +14,7 @@ import Sauce
 extension CGEventFlags {
     var toNSEventModifierFlags: NSEvent.ModifierFlags {
         var nsFlags = NSEvent.ModifierFlags()
-        
+
         if contains(.maskShift) {
             nsFlags.insert(.shift)
         }
@@ -36,7 +36,7 @@ extension CGEventFlags {
         if contains(.maskAlphaShift) {
             nsFlags.insert(.capsLock)
         }
-        
+
         return nsFlags
     }
 }
@@ -70,7 +70,7 @@ class EventEffectHandler {
         "y": ["yak", "yes", "yarn", "yell", "yet", "yum", "you", "young"],
         "z": ["zebra", "zip", "zap", "zig", "zoo", "zen", "zero", "zone"]
     ]
-    
+
     // Translation dictionaries for supported languages
     let frenchTranslations: [String: String] = [
         "apple": "pomme", "ant": "fourmi", "air": "air", "arm": "bras", "axe": "hache", "all": "tous", "ask": "demander", "and": "et", "add": "ajouter",
@@ -100,7 +100,7 @@ class EventEffectHandler {
         "yak": "yack", "yes": "oui", "yarn": "fil", "yell": "crier", "yet": "encore", "yum": "miam", "you": "toi", "young": "jeune",
         "zebra": "zèbre", "zip": "fermeture éclair", "zap": "zapper", "zig": "zigzag", "zoo": "zoo", "zen": "zen", "zero": "zéro", "zone": "zone"
     ]
-    
+
     let russianTranslations: [String: String] = [
         "apple": "яблоко", "ant": "муравей", "air": "воздух", "arm": "рука", "axe": "топор", "all": "все", "ask": "спрашивать", "and": "и", "add": "добавить",
         "ball": "мяч", "bat": "летучая мышь", "bag": "сумка", "bed": "кровать", "bear": "медведь", "bug": "жук", "bun": "булочка", "bus": "автобус", "big": "большой", "bit": "кусочек",
@@ -129,7 +129,7 @@ class EventEffectHandler {
         "yak": "як", "yes": "да", "yarn": "пряжа", "yell": "кричать", "yet": "еще", "yum": "вкусно", "you": "ты", "young": "молодой",
         "zebra": "зебра", "zip": "застежка", "zap": "бить", "zig": "зигзаг", "zoo": "зоопарк", "zen": "дзен", "zero": "ноль", "zone": "зона"
     ]
-    
+
     let germanTranslations: [String: String] = [
         "apple": "Apfel", "ant": "Ameise", "air": "Luft", "arm": "Arm", "axe": "Axt", "all": "alle", "ask": "fragen", "and": "und", "add": "hinzufügen",
         "ball": "Ball", "bat": "Fledermaus", "bag": "Tasche", "bed": "Bett", "bear": "Bär", "bug": "Käfer", "bun": "Brötchen", "bus": "Bus", "big": "groß", "bit": "Stück",
@@ -158,7 +158,7 @@ class EventEffectHandler {
         "yak": "Yak", "yes": "ja", "yarn": "Garn", "yell": "schreien", "yet": "noch", "yum": "lecker", "you": "du", "young": "jung",
         "zebra": "Zebra", "zip": "Reißverschluss", "zap": "zappen", "zig": "Zickzack", "zoo": "Zoo", "zen": "Zen", "zero": "null", "zone": "Zone"
     ]
-    
+
     let spanishTranslations: [String: String] = [
         "apple": "manzana", "ant": "hormiga", "air": "aire", "arm": "brazo", "axe": "hacha", "all": "todo", "ask": "preguntar", "and": "y", "add": "añadir",
         "ball": "pelota", "bat": "murciélago", "bag": "bolsa", "bed": "cama", "bear": "oso", "bug": "bicho", "bun": "bollo", "bus": "autobús", "big": "grande", "bit": "pedazo",
@@ -187,7 +187,7 @@ class EventEffectHandler {
         "yak": "yak", "yes": "sí", "yarn": "hilo", "yell": "gritar", "yet": "aún", "yum": "rico", "you": "tú", "young": "joven",
         "zebra": "cebra", "zip": "cerniera", "zap": "golpear", "zig": "zigzag", "zoo": "zoo", "zen": "zen", "zero": "cero", "zone": "zona"
     ]
-    
+
     let italianTranslations: [String: String] = [
         "apple": "mela", "ant": "formica", "air": "aria", "arm": "braccio", "axe": "ascia", "all": "tutti", "ask": "chiedere", "and": "e", "add": "aggiungere",
         "ball": "palla", "bat": "pipistrello", "bag": "borsa", "bed": "letto", "bear": "orso", "bug": "insetto", "bun": "panino", "bus": "autobus", "big": "grande", "bit": "pezzo",
@@ -216,7 +216,7 @@ class EventEffectHandler {
         "yak": "yak", "yes": "sì", "yarn": "filato", "yell": "urlare", "yet": "ancora", "yum": "yum", "you": "tu", "young": "giovane",
         "zebra": "zebra", "zip": "cerniera", "zap": "colpire", "zig": "zigzag", "zoo": "zoo", "zen": "zen", "zero": "zero", "zone": "zona"
     ]
-    
+
     let japaneseTranslations: [String: String] = [
         "apple": "りんご", "ant": "あり", "air": "くうき", "arm": "うで", "axe": "おの", "all": "すべて", "ask": "たずねる", "and": "そして", "add": "くわえる",
         "ball": "ボール", "bat": "こうもり", "bag": "かばん", "bed": "ベッド", "bear": "くま", "bug": "むし", "bun": "パン", "bus": "バス", "big": "おおきい", "bit": "かけら",
@@ -245,7 +245,7 @@ class EventEffectHandler {
         "yak": "ヤク", "yes": "はい", "yarn": "毛糸", "yell": "さけぶ", "yet": "まだ", "yum": "おいしい", "you": "あなた", "young": "わかい",
         "zebra": "しまうま", "zip": "ジッパー", "zap": "ピシッ", "zig": "ジグザグ", "zoo": "どうぶつえん", "zen": "禅", "zero": "ゼロ", "zone": "エリア"
     ]
-    
+
     let chineseTranslations: [String: String] = [
         "apple": "苹果", "ant": "蚂蚁", "air": "空气", "arm": "手臂", "axe": "斧头", "all": "全部", "ask": "问", "and": "和", "add": "添加",
         "ball": "球", "bat": "蝙蝠", "bag": "包", "bed": "床", "bear": "熊", "bug": "虫子", "bun": "面包", "bus": "公交车", "big": "大", "bit": "一点",
@@ -274,27 +274,35 @@ class EventEffectHandler {
         "yak": "牦牛", "yes": "是", "yarn": "纱线", "yell": "叫喊", "yet": "尚", "yum": "好吃", "you": "你", "young": "年轻",
         "zebra": "斑马", "zip": "拉链", "zap": "啪", "zig": "锯齿", "zoo": "动物园", "zen": "禅", "zero": "零", "zone": "区域"
     ]
-    
+
     let synth = AVSpeechSynthesizer()
     var translationLanguage: TranslationLanguage = .none
-    
+
     func handle(event: CGEvent, eventType: CGEventType, selectedLockEffect: LockEffect) -> String {
-        debugPrint("speaking handle ------- \(selectedLockEffect)")
+        debugLog("speaking handle ------- \(selectedLockEffect)")
         // guard eventType == .keyUp else { return }
         guard let str = getString(event: event, eventType: eventType) else { return "" }
-        debugPrint("get key name ------- \(str)")
- 
-       
+        debugLog("get key name ------- \(str)")
+
+
         switch selectedLockEffect {
         case .speakTheKey:
             DispatchQueue.global(qos: .background).async {
+                // Stop any ongoing speech to prevent queue buildup
+                if self.synth.isSpeaking {
+                    self.synth.stopSpeaking(at: .immediate)
+                }
                 self.synth.speak(self.createUtterance(for: str))
             }
         case .speakAKeyWord:
             let randomWord = getRandomWord(forKey: str)
             DispatchQueue.global(qos: .background).async {
+                // Stop any ongoing speech to prevent queue buildup
+                if self.synth.isSpeaking {
+                    self.synth.stopSpeaking(at: .immediate)
+                }
                 self.synth.speak(self.createUtterance(for: randomWord))
-                
+
                 // If translation is enabled, speak the translation after a short delay
                 if self.translationLanguage != .none {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
@@ -308,57 +316,57 @@ class EventEffectHandler {
         default:
             break
         }
-        
+
         return str
     }
-    
+
     func getString(event: CGEvent, eventType: CGEventType) -> String? {
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
         if KeyCode.allCases.contains(where: { $0.rawValue == keyCode }) {
             return String(describing: KeyCode(rawValue: CGKeyCode(keyCode))!)
         }
-        
+
         return Sauce.shared.character(
             for: Int(event.getIntegerValueField(.keyboardEventKeycode)),
             cocoaModifiers: event.flags.toNSEventModifierFlags
         )
     }
-    
+
     func getRandomWord(forKey key: String) -> String {
         let key = key.lowercased()
-        // debugPrint("getWord ------- \(key) -- \(wordCache[key])")
+        // debugLog("getWord ------- \(key) -- \(wordCache[key])")
         guard let words = simpleWordsMap[key],
               let randomWord = words.randomElement() else {
             return key
         }
-        
-        debugPrint("getWord ------- \(key) -- \(randomWord)")
+
+        debugLog("getWord ------- \(key) -- \(randomWord)")
         return randomWord
     }
-    
+
     private func createUtterance(for str: String, language: String? = nil) -> AVSpeechUtterance {
         let utterance = AVSpeechUtterance(string: str)
         // utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.1
-        
+
         let languageCode = language ?? Locale.preferredLanguages[0]
-        
+
         // https://stackoverflow.com/questions/37512621/avspeechsynthesizer-change-voice
         let allVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
             guard languageCode == voice.language else { return false}
-            // debugPrint("speaking ------- \(voice.identifier)")
+            // debugLog("speaking ------- \(voice.identifier)")
             return true
         }
         utterance.voice = allVoices.first {voice in voice.identifier.contains("siri") } ?? allVoices.first
-        
+
         return utterance
     }
-    
+
     // Get translation for a word based on the selected language
     func getTranslation(word: String, language: TranslationLanguage) -> String? {
         switch language {
         case .french:
             return frenchTranslations[word.lowercased()]
-        case .russian: 
+        case .russian:
             return russianTranslations[word.lowercased()]
         case .german:
             return germanTranslations[word.lowercased()]
