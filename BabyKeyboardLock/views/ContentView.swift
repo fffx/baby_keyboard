@@ -138,7 +138,7 @@ struct ContentView: View {
             showOrCloseAnimationWindow(isLocked: newVal)
         }.onAppear() {
             debugLog("onAppear --- ")
-            guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == MainWindowID }) else { return}
+            // guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == MainWindowID }) else { return}
 
 
         }

@@ -1,43 +1,26 @@
+//
+//  EventHandler.swift
+//  BabyKeyboardLock
+//
+//  Created by Fangxing Xiong on 15.12.2024.
+//
+
 import Foundation
 import CoreGraphics
 import AppKit
 import ApplicationServices
-import CoreData
-import SwiftData
-
-// Debug print helper - only prints in DEBUG builds
-func debugLog(_ message: String) {
-    #if DEBUG
-    print(message)
-    #endif
-}
-
-enum KeyCode: CGKeyCode, CaseIterable, Identifiable {
-    case u = 0x20
-    case delete = 0x33
-    case up = 0x7e
-    case left = 0x7b
-    case right = 0x7c
-    case down = 0x7d
-    case escape = 0x35
-    case tab = 0x30
-    case enter = 0x24
-
-    var id: Self {
-        return self
-    }
-}
 
 class EventHandler: ObservableObject {
     private let lock = NSLock()
-    let eventEffectHandler = EventEffectHandler()
+    let effectCoordinator: EffectCoordinator
+    private let throttleManager: ThrottleManager
     private var eventLoopStarted = false
     private var eventTap : CFMachPort?
 
     @Published var selectedLockEffect: LockEffect = .none
     @Published var selectedTranslationLanguage: TranslationLanguage = .none {
         didSet {
-            eventEffectHandler.translationLanguage = selectedTranslationLanguage
+            effectCoordinator.translationLanguage = selectedTranslationLanguage
         }
     }
     @Published var isLocked = true {
@@ -50,23 +33,13 @@ class EventHandler: ObservableObject {
     @Published var accessibilityPermissionGranted = false
     @Published var lastKeyString: String = "a" // fix onReceive won't work as expected for first key press
 
-    private var lastEventTime: Date = Date()
-    private let throttleInterval: TimeInterval = 1 // seconds
-    private func isThrottled() -> Bool {
-        let now = Date()
-        let timeSinceLastEvent = now.timeIntervalSince(lastEventTime)
-
-        if timeSinceLastEvent >= throttleInterval {
-            lastEventTime = now
-            return false
-        }
-        debugLog("Throttled >>>>> timeSinceLastEvent: \(timeSinceLastEvent)")
-        return true
-    }
-
     static let shared = EventHandler()
 
-    init(isLocked: Bool = true) {
+    init(isLocked: Bool = true,
+         effectCoordinator: EffectCoordinator = EffectCoordinator(),
+         throttleManager: ThrottleManager = ThrottleManager()) {
+        self.effectCoordinator = effectCoordinator
+        self.throttleManager = throttleManager
         self.isLocked = isLocked
         self.accessibilityPermissionGranted = requestAccessibilityPermissions()
         if !self.accessibilityPermissionGranted {
@@ -82,8 +55,6 @@ class EventHandler: ObservableObject {
         } else {
             self.isLocked = false
         }
-
-
     }
 
     func checkAccessibilityPermission(){
@@ -120,7 +91,6 @@ class EventHandler: ObservableObject {
             self.accessibilityPermissionGranted = false
             self.isLocked = false
             debugLog("Please grant accessibility permissions in System Preferences")
-            // exit(EXIT_SUCCESS)
         }
     }
 
@@ -146,7 +116,7 @@ class EventHandler: ObservableObject {
         let eventMask = CGEventMask(
             (1 << CGEventType.keyDown.rawValue) |
             (1 << CGEventType.keyUp.rawValue) |
-            (1 << 14) // seacrh and voice key
+            (1 << 14) // search and voice key
         )
 
         eventTap = CGEvent.tapCreate(
@@ -217,9 +187,9 @@ class EventHandler: ObservableObject {
 
             if type != .keyUp { return nil }
 
-            if isThrottled() { return nil }
+            if throttleManager.isThrottled() { return nil }
 
-            self.lastKeyString = eventEffectHandler.handle(
+            self.lastKeyString = effectCoordinator.handle(
                 event: event, eventType: type, selectedLockEffect: selectedLockEffect
             )
             debugLog("keyup------- \(lastKeyString), str: \(lastKeyString)")
@@ -241,6 +211,7 @@ class EventHandler: ObservableObject {
     }
 
 }
+
 func globalKeyEventHandler(
     proxy: CGEventTapProxy,
     type: CGEventType,
