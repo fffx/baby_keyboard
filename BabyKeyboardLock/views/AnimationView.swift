@@ -98,8 +98,7 @@ struct AnimationView: View {
 
                 guard let letter = eventHandler.lastKeyString.first, letter.isLetter || letter.isNumber else { return }
 
-                counter += 1
-                debugLog("counter increase -------- \(counter)")
+                counter = (counter + 1) % 10
                 let randomX = CGFloat.random(in: 0...geometry.size.width)
                 let randomY = CGFloat.random(in: 0...geometry.size.height)
 

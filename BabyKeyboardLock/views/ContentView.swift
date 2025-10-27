@@ -161,6 +161,7 @@ struct ContentView: View {
                     window.close()
                 }
             }
+            animationWindow = nil
             return
         }
 
