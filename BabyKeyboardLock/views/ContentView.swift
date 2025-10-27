@@ -177,11 +177,16 @@ struct ContentView: View {
                 // Make the window transparent
                 guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == AnimationWindowID }) else { return }
                 window.isOpaque = false
-                // window.backgroundColor = NSColor.clear
+                window.backgroundColor = NSColor.clear
                 window.level = .floating
                 window.titlebarAppearsTransparent = true
+                window.hasShadow = false // Disable shadow to prevent lagging
 
-                // window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+                // Enable layer backing for smooth animations
+                if let contentView = window.contentView {
+                    contentView.wantsLayer = true
+                    contentView.layer?.backgroundColor = NSColor.clear.cgColor
+                }
             }
             .openInWindow(id: AnimationWindowID, sender: self)
     }

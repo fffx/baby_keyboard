@@ -32,6 +32,16 @@ private struct FullscreenTransparentWindowBackground: NSViewRepresentable {
             window.standardWindowButton(.closeButton)?.isHidden = true
             window.standardWindowButton(.miniaturizeButton)?.isHidden = true
             window.standardWindowButton(.zoomButton)?.isHidden = true
+
+            // Fix lagging shadow by configuring proper backing and compositing
+            window.hasShadow = false
+            window.isMovableByWindowBackground = false
+
+            // Enable layer backing for better performance
+            if let contentView = window.contentView {
+                contentView.wantsLayer = true
+                contentView.layer?.backgroundColor = NSColor.clear.cgColor
+            }
         }
         return view
     }
@@ -64,6 +74,7 @@ struct AnimationView: View {
                 .buttonStyle(PlainButtonStyle())
                 .confettiCannon(
                     counter: $counter,
+                    // confettis: [.text("💩")],
                     num: Int.random(in: 15...40),
                     confettiSize: 15,
                     rainHeight: 800,
