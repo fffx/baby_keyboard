@@ -45,5 +45,60 @@ struct SpeechServiceTests {
 
         #expect(mockSynthesizer.stopSpeakingCalled)
     }
+
+    @Test func testVoiceConsistencyAcrossMultipleCalls() async throws {
+        let mockSynthesizer = MockSpeechSynthesizer()
+        let service = SpeechService(synthesizer: mockSynthesizer)
+
+        // Speak multiple times with the same language
+        service.speak("apple")
+        try await Task.sleep(for: .milliseconds(300))
+        service.speak("banana")
+        try await Task.sleep(for: .milliseconds(300))
+        service.speak("cherry")
+        try await Task.sleep(for: .milliseconds(300))
+
+        // All utterances should use the same voice for the same language
+        #expect(mockSynthesizer.spokenUtterances.count == 3)
+
+        // Verify that all utterances have a voice set
+        for utterance in mockSynthesizer.spokenUtterances {
+            #expect(utterance.voice != nil)
+        }
+
+        // Verify that all utterances use the same voice (consistent voice selection)
+        if mockSynthesizer.spokenUtterances.count > 1 {
+            let firstVoice = mockSynthesizer.spokenUtterances[0].voice
+            for i in 1..<mockSynthesizer.spokenUtterances.count {
+                #expect(mockSynthesizer.spokenUtterances[i].voice?.identifier == firstVoice?.identifier)
+            }
+        }
+    }
+
+    @Test func testVoiceCachingForDifferentLanguages() async throws {
+        let mockSynthesizer = MockSpeechSynthesizer()
+        let service = SpeechService(synthesizer: mockSynthesizer)
+
+        // Speak in English
+        service.speak("hello", language: "en-US")
+        try await Task.sleep(for: .milliseconds(300))
+
+        // Speak in French
+        service.speak("bonjour", language: "fr-FR")
+        try await Task.sleep(for: .milliseconds(300))
+
+        // Speak in English again - should use cached voice
+        service.speak("goodbye", language: "en-US")
+        try await Task.sleep(for: .milliseconds(300))
+
+        #expect(mockSynthesizer.spokenUtterances.count == 3)
+
+        // First and third should have same voice (both English)
+        if mockSynthesizer.spokenUtterances.count >= 3 {
+            let firstVoice = mockSynthesizer.spokenUtterances[0].voice
+            let thirdVoice = mockSynthesizer.spokenUtterances[2].voice
+            #expect(firstVoice?.identifier == thirdVoice?.identifier, "English voice should be consistent across calls")
+        }
+    }
 }
 

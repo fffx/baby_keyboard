@@ -10,6 +10,7 @@ import Foundation
 
 class SpeechService {
     private let synthesizer: SpeechSynthesizing
+    private var voiceCache: [String: AVSpeechSynthesisVoice] = [:]
 
     init(synthesizer: SpeechSynthesizing = AVSpeechSynthesizer()) {
         self.synthesizer = synthesizer
@@ -36,12 +37,21 @@ class SpeechService {
 
         let languageCode = language ?? Locale.preferredLanguages[0]
 
-        // https://stackoverflow.com/questions/37512621/avspeechsynthesizer-change-voice
-        let allVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
-            guard languageCode == voice.language else { return false}
-            return true
+        // Cache voices to ensure consistent voice selection across calls
+        if let cachedVoice = voiceCache[languageCode] {
+            utterance.voice = cachedVoice
+        } else {
+            // https://stackoverflow.com/questions/37512621/avspeechsynthesizer-change-voice
+            let allVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
+                guard languageCode == voice.language else { return false}
+                return true
+            }
+            let selectedVoice = allVoices.first {voice in voice.identifier.contains("siri") } ?? allVoices.first
+            if let selectedVoice = selectedVoice {
+                voiceCache[languageCode] = selectedVoice
+            }
+            utterance.voice = selectedVoice
         }
-        utterance.voice = allVoices.first {voice in voice.identifier.contains("siri") } ?? allVoices.first
 
         return utterance
     }
