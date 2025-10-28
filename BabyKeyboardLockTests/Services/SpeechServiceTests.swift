@@ -16,8 +16,8 @@ struct SpeechServiceTests {
 
         service.speak("hello")
 
-        // Wait a bit for async operation
-        try await Task.sleep(for: .milliseconds(100))
+        // Wait a bit for async operation on background queue
+        try await Task.sleep(for: .milliseconds(500))
 
         #expect(mockSynthesizer.spokenUtterances.count > 0)
         #expect(mockSynthesizer.spokenUtterances.first?.speechString == "hello")
@@ -30,8 +30,8 @@ struct SpeechServiceTests {
 
         service.speak("test")
 
-        // Wait a bit for async operation
-        try await Task.sleep(for: .milliseconds(100))
+        // Wait a bit for async operation on background queue
+        try await Task.sleep(for: .milliseconds(500))
 
         #expect(mockSynthesizer.stopSpeakingCalled)
     }
