@@ -33,6 +33,12 @@ private struct FullscreenTransparentWindowBackground: NSViewRepresentable {
             window.standardWindowButton(.miniaturizeButton)?.isHidden = true
             window.standardWindowButton(.zoomButton)?.isHidden = true
 
+            // Completely hide the title bar
+            window.titleVisibility = .hidden
+            window.titlebarAppearsTransparent = true
+            window.styleMask.insert(.borderless)
+            window.styleMask.remove(.titled)
+
             // Fix lagging shadow by configuring proper backing and compositing
             window.hasShadow = false
             window.isMovableByWindowBackground = false

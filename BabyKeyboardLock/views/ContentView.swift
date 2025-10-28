@@ -105,6 +105,8 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .onChange(of: eventHandler.selectedLockEffect) { newVal in
                 selectedLockEffect = newVal
+                // Update animation window when effect changes
+                showOrCloseAnimationWindow(isLocked: eventHandler.isLocked)
             }
 
             if eventHandler.selectedLockEffect == .speakAKeyWord {
@@ -155,7 +157,10 @@ struct ContentView: View {
     }
 
     private func showOrCloseAnimationWindow(isLocked: Bool) {
-        if (!isLocked) {
+        // Only show animation window for effects that need visual animations
+        let needsAnimationWindow = eventHandler.selectedLockEffect == .confettiConnon
+
+        if (!isLocked || !needsAnimationWindow) {
             NSApp.windows.forEach { window in
                 if window.identifier?.rawValue == AnimationWindowID {
                     window.close()
@@ -179,7 +184,13 @@ struct ContentView: View {
                 window.isOpaque = false
                 window.backgroundColor = NSColor.clear
                 window.level = .floating
+
+                // Completely hide the title bar
+                window.titleVisibility = .hidden
                 window.titlebarAppearsTransparent = true
+                window.styleMask.insert(.borderless)
+                window.styleMask.remove(.titled)
+
                 window.hasShadow = false // Disable shadow to prevent lagging
 
                 // Enable layer backing for smooth animations
