@@ -61,6 +61,7 @@ struct BabyKeyboardLockAppTests {
         }
     }
 
+    @MainActor
     @Test func testApplicationShouldNotTerminateAfterLastWindowClosed() async throws {
         let delegate = AppDelegate()
         let app = NSApplication.shared

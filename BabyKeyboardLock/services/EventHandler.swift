@@ -14,6 +14,7 @@ class EventHandler: ObservableObject {
     private let lock = NSLock()
     let effectCoordinator: EffectCoordinator
     private let throttleManager: ThrottleManager
+    private let eventTapManager: EventTapManaging
     private var eventLoopStarted = false
     private var eventTap : CFMachPort?
 
@@ -35,13 +36,50 @@ class EventHandler: ObservableObject {
 
     static let shared = EventHandler()
 
+    // Helper to detect if running in test or preview environment
+    private static var isRunningTestsOrPreview: Bool {
+        #if DEBUG
+        // Check if we're in a test bundle (most reliable)
+        let isTestBundle = Bundle.main.bundlePath.hasSuffix(".xctest") ||
+                          Bundle.main.bundlePath.contains("XCTestProducts") ||
+                          Bundle(for: EventHandler.self).bundlePath.contains("Tests")
+
+        // Check for XCTest
+        let isXCTest = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil ||
+                       NSClassFromString("XCTest") != nil
+
+        // Check for Swift Testing framework
+        let isSwiftTesting = NSClassFromString("Testing.Test") != nil ||
+                            ProcessInfo.processInfo.environment["XCTestBundlePath"] != nil ||
+                            ProcessInfo.processInfo.arguments.contains { $0.contains("xctest") }
+
+        // Check for SwiftUI Previews
+        let isPreview = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+
+        return isTestBundle || isXCTest || isSwiftTesting || isPreview
+        #else
+        return false
+        #endif
+    }
+
     init(isLocked: Bool = true,
          effectCoordinator: EffectCoordinator = EffectCoordinator(),
-         throttleManager: ThrottleManager = ThrottleManager()) {
+         throttleManager: ThrottleManager = ThrottleManager(),
+         eventTapManager: EventTapManaging? = nil) {
         self.effectCoordinator = effectCoordinator
         self.throttleManager = throttleManager
+
+        // Determine which event tap manager to use
+        let isTestMode = Self.isRunningTestsOrPreview
+        debugLog("EventHandler init - Test mode: \(isTestMode)")
+
+        // Use MockEventTapManager in tests, DefaultEventTapManager in production
+        self.eventTapManager = eventTapManager ?? (isTestMode ? MockEventTapManager() : DefaultEventTapManager())
         self.isLocked = isLocked
-        self.accessibilityPermissionGranted = requestAccessibilityPermissions()
+
+        // Skip accessibility check if running tests or previews
+        self.accessibilityPermissionGranted = isTestMode ? true : requestAccessibilityPermissions()
+
         if !self.accessibilityPermissionGranted {
             self.isLocked = false
         }
@@ -59,7 +97,7 @@ class EventHandler: ObservableObject {
 
     func checkAccessibilityPermission(){
         debugLog("------ Checking Accessibility Permission ------")
-        if eventTap != nil && !CGEvent.tapIsEnabled(tap: eventTap!) {
+        if eventTap != nil && !eventTapManager.isTapEnabled(eventTap) {
             debugLog("Event tap disabled, attempting restart...")
             setupEventTap()
         }
@@ -83,6 +121,11 @@ class EventHandler: ObservableObject {
     }
 
     func run() {
+        // Skip permission checks in test or preview environment
+        if Self.isRunningTestsOrPreview {
+            return
+        }
+
         checkAccessibilityPermission()
 
         if requestAccessibilityPermissions() {
@@ -96,7 +139,7 @@ class EventHandler: ObservableObject {
 
     func stop(){
         isLocked = false
-        CFRunLoopStop(CFRunLoopGetCurrent())
+        eventTapManager.stopRunLoop()
     }
 
     func startEventLoop() {
@@ -108,7 +151,7 @@ class EventHandler: ObservableObject {
         setupEventTap() // Setup event tap to capture key events
         DispatchQueue.main.async {
             self.eventLoopStarted = true
-            CFRunLoopRun()  // Start the run loop to handle events in a background thread
+            self.eventTapManager.runLoop()  // Start the run loop to handle events in a background thread
         }
     }
 
@@ -119,7 +162,7 @@ class EventHandler: ObservableObject {
             (1 << 14) // search and voice key
         )
 
-        eventTap = CGEvent.tapCreate(
+        eventTap = eventTapManager.createEventTap(
             tap: .cghidEventTap,
             place: .headInsertEventTap,
             options: .defaultTap,
@@ -131,16 +174,18 @@ class EventHandler: ObservableObject {
         )
 
         guard eventTap != nil else {
-            fatalError("Failed to create event tap")
+            // In test/preview mode, event tap creation may return nil (mock)
+            // Don't crash the app in this case
+            if !Self.isRunningTestsOrPreview {
+                fatalError("Failed to create event tap")
+            }
+            debugLog("Event tap is nil (test/preview mode)")
+            return
         }
 
-        let runLoopSource = CFMachPortCreateRunLoopSource(
-            kCFAllocatorDefault,
-            eventTap,
-            0
-        )
-        CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
-        CGEvent.tapEnable(tap: eventTap!, enable: true)
+        let runLoopSource = eventTapManager.createRunLoopSource(eventTap)
+        eventTapManager.addSourceToRunLoop(runLoopSource)
+        eventTapManager.enableTap(eventTap, enable: true)
     }
 
     func handleKeyEvent(
@@ -152,9 +197,7 @@ class EventHandler: ObservableObject {
         // Handle tap disable events first
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
             debugLog("Event tap disabled, attempting to re-enable...")
-            if let tap = eventTap {
-                CGEvent.tapEnable(tap: tap, enable: true)
-            }
+            eventTapManager.enableTap(eventTap, enable: true)
             return Unmanaged.passRetained(event)
         }
 
@@ -178,7 +221,7 @@ class EventHandler: ObservableObject {
         if optionFlag && controlFlag && keyCode == KeyCode.u.rawValue && type == .keyDown {
             debugLog("Keyboard locked: \(isLocked)")
             self.isLocked = isLocked ? false : true
-            CFRunLoopStop(CFRunLoopGetCurrent())
+            eventTapManager.stopRunLoop()
 
             return nil
         }
@@ -209,6 +252,37 @@ class EventHandler: ObservableObject {
         }
         return trusted
     }
+
+    #if DEBUG
+    // MARK: - Test Helpers
+    // These methods are only available in DEBUG builds for testing purposes
+
+    /// Returns whether the event tap has been set up
+    var isEventTapSetup: Bool {
+        return eventTap != nil
+    }
+
+    /// Exposes the event tap for testing purposes
+    var testEventTap: CFMachPort? {
+        return eventTap
+    }
+
+    /// Exposes the event tap manager for testing purposes
+    var testEventTapManager: EventTapManaging {
+        return eventTapManager
+    }
+
+    /// Allows tests to manually trigger setupEventTap without starting the run loop
+    func testSetupEventTap() {
+        setupEventTap()
+    }
+
+    /// Allows tests to clear the event tap (useful for cleanup)
+    func testClearEventTap() {
+        eventTapManager.enableTap(eventTap, enable: false)
+        eventTap = nil
+    }
+    #endif
 
 }
 

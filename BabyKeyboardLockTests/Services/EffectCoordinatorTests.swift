@@ -11,12 +11,14 @@ import CoreGraphics
 
 struct EffectCoordinatorTests {
 
+    @MainActor
     @Test func testEffectCoordinatorInitialization() async throws {
         let coordinator = EffectCoordinator()
 
         #expect(coordinator.translationLanguage == .none, "Default translation language should be none")
     }
 
+    @MainActor
     @Test func testNoneEffectReturnsKeyString() async throws {
         let mockSpeech = MockSpeechSynthesizer()
         let coordinator = EffectCoordinator(
@@ -36,6 +38,7 @@ struct EffectCoordinatorTests {
         #expect(mockSpeech.spokenUtterances.isEmpty, "Should not speak with none effect")
     }
 
+    @MainActor
     @Test func testConfettiEffectReturnsKeyString() async throws {
         let mockSpeech = MockSpeechSynthesizer()
         let coordinator = EffectCoordinator(
@@ -55,6 +58,7 @@ struct EffectCoordinatorTests {
         #expect(mockSpeech.spokenUtterances.isEmpty, "Confetti effect should not speak")
     }
 
+    @MainActor
     @Test func testSpeakTheKeyEffect() async throws {
         let mockSpeech = MockSpeechSynthesizer()
         let coordinator = EffectCoordinator(
@@ -76,6 +80,7 @@ struct EffectCoordinatorTests {
         #expect(mockSpeech.spokenUtterances.count > 0, "Should speak the key")
     }
 
+    @MainActor
     @Test func testSpeakAKeyWordEffect() async throws {
         let mockSpeech = MockSpeechSynthesizer()
         let coordinator = EffectCoordinator(
@@ -100,6 +105,7 @@ struct EffectCoordinatorTests {
         #expect(result.count > 1, "Should return a word, not just a letter")
     }
 
+    @MainActor
     @Test func testSpeakAKeyWordWithTranslation() async throws {
         let mockSpeech = MockSpeechSynthesizer()
         let coordinator = EffectCoordinator(
@@ -123,6 +129,7 @@ struct EffectCoordinatorTests {
         #expect(mockSpeech.spokenUtterances.count >= 1, "Should speak at least the word")
     }
 
+    @MainActor
     @Test func testGetStringForLetterKey() async throws {
         let coordinator = EffectCoordinator()
 
@@ -138,6 +145,7 @@ struct EffectCoordinatorTests {
         #expect(!result!.isEmpty, "String should not be empty")
     }
 
+    @MainActor
     @Test func testTranslationLanguageSettable() async throws {
         let coordinator = EffectCoordinator()
 
@@ -148,6 +156,7 @@ struct EffectCoordinatorTests {
         #expect(coordinator.translationLanguage == .german, "Translation language should update")
     }
 
+    @MainActor
     @Test func testAllLockEffects() async throws {
         let coordinator = EffectCoordinator()
 
