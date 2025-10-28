@@ -16,7 +16,7 @@ jobs:
           code-sign-certificate: ${{ secrets.CERTIFICATE_BASE64 }}
           code-sign-certificate-passphrase: ${{ secrets.CERTIFICATE_PASSPHRASE}}
           scheme: BabyKeyboardLock
-          action: build
+          action: none
           verbosity: xcpretty
           upload-logs: always
           configuration: release
