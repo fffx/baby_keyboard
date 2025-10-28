@@ -33,8 +33,6 @@ struct ContentView: View {
     @ObservedObject var eventHandler: EventHandler = EventHandler.shared
 
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
-    @AppStorage("selectedLockEffect") var selectedLockEffect: LockEffect = .none
-    @AppStorage("selectedTranslationLanguage") var selectedTranslationLanguage: TranslationLanguage = .none
 
     @State var hoveringMoreButton: Bool = false
     var body: some View {
@@ -104,7 +102,7 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .onChange(of: eventHandler.selectedLockEffect) { newVal in
-                selectedLockEffect = newVal
+                UserDefaults.standard.set(newVal.rawValue, forKey: "selectedLockEffect")
                 // Update animation window when effect changes
                 showOrCloseAnimationWindow(isLocked: eventHandler.isLocked)
             }
@@ -117,7 +115,7 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .onChange(of: eventHandler.selectedTranslationLanguage) { newVal in
-                    selectedTranslationLanguage = newVal
+                    UserDefaults.standard.set(newVal.rawValue, forKey: "selectedTranslationLanguage")
                 }
             }
 
@@ -140,9 +138,6 @@ struct ContentView: View {
             showOrCloseAnimationWindow(isLocked: newVal)
         }.onAppear() {
             debugLog("onAppear --- ")
-            // guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == MainWindowID }) else { return}
-
-
         }
     }
 
