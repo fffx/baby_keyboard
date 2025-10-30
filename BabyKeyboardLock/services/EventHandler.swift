@@ -97,6 +97,7 @@ class EventHandler: ObservableObject {
     }
 
     func checkAccessibilityPermission(){
+        if Self.isRunningTestsOrPreview { return }
         debugLog("------ Checking Accessibility Permission ------")
         if eventTap != nil && !eventTapManager.isTapEnabled(eventTap) {
             debugLog("Event tap disabled, attempting restart...")
