@@ -8,9 +8,42 @@
 import XCTest
 
 final class BabyKeyboardLockUITestsLaunchTests: XCTestCase {
+    
+    // Store original appearance mode
+    static var originalAppearance: String?
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
-        true
+        // Set to false to prevent automatic switching between light/dark modes
+        // which can leave the system in dark mode after tests complete
+        false
+    }
+    
+    override class func setUp() {
+        super.setUp()
+        // Save the original system appearance before tests run
+        originalAppearance = UserDefaults.standard.string(forKey: "AppleInterfaceStyle")
+    }
+    
+    override class func tearDown() {
+        // Restore the original system appearance after all tests complete
+        if let original = originalAppearance {
+            // Restore dark mode
+            UserDefaults.standard.set(original, forKey: "AppleInterfaceStyle")
+        } else {
+            // Remove the key to restore light mode
+            UserDefaults.standard.removeObject(forKey: "AppleInterfaceStyle")
+        }
+        UserDefaults.standard.synchronize()
+        
+        // Notify the system of the appearance change
+        DistributedNotificationCenter.default().postNotificationName(
+            NSNotification.Name("AppleInterfaceThemeChangedNotification"),
+            object: nil,
+            userInfo: nil,
+            deliverImmediately: true
+        )
+        
+        super.tearDown()
     }
 
     override func setUpWithError() throws {
