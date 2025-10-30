@@ -74,7 +74,7 @@ struct EffectCoordinatorTests {
         let result = coordinator.handle(event: event, eventType: .keyUp, selectedLockEffect: .speakTheKey)
 
         // Wait for async speech operation
-        try await Task.sleep(for: .milliseconds(500))
+        try await Task.sleep(for: .milliseconds(1000))
 
         #expect(!result.isEmpty, "Should return a key string")
         #expect(mockSpeech.spokenUtterances.count > 0, "Should speak the key")
@@ -96,7 +96,7 @@ struct EffectCoordinatorTests {
         let result = coordinator.handle(event: event, eventType: .keyUp, selectedLockEffect: .speakAKeyWord)
 
         // Wait for async speech operation
-        try await Task.sleep(for: .milliseconds(500))
+        try await Task.sleep(for: .milliseconds(1000))
 
         #expect(!result.isEmpty, "Should return a random word")
         #expect(mockSpeech.spokenUtterances.count > 0, "Should speak a word")

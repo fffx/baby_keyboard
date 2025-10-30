@@ -17,6 +17,7 @@ class EventHandler: ObservableObject {
     private let eventTapManager: EventTapManaging
     private var eventLoopStarted = false
     private var eventTap : CFMachPort?
+    private var permissionCheckWorkItem: DispatchWorkItem?
 
     @Published var selectedLockEffect: LockEffect = .none
     @Published var selectedTranslationLanguage: TranslationLanguage = .none {
@@ -111,13 +112,18 @@ class EventHandler: ObservableObject {
         if processTrusted {
             self.accessibilityPermissionGranted = true
         }
-        DispatchQueue.global(qos: .background).async {
-          // Schedule the next check
-            let delay = DispatchTimeInterval.seconds(3)
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                self.checkAccessibilityPermission()
-            }
+
+        // Cancel any existing scheduled check to prevent memory accumulation
+        permissionCheckWorkItem?.cancel()
+
+        // Create a new work item for the next check
+        let workItem = DispatchWorkItem { [weak self] in
+            self?.checkAccessibilityPermission()
         }
+        permissionCheckWorkItem = workItem
+
+        // Schedule the next check
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: workItem)
     }
 
     func run() {
@@ -139,7 +145,24 @@ class EventHandler: ObservableObject {
 
     func stop(){
         isLocked = false
+
+        // Cancel any pending permission checks to prevent memory leaks
+        permissionCheckWorkItem?.cancel()
+        permissionCheckWorkItem = nil
+
         eventTapManager.stopRunLoop()
+    }
+
+    deinit {
+        // Clean up resources on deallocation
+        permissionCheckWorkItem?.cancel()
+        permissionCheckWorkItem = nil
+
+        if let eventTap = eventTap {
+            eventTapManager.enableTap(eventTap, enable: false)
+            // CFMachPort is auto-released in ARC
+        }
+        eventTap = nil
     }
 
     func startEventLoop() {
@@ -198,7 +221,7 @@ class EventHandler: ObservableObject {
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
             debugLog("Event tap disabled, attempting to re-enable...")
             eventTapManager.enableTap(eventTap, enable: true)
-            return Unmanaged.passRetained(event)
+            return Unmanaged.passUnretained(event)
         }
 
         debugLog("--- keyup/down: \(type == .keyDown || type == .keyUp), keyboardEventKeyboardType: \(event.getIntegerValueField(.keyboardEventKeyboardType))")
@@ -207,7 +230,7 @@ class EventHandler: ObservableObject {
             return nil
         }
         guard type == .keyDown || type == .keyUp else {
-            return Unmanaged.passRetained(event)
+            return Unmanaged.passUnretained(event)
         }
 
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
@@ -238,7 +261,7 @@ class EventHandler: ObservableObject {
             debugLog("keyup------- \(lastKeyString), str: \(lastKeyString)")
             return nil
         } else {
-            return Unmanaged.passRetained(event)
+            return Unmanaged.passUnretained(event)
         }
     }
 
@@ -291,7 +314,7 @@ func globalKeyEventHandler(
     type: CGEventType,
     event: CGEvent,
     refcon: UnsafeMutableRawPointer?) -> Unmanaged<CGEvent>? {
-    guard let refcon = refcon else { return Unmanaged.passRetained(event) }
+    guard let refcon = refcon else { return Unmanaged.passUnretained(event) }
     let mySelf = Unmanaged<EventHandler>.fromOpaque(refcon).takeUnretainedValue()
     return mySelf.handleKeyEvent(proxy: proxy, type: type, event: event)
 }

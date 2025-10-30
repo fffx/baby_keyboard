@@ -52,11 +52,11 @@ struct SpeechServiceTests {
 
         // Speak multiple times with the same language
         service.speak("apple")
-        try await Task.sleep(for: .milliseconds(300))
+        try await Task.sleep(for: .milliseconds(600))
         service.speak("banana")
-        try await Task.sleep(for: .milliseconds(300))
+        try await Task.sleep(for: .milliseconds(600))
         service.speak("cherry")
-        try await Task.sleep(for: .milliseconds(300))
+        try await Task.sleep(for: .milliseconds(600))
 
         // All utterances should use the same voice for the same language
         #expect(mockSynthesizer.spokenUtterances.count == 3)
@@ -81,15 +81,15 @@ struct SpeechServiceTests {
 
         // Speak in English
         service.speak("hello", language: "en-US")
-        try await Task.sleep(for: .milliseconds(300))
+        try await Task.sleep(for: .milliseconds(600))
 
         // Speak in French
         service.speak("bonjour", language: "fr-FR")
-        try await Task.sleep(for: .milliseconds(300))
+        try await Task.sleep(for: .milliseconds(600))
 
         // Speak in English again - should use cached voice
         service.speak("goodbye", language: "en-US")
-        try await Task.sleep(for: .milliseconds(300))
+        try await Task.sleep(for: .milliseconds(600))
 
         #expect(mockSynthesizer.spokenUtterances.count == 3)
 

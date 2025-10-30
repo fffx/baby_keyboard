@@ -14,6 +14,7 @@ class EffectCoordinator {
     private let wordService: WordService
     private let translationService: TranslationService
     private let speechService: SpeechService
+    private var translationWorkItem: DispatchWorkItem?
 
     var translationLanguage: TranslationLanguage = .none
 
@@ -23,6 +24,12 @@ class EffectCoordinator {
         self.wordService = wordService
         self.translationService = translationService
         self.speechService = speechService
+    }
+
+    deinit {
+        // Cancel any pending translation tasks to prevent memory leaks
+        translationWorkItem?.cancel()
+        translationWorkItem = nil
     }
 
     func handle(event: CGEvent, eventType: CGEventType, selectedLockEffect: LockEffect) -> String {
@@ -39,11 +46,20 @@ class EffectCoordinator {
 
             // If translation is enabled, speak the translation after a short delay
             if translationLanguage != .none {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                // Cancel any existing translation work to prevent memory accumulation
+                translationWorkItem?.cancel()
+
+                // Create a new work item with weak self to prevent retain cycles
+                let workItem = DispatchWorkItem { [weak self] in
+                    guard let self = self else { return }
                     if let translatedWord = self.translationService.getTranslation(word: randomWord, language: self.translationLanguage) {
                         self.speechService.speak(translatedWord, language: self.translationLanguage.languageCode)
                     }
                 }
+                translationWorkItem = workItem
+
+                // Schedule the translation
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8, execute: workItem)
             }
             return randomWord
         default:

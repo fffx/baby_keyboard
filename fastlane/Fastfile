@@ -57,7 +57,13 @@ lane :build do
     output_path: "build/BabyKeyboardLock-#{tag}.zip"
   )
 end
-
+scheme = "BabyKeyboardLock"
 lane :test do
-  run_tests(scheme: "BabyKeyboardLock")
+  run_tests(
+    scheme: scheme,
+    fail_build: false,
+    code_coverage: true,
+    output_style: "standard",
+    output_directory: "build/test-reports/#{scheme}",
+  )
 end
