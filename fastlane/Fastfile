@@ -169,12 +169,9 @@ lane :release do |options|
     xcodeproj: "BabyKeyboardLock.xcodeproj"
   )
 
-  # Get new version
-  version = get_version_number(
-    xcodeproj: "BabyKeyboardLock.xcodeproj",
-    target: "BabyKeyboardLock"
-  )
-  build = get_build_number(xcodeproj: "BabyKeyboardLock.xcodeproj")
+  # Use the calculated versions (don't re-read as agvtool and Xcode might be out of sync)
+  version = new_version
+  build = new_build
   tag_name = "v#{version}"
 
   UI.message("📦 New version: #{version} (Build #{build})")
