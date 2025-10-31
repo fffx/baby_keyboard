@@ -24,7 +24,9 @@ requires-python = ">=3.13,<3.14"
 dependencies = [
     "aiogram>=2.15",
     "async-lru>=2.0.5",
+    "cryptography>=46.0.3",
     "fiftyone>=1.9.0",
+    "keychain>=0.14.2.0",
     "keyring>=25.6.0",
     "litellm>=1.79.0",
     "loguru>=0.7.3",
@@ -39,8 +41,7 @@ dependencies = [
 
 [dependency-groups]
 extras = [
-    "calmlib @ git+https://github.com/calmmage/calmlib.git",
-#    "calmlib>=2.0.14",
+    "calmlib>=2.0.14",
 ]
 
 dev = [

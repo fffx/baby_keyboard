@@ -1,3 +1,6 @@
+output*
+uv.lock
+
 .DS_Store
 /.build
 /Packages
@@ -21,3 +24,5 @@ CLAUDE.md
 GEMINI.md
 .cursorrules
 .claude
+AGENTS.md
+WARP.md
