@@ -67,3 +67,95 @@ lane :test do
     output_directory: "build/test-reports/#{scheme}",
   )
 end
+
+
+desc "Bump build number only"
+lane :bump_build do
+  increment_build_number(
+    xcodeproj: "BabyKeyboardLock.xcodeproj"
+  )
+  show_version
+end
+
+desc "Show current version and build number"
+lane :show_version do
+  version = get_version_number(xcodeproj: "BabyKeyboardLock.xcodeproj")
+  build = get_build_number(xcodeproj: "BabyKeyboardLock.xcodeproj")
+  UI.success("📦 Current version: #{version} (Build #{build})")
+end
+
+
+desc "Release: bump version, commit, tag, and optionally push"
+desc "Usage:"
+desc "  fastlane release type:patch           # Bump patch (0.2.2 → 0.2.3)"
+desc "  fastlane release type:minor           # Bump minor (0.2.2 → 0.3.0)"
+desc "  fastlane release type:major           # Bump major (0.2.2 → 1.0.0)"
+desc "  fastlane release version:1.2.3        # Set specific version"
+desc "  fastlane release type:patch push:true # Auto-push to remote"
+lane :release do |options|
+  push_to_remote = options[:push] || false
+
+  # Ensure we're on a clean git state
+  unless options[:skip_git_check]
+    ensure_git_status_clean
+  end
+
+  # Bump version: either specific version or bump type
+  if options[:version]
+    # Set specific version
+    increment_version_number(
+      version_number: options[:version],
+      xcodeproj: "BabyKeyboardLock.xcodeproj"
+    )
+  elsif options[:type]
+    # Bump by type (patch/minor/major)
+    increment_version_number(
+      bump_type: options[:type],
+      xcodeproj: "BabyKeyboardLock.xcodeproj"
+    )
+  else
+    # Default to patch
+    increment_version_number(
+      bump_type: "patch",
+      xcodeproj: "BabyKeyboardLock.xcodeproj"
+    )
+  end
+
+  # Always bump build number
+  increment_build_number(
+    xcodeproj: "BabyKeyboardLock.xcodeproj"
+  )
+
+  # Get new version
+  version = get_version_number(xcodeproj: "BabyKeyboardLock.xcodeproj")
+  build = get_build_number(xcodeproj: "BabyKeyboardLock.xcodeproj")
+  tag_name = "v#{version}"
+
+  UI.message("📦 New version: #{version} (Build #{build})")
+
+  # Commit version bump
+  git_commit(
+    path: ["BabyKeyboardLock.xcodeproj/project.pbxproj"],
+    message: "Bump version to #{version} (Build #{build})"
+  )
+
+  # Create git tag
+  add_git_tag(
+    tag: tag_name,
+    message: "Release #{version}"
+  )
+
+  UI.success("✅ Created git tag: #{tag_name}")
+
+  # Push if requested
+  if push_to_remote
+    push_to_git_remote(
+      tags: true
+    )
+    UI.success("🚀 Pushed tag #{tag_name} to remote")
+  else
+    UI.message("💡 To push this tag, run: git push origin #{tag_name}")
+  end
+
+  UI.success("🎉 Release #{version} is ready!")
+end
