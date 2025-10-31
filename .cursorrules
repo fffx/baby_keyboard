@@ -1,139 +1,128 @@
-# BabyKeyboardLock - Codebase Overview
+# Cursor Rules
 
-BabyKeyboardLock is a macOS application that locks the keyboard to prevent accidental keypresses, designed especially for use with babies or toddlers. When locked, keyboard input is intercepted and, instead of normal system interaction, produces various customizable effects.
+Imports
+- Always use absolute imports - from repo root
+- Use uv run to ensure imports work
+- Avoid modifying sys.path
 
-## Core Architecture
+Calmlib utils:
+- telegram: get_telegram_cache, get_telethon_client
+- user_interactions: ask_user
+- llm: aquery_llm_text
+- logging: from calmlib.logging import setup_logger_simple
+- utils: find_env_key, find_calmmage_env_key
 
-### Main Components
+Botspot - telegram bot framework at ~/work/projects/botspot/
+Botspot template - example for new bots - ~/work/projects/botspot-template/
 
-1. **EventHandler** (`EventHandler.swift`)
-   - Singleton that manages keyboard event interception
-   - Uses macOS accessibility API to capture system-wide keyboard events
-   - Controls the locking/unlocking state
-   - Routes captured events to the appropriate effect handler
+# More
+- **botspot**: Telegram bot framework with routing and middleware, based and interchangeable with aiogram
+    - Location: `~/work/projects/botspot/`
+    - Import: `from botspot import get_chat_fetcher, llm_provider, commands_menu`
+    - Usage: Component-based architecture with send_safe, chat_binder, user_interactions
+- **calmlib**: Personal utility library with read/write, logging, service registry
+    - Location: `~/work/projects/calmmage/calmlib/`
+    - Import: Look around and see what's available at runtime - structure may be updated
+    - Usage: Various python utils for file operations, logging, service management, llm, telegram etc.
+- **tools**: Collection of CLI utilities and automation tools
+    - Location: `~/work/projects/calmmage/tools/` with subdirectories for each tool
+    - Import: `from tools.section.tool_name.module import Class`
+    - Usage: `uv run typer ~/work/projects/calmmage/tools/tool_name/cli.py run [command]`
+- **docker**: Containerization for local services and deployment
+    - Location: Local Docker Desktop installation
+    - Usage: `docker run -d --name mongodb mongo:latest`, containers accessible on localhost
+- **mongodb**: Document database for data storage and querying
+    - Location: localhost MongoDB via Docker
+    - Usage: Connection string from ~/.env, accessible directly or through botspot mongo_database component - use
+      get_database() util
+- **scripts**: Scheduled jobs and automation scripts
+    - Location: `~/work/projects/calmmage/scripts/` - cronicle, prefect and daily-jobs
+- **~/.env**: Environment variables via planned calmlib env key discovery
+    - Location: `~/.env` file in user home directory
+    - Usage: dotenv loading, planned calmlib utilities for key discovery and management
+- **cronicle**: Job scheduler for automated tasks and workflows
+    - Location: `~/work/projects/calmmage/tools/cronicle_scheduler/cli/cronicle_manager.py`
+    - Usage: `uv run typer ~/work/projects/calmmage/tools/cronicle_scheduler/cli/cronicle_manager.py run [command]`
+- **cronitor**: Health monitoring and alerting for scheduled jobs
+    - Location: `~/work/projects/calmmage/scripts/cronicle/cronitor_ping.py`
+    - Usage: HTTP pings to cronitor.io for job health monitoring
+- **obsidian-ecosystem**: Note management with database-like access to people/contacts, bookmarks, posts/blog/zettelkasten fields
+    - Location: `~/work/projects/calmmage/tools/obsidian_sorter/` for sorting automation
+    - Usage: Database-like access to Obsidian vault with structured data fields for contacts, bookmarks, content
+- **NoNix shell**: Shell configuration, aliases, functions
+    - Location: `~/work/projects/calmmage/nonix/`
+  - Usage: Single merged aliases file at `nonix/shell/aliases.sh`; zsh config at `nonix/shell/.zshrc`, functions
+    at `nonix/shell/functions/`
 
-2. **EventEffectHandler** (`EventEffectHandler.swift`)
-   - Processes intercepted keyboard events
-   - Implements various effects (sounds, words, etc.)
-   - Manages word lists and translations
+Docker compose
+- For projects with interlinked components, include Docker file and a docker-compose.yml
+- Specificaly, that concerns frontend + backend applications or other multi-component projects
 
-3. **UI Components** (`ContentView.swift`)
-   - Main settings interface
-   - Effect selection and configuration
-   - Lock/unlock toggle
+Monorepo selective commits:
 
-4. **Effect Types** (`LockEffect.swift`)
-   - Defines available keyboard lock effects
-   - Defines translation language options
-   - Defines word set types
+```bash
+git add -A
+git commit <file1> <file2> <file3> -m "message"
+```
 
-## Key Features
+Step 1 stages everything, Step 2 commits only specified files. Does NOT unstage other files, does NOT require stashing.
 
-### 1. Keyboard Locking
+Alternatives:
+- lazygit: Navigate → Space to stage → `c` to commit
+- PyCharm: Commit window (Cmd+K) → select files → commit
+- GUI tools: GitHub Desktop, GitKraken, Fork
 
-The app uses macOS's accessibility APIs to intercept keyboard events system-wide:
+We are writing instructions for a smart user, that can figure everything out, has strong intuition and can easily guess reasonable things, given a few hints.
 
-- Implements a CGEvent tap to capture keystrokes
-- Provides a keyboard shortcut (Ctrl+Option+U) to unlock
-- Shows visual feedback when locked/unlocked
+Therefore:
+1) NO HEADERS
+2) BE EXTREMELY CONCISE, JUST MENTION KEY FUNCTIONS / FOLDERS BY NAME, DO NOT GO INTO VERBOSE DETAILS OR YAPPING
 
-### 2. Effect System
+Preserve original text and phrasing provided by the user in chats as much as possible.
 
-When the keyboard is locked, keypresses trigger various effects:
+Makefile - add after prototype, 1-2 essential commands per component max
 
-- **None**: Just locks keyboard without effects
-- **Confetti Cannon**: Visual confetti effect
-- **Speak The Key**: Vocalizes the pressed key name
-- **Speak A Key Word**: Speaks a word associated with the pressed key
-- **Speak Random Word**: Speaks a random word from a custom list regardless of which key is pressed
+Minimal prototyping flow
+For ~/calmmage/experiments/prototypes folder
+- Before implementing a new feature - write a minimal working standalone prototype / demo - and test it.
+- After the feature is working - update the existing code with the working code
 
-### 3. Word Sets
+# Next.js Style (shadcn, v0.dev-inspired)
 
-For word-based effects, the app offers two types of word collections:
+Build front-ends in Next.js with:
+- App Router, Server Components by default; Client Components only when needed.
+- UI components: use shadcn patterns for UIs.
 
-- **Random Short Words**: Built-in comprehensive dictionary of simple words organized by starting letter
-- **Main Words**: Customizable set of core words
+uv for python:
+- initialize pyproject.toml if missing.
+    - use `fix_repo` alias
+- uv run for execution
+- uv add for dependencies
 
-### 4. Translation System
+# Python Libraries
+- pathlib: Filesystem paths with `Path`.
+- dotenv: Load `~/.env` variables.
+- httpx: HTTP client (sync/async) with timeouts.
+- use loguru with calmlib.logging.setup_logger() settings - avoid prints
+- typer for CLI, argparse for simple script flags
+- rich: Rich terminal output (tables, colors).
+- pydantic / pydantic_settings - avoid dataclasses and unstructured Dicts
+- fastapi
+- tqdm
 
-Words can be spoken in multiple languages:
+- print_exc - use to show full tracebacks
+- avoid excessive try/except nesting or blocks, always handle errors on external level, unless explicitly
+  requested[6_python_libs.md](6_python_libs.md)
 
-- Supports English, French, Russian, German, Spanish, Italian, Japanese, and Chinese
-- Translates words automatically using built-in dictionaries
-- In "Speak Random Word" mode, speaks both English and translation
-
-### 5. Customization
-
-Users can customize various aspects:
-
-- Edit the list of words for "Main Words" set
-- Edit the random words list for "Speak Random Word" mode
-- Select preferred translation language
-- Choose to lock keyboard on application launch
-
-## Data Management
-
-- Uses `UserDefaults` to store settings and preferences
-- Custom word lists stored as encoded JSON data
-- Implements `Codable` for serialization/deserialization
-
-## User Interaction Flow
-
-1. User launches the app
-2. Toggles the "Lock Keyboard" switch
-3. System-wide keyboard events are intercepted
-4. Effects are applied based on user settings
-5. User can unlock with the designated shortcut
-
-## Key Classes in Detail
-
-### `EventHandler`
-
-- Handles system-wide keyboard event capture
-- Manages permission requests for accessibility features
-- Contains logic for the keyboard shortcut to unlock
-- Throttles event processing to prevent rapid-fire effects
-
-### `EventEffectHandler`
-
-- Contains dictionaries of words for each initial letter
-- Maintains translation dictionaries for multiple languages
-- Implements word selection logic for different modes
-- Handles text-to-speech via AVSpeechSynthesizer
-
-### `LockEffect` and related enums
-
-- Defines the available effect types
-- Provides localized strings for UI display
-- Structures the application's feature set
-
-### `RandomWordList` and `CustomWordSetsManager`
-
-- Manage specialized word collections
-- Support custom user-defined word sets
-- Handle persistence and retrieval of word data
-- Notify the UI of changes through NotificationCenter
-
-## Technical Implementation Details
-
-1. **System Integration**
-   - Uses Carbon and ApplicationServices to tap into macOS event system
-   - Properly handles permissions through macOS accessibility services
-   - Implements proper event lifecycle management
-
-2. **Thread Management**
-   - Uses run loops and async dispatching for event processing
-   - Prevents UI blocking during event handling
-
-3. **Localization Support**
-   - Implements NSLocalizedString for UI elements
-   - Stores translations in Localizable.xcstrings
-
-4. **User Interface**
-   - SwiftUI-based interface
-   - Reactive design using @Published properties and ObservableObject
-   - Sheet-based editors for word list customization
-
-5. **Event Processing Pipeline**
-   - Event capture → Effect selection → Processing → Output
-   - Properly handles event passing/blocking 
+- Type safety - use pydantic, type hints
+- Clean patterns - pathlib over os.path, loguru over print
+- Simplicity
+    - Implement minimal necessary functionality
+    - Avoid major refactorings unless explicitly requested
+- Modularity with utils
+    - Avoid nesting as much as possible - create separate service util functions (private - _func)
+    - Avoid code duplication - instead, create reusable utils
+    
+- CLIs with `typer`;
+- Keep `cli.py` colocated under each tool directory.
+- Provide short docstrings and a quick usage example per command.

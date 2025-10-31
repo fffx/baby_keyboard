@@ -7,6 +7,9 @@ enum FlashcardStyle: String, CaseIterable {
     case doodle
     case pencil
     case simple
+    case watercolor
+    case mosaic
+    case elvish
     case random
 
     var title: String {
@@ -39,14 +42,13 @@ extension RandomWord {
         guard style != .none, !english.isEmpty else { return nil }
 
         // Handle random style by picking a random style from available styles
-        let actualStyle: FlashcardStyle
-        if style == .random {
-            // Get all styles except 'none' and 'random'
-            let availableStyles: [FlashcardStyle] = [.crayon, .doodle, .pencil, .simple]
-            actualStyle = availableStyles.randomElement() ?? .simple
-        } else {
-            actualStyle = style
-        }
+        let actualStyle: FlashcardStyle = {
+            if style == .random {
+                let availableStyles = FlashcardStyle.allCases.filter { $0 != .none && $0 != .random }
+                return availableStyles.randomElement() ?? .simple
+            }
+            return style
+        }()
 
         // Handle spaces in filenames and add style prefix
         let sanitizedEnglish = english.lowercased().replacingOccurrences(of: " ", with: "_")

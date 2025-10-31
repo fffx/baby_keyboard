@@ -1,58 +1,74 @@
-.PHONY: deploy update clean archive export install fix-signature
-.PHONY: test-images test-quickdraw test-generate download-quickdraw generate-all-images images-main
-.PHONY: test-openimages download-openimages
+.PHONY: generate-images download-openimages
+
+PYTHON := .venv/bin/python3
+.PHONY: test-openimage run-openimage test-gemini run-gemini
+.PHONY: list-words
+.PHONY: deploy update clean archive export install
+
+# Compose shared flag helpers
+WORDS_FLAG := $(if $(strip $(WORDS)),--words $(WORDS),)
+WORDS_FILE_FLAG := $(if $(strip $(WORDS_FILE)),--words-file $(WORDS_FILE),)
+OUTPUT_FLAG := $(if $(strip $(OUTPUT)),--output $(OUTPUT),)
+MODEL_FLAG := $(if $(strip $(MODEL)),--model $(MODEL),)
+SIZE_FLAG := $(if $(strip $(SIZE)),--size $(SIZE),)
+MAX_CONCURRENT_FLAG := $(if $(strip $(MAX_CONCURRENT)),--max-concurrent $(MAX_CONCURRENT),)
+SAMPLE_SIZE_FLAG := $(if $(strip $(SAMPLE_SIZE)),--sample-size $(SAMPLE_SIZE),)
+SEED_FLAG := $(if $(strip $(SEED)),--seed $(SEED),)
+ALL_DEFAULTS_FLAG := $(if $(strip $(ALL_DEFAULTS)),--all-defaults,)
+
+# Image generator specific flags
+STYLE_FLAG := $(if $(strip $(STYLE)),--style $(STYLE),)
+STYLE_PROMPT_FLAG := $(if $(strip $(STYLE_PROMPT)),--style-prompt "$(STYLE_PROMPT)",)
+
+# Open Images specific flags
+LIMIT_FLAG := $(if $(strip $(LIMIT)),--limit $(LIMIT),)
+MAX_SAMPLES_FLAG := $(if $(strip $(MAX_SAMPLES)),--max-samples $(MAX_SAMPLES),)
+
+generate-images:
+	$(PYTHON) scripts/generate_images.py \
+		$(WORDS_FLAG) \
+		$(WORDS_FILE_FLAG) \
+		$(SAMPLE_SIZE_FLAG) \
+		$(SEED_FLAG) \
+		$(ALL_DEFAULTS_FLAG) \
+		$(STYLE_FLAG) \
+		$(STYLE_PROMPT_FLAG) \
+		$(OUTPUT_FLAG) \
+		$(MODEL_FLAG) \
+		$(SIZE_FLAG) \
+		$(MAX_CONCURRENT_FLAG) \
+		$(ARGS)
+
+download-openimages:
+	$(PYTHON) scripts/download_openimages.py \
+		$(WORDS_FLAG) \
+		$(WORDS_FILE_FLAG) \
+		$(OUTPUT_FLAG) \
+		$(SAMPLE_SIZE_FLAG) \
+		$(SEED_FLAG) \
+		$(ALL_DEFAULTS_FLAG) \
+		$(LIMIT_FLAG) \
+		$(MAX_SAMPLES_FLAG) \
+		$(ARGS)
+
+test-openimage:
+	$(MAKE) --no-print-directory download-openimages SAMPLE_SIZE=2 LIMIT=2 MAX_SAMPLES=40 ARGS="--yes"
+
+run-openimage: download-openimages
+
+test-gemini:
+	printf 'yes\n' | $(MAKE) --no-print-directory generate-images SAMPLE_SIZE=2 SIZE=512x512 MAX_CONCURRENT=2
+
+run-gemini: generate-images
+
+list-words:
+	uv run python -m scripts.list_words
+
 
 # Main target - build and deploy the app
 deploy: archive export install
 	@echo "✅ BabyKeyboardLock deployed successfully to /Applications/"
 
-# Main image workflow - all 4 steps with confirmation
-images-main:
-	@echo "=== IMAGE GENERATION WORKFLOW ==="
-	@echo ""
-	@echo "This will run 4 steps:"
-	@echo "  1. Test downloading Quick Draw dataset (3 categories)"
-	@echo "  2. Test generating images with nano-banana (3 images)"
-	@echo "  3. Download full Quick Draw dataset (all baby-friendly categories)"
-	@echo "  4. Generate all missing flashcard images"
-	@echo ""
-	@read -p "Step 1: Test Quick Draw download? [y/n/skip] " response; \
-	if [ "$$response" = "y" ]; then \
-		$(MAKE) test-quickdraw; \
-	elif [ "$$response" = "skip" ]; then \
-		echo "⏭️  Skipped step 1"; \
-	else \
-		echo "❌ Cancelled"; exit 1; \
-	fi
-	@echo ""
-	@read -p "Step 2: Test nano-banana generation? [y/n/skip] " response; \
-	if [ "$$response" = "y" ]; then \
-		$(MAKE) test-generate; \
-	elif [ "$$response" = "skip" ]; then \
-		echo "⏭️  Skipped step 2"; \
-	else \
-		echo "❌ Cancelled"; exit 1; \
-	fi
-	@echo ""
-	@read -p "Step 3: Download full Quick Draw dataset? [y/n/skip] " response; \
-	if [ "$$response" = "y" ]; then \
-		$(MAKE) download-quickdraw; \
-	elif [ "$$response" = "skip" ]; then \
-		echo "⏭️  Skipped step 3"; \
-	else \
-		echo "❌ Cancelled"; exit 1; \
-	fi
-	@echo ""
-	@read -p "Step 4: Generate all missing images? [y/n/skip] " response; \
-	if [ "$$response" = "y" ]; then \
-		$(MAKE) generate-all-images; \
-	elif [ "$$response" = "skip" ]; then \
-		echo "⏭️  Skipped step 4"; \
-	else \
-		echo "❌ Cancelled"; exit 1; \
-	fi
-	@echo ""
-	@echo "=== ✅ WORKFLOW COMPLETE ==="
 
 # Alias for deploy - update the installed app
 update: deploy
@@ -72,72 +88,3 @@ export:
 # Install to Applications folder
 install:
 	@./scripts/install.sh
-
-# Fix signature issues (resets accessibility permissions!)
-fix-signature:
-	@./scripts/fix-signature.sh
-
-# ============== Image Generation Commands ==============
-
-# Test both image generation methods (3 test images each)
-test-images:
-	@echo "🧪 Testing image generation methods..."
-	@./scripts/test_image_generation.sh
-
-# Test Quick Draw dataset download (3 categories)
-test-quickdraw:
-	@echo "🧪 Testing Quick Draw download (3 categories)..."
-	@uv run python scripts/download_quickdraw.py \
-		--categories cat dog apple \
-		--extract-samples 5 \
-		--output ./test_quickdraw
-
-# Test nano-banana image generation (3 images)
-test-generate:
-	@echo "🧪 Testing nano-banana generation (3 images)..."
-	@uv run python scripts/generate_with_nano_banana.py \
-		--words cat dog apple \
-		--style crayon \
-		--model nano-banana \
-		--limit 3
-
-# Download full Quick Draw dataset (all baby-friendly categories)
-download-quickdraw:
-	@echo "📥 Downloading Quick Draw dataset..."
-	@uv run python scripts/download_quickdraw.py \
-		--extract-samples 10 \
-		--output ./quickdraw_images
-
-# Generate all missing flashcard images with nano-banana
-generate-all-images:
-	@echo "🎨 Generating all missing flashcard images..."
-	@uv run python scripts/generate_with_nano_banana.py \
-		--model nano-banana
-
-# Generate specific style only
-generate-crayon:
-	@uv run python scripts/generate_with_nano_banana.py --style crayon --model nano-banana
-
-generate-doodle:
-	@uv run python scripts/generate_with_nano_banana.py --style doodle --model nano-banana
-
-generate-pencil:
-	@uv run python scripts/generate_with_nano_banana.py --style pencil --model nano-banana
-
-generate-simple:
-	@uv run python scripts/generate_with_nano_banana.py --style simple --model nano-banana
-
-# Test Open Images download (3 words, 5 images each)
-test-openimages:
-	@echo "🧪 Testing Open Images download (3 words, 5 images each)..."
-	@uv run python scripts/download_open_images_fiftyone.py \
-		--test \
-		--limit 5 \
-		--yes
-
-# Download full Open Images dataset (all vocabulary words)
-download-openimages:
-	@echo "📥 Downloading Open Images dataset (real photos)..."
-	@uv run python scripts/download_open_images_fiftyone.py \
-		--limit 10 \
-		--yes
