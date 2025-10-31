@@ -8,7 +8,8 @@
 import Foundation
 
 class TranslationService {
-    private let frenchTranslations: [String: String] = [
+    // Lazy load translation dictionaries to reduce initial memory footprint
+    private lazy var frenchTranslations: [String: String] = [
         "apple": "pomme", "ant": "fourmi", "air": "air", "arm": "bras", "axe": "hache", "all": "tous", "ask": "demander", "and": "et", "add": "ajouter",
         "ball": "balle", "bat": "chauve-souris", "bag": "sac", "bed": "lit", "bear": "ours", "bug": "insecte", "bun": "petit pain", "bus": "bus", "big": "grand", "bit": "morceau",
         "cat": "chat", "car": "voiture", "cow": "vache", "cup": "tasse", "cap": "casquette", "can": "peut", "cut": "couper", "cry": "pleurer", "corn": "maïs",
@@ -37,7 +38,7 @@ class TranslationService {
         "zebra": "zèbre", "zip": "fermeture éclair", "zap": "zapper", "zig": "zigzag", "zoo": "zoo", "zen": "zen", "zero": "zéro", "zone": "zone"
     ]
 
-    private let russianTranslations: [String: String] = [
+    private lazy var russianTranslations: [String: String] = [
         "apple": "яблоко", "ant": "муравей", "air": "воздух", "arm": "рука", "axe": "топор", "all": "все", "ask": "спрашивать", "and": "и", "add": "добавить",
         "ball": "мяч", "bat": "летучая мышь", "bag": "сумка", "bed": "кровать", "bear": "медведь", "bug": "жук", "bun": "булочка", "bus": "автобус", "big": "большой", "bit": "кусочек",
         "cat": "кот", "car": "машина", "cow": "корова", "cup": "чашка", "cap": "кепка", "can": "может", "cut": "резать", "cry": "плакать", "corn": "кукуруза",
@@ -66,7 +67,7 @@ class TranslationService {
         "zebra": "зебра", "zip": "застежка", "zap": "бить", "zig": "зигзаг", "zoo": "зоопарк", "zen": "дзен", "zero": "ноль", "zone": "зона"
     ]
 
-    private let germanTranslations: [String: String] = [
+    private lazy var germanTranslations: [String: String] = [
         "apple": "Apfel", "ant": "Ameise", "air": "Luft", "arm": "Arm", "axe": "Axt", "all": "alle", "ask": "fragen", "and": "und", "add": "hinzufügen",
         "ball": "Ball", "bat": "Fledermaus", "bag": "Tasche", "bed": "Bett", "bear": "Bär", "bug": "Käfer", "bun": "Brötchen", "bus": "Bus", "big": "groß", "bit": "Stück",
         "cat": "Katze", "car": "Auto", "cow": "Kuh", "cup": "Tasse", "cap": "Mütze", "can": "kann", "cut": "schneiden", "cry": "weinen", "corn": "Mais",
@@ -95,7 +96,7 @@ class TranslationService {
         "zebra": "Zebra", "zip": "Reißverschluss", "zap": "zappen", "zig": "Zickzack", "zoo": "Zoo", "zen": "Zen", "zero": "null", "zone": "Zone"
     ]
 
-    private let spanishTranslations: [String: String] = [
+    private lazy var spanishTranslations: [String: String] = [
         "apple": "manzana", "ant": "hormiga", "air": "aire", "arm": "brazo", "axe": "hacha", "all": "todo", "ask": "preguntar", "and": "y", "add": "añadir",
         "ball": "pelota", "bat": "murciélago", "bag": "bolsa", "bed": "cama", "bear": "oso", "bug": "bicho", "bun": "bollo", "bus": "autobús", "big": "grande", "bit": "pedazo",
         "cat": "gato", "car": "coche", "cow": "vaca", "cup": "taza", "cap": "gorra", "can": "poder", "cut": "cortar", "cry": "llorar", "corn": "maíz",
@@ -124,7 +125,7 @@ class TranslationService {
         "zebra": "cebra", "zip": "cerniera", "zap": "golpear", "zig": "zigzag", "zoo": "zoo", "zen": "zen", "zero": "cero", "zone": "zona"
     ]
 
-    private let italianTranslations: [String: String] = [
+    private lazy var italianTranslations: [String: String] = [
         "apple": "mela", "ant": "formica", "air": "aria", "arm": "braccio", "axe": "ascia", "all": "tutti", "ask": "chiedere", "and": "e", "add": "aggiungere",
         "ball": "palla", "bat": "pipistrello", "bag": "borsa", "bed": "letto", "bear": "orso", "bug": "insetto", "bun": "panino", "bus": "autobus", "big": "grande", "bit": "pezzo",
         "cat": "gatto", "car": "auto", "cow": "mucca", "cup": "tazza", "cap": "cappello", "can": "potere", "cut": "tagliare", "cry": "piangere", "corn": "mais",
@@ -153,7 +154,7 @@ class TranslationService {
         "zebra": "zebra", "zip": "cerniera", "zap": "colpire", "zig": "zigzag", "zoo": "zoo", "zen": "zen", "zero": "zero", "zone": "zona"
     ]
 
-    private let japaneseTranslations: [String: String] = [
+    private lazy var japaneseTranslations: [String: String] = [
         "apple": "りんご", "ant": "あり", "air": "くうき", "arm": "うで", "axe": "おの", "all": "すべて", "ask": "たずねる", "and": "そして", "add": "くわえる",
         "ball": "ボール", "bat": "こうもり", "bag": "かばん", "bed": "ベッド", "bear": "くま", "bug": "むし", "bun": "パン", "bus": "バス", "big": "おおきい", "bit": "かけら",
         "cat": "ねこ", "car": "くるま", "cow": "うし", "cup": "カップ", "cap": "ぼうし", "can": "できる", "cut": "きる", "cry": "なく", "corn": "とうもろこし",
@@ -182,7 +183,7 @@ class TranslationService {
         "zebra": "しまうま", "zip": "ジッパー", "zap": "ピシッ", "zig": "ジグザグ", "zoo": "どうぶつえん", "zen": "禅", "zero": "ゼロ", "zone": "エリア"
     ]
 
-    private let chineseTranslations: [String: String] = [
+    private lazy var chineseTranslations: [String: String] = [
         "apple": "苹果", "ant": "蚂蚁", "air": "空气", "arm": "手臂", "axe": "斧头", "all": "全部", "ask": "问", "and": "和", "add": "添加",
         "ball": "球", "bat": "蝙蝠", "bag": "包", "bed": "床", "bear": "熊", "bug": "虫子", "bun": "面包", "bus": "公交车", "big": "大", "bit": "一点",
         "cat": "猫", "car": "车", "cow": "牛", "cup": "杯子", "cap": "帽子", "can": "能", "cut": "切", "cry": "哭", "corn": "玉米",
@@ -212,6 +213,7 @@ class TranslationService {
     ]
 
     func getTranslation(word: String, language: TranslationLanguage) -> String? {
+        // Dictionaries are now lazy-loaded only when first accessed
         switch language {
         case .french:
             return frenchTranslations[word.lowercased()]

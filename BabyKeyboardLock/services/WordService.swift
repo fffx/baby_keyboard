@@ -8,7 +8,8 @@
 import Foundation
 
 class WordService {
-    let simpleWordsMap: [String: [String]] = [
+    // Lazy load word dictionary to reduce initial memory footprint
+    lazy var simpleWordsMap: [String: [String]] = [
         "a": ["apple", "ant", "air", "arm", "axe", "all", "ask", "and", "add"],
         "b": ["ball", "bat", "bag", "bed", "bear", "bug", "bun", "bus", "big", "bit"],
         "c": ["cat", "car", "cow", "cup", "cap", "can", "cut", "cry", "corn"],

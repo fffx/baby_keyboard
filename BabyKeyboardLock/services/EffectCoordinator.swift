@@ -11,19 +11,27 @@ import CoreGraphics
 import Sauce
 
 class EffectCoordinator {
-    private let wordService: WordService
-    private let translationService: TranslationService
-    private let speechService: SpeechService
+    // Lazy initialize services to reduce initial memory footprint
+    private lazy var wordService: WordService = WordService()
+    private lazy var translationService: TranslationService = TranslationService()
+    private lazy var speechService: SpeechService = SpeechService()
     private var translationWorkItem: DispatchWorkItem?
 
     var translationLanguage: TranslationLanguage = .none
 
-    init(wordService: WordService = WordService(),
-         translationService: TranslationService = TranslationService(),
-         speechService: SpeechService = SpeechService()) {
-        self.wordService = wordService
-        self.translationService = translationService
-        self.speechService = speechService
+    init(wordService: WordService? = nil,
+         translationService: TranslationService? = nil,
+         speechService: SpeechService? = nil) {
+        // Allow dependency injection for testing while defaulting to lazy initialization
+        if let wordService = wordService {
+            self.wordService = wordService
+        }
+        if let translationService = translationService {
+            self.translationService = translationService
+        }
+        if let speechService = speechService {
+            self.speechService = speechService
+        }
     }
 
     deinit {

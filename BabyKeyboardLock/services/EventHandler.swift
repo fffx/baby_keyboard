@@ -12,7 +12,8 @@ import ApplicationServices
 
 class EventHandler: ObservableObject {
     private let lock = NSLock()
-    let effectCoordinator: EffectCoordinator
+    // Lazy initialize effect coordinator to defer loading of word/translation dictionaries
+    lazy var effectCoordinator: EffectCoordinator = EffectCoordinator()
     private let throttleManager: ThrottleManager
     private let eventTapManager: EventTapManaging
     private var eventLoopStarted = false
@@ -64,10 +65,10 @@ class EventHandler: ObservableObject {
     }
 
     init(isLocked: Bool = true,
-         effectCoordinator: EffectCoordinator = EffectCoordinator(),
+         effectCoordinator: EffectCoordinator? = nil,
          throttleManager: ThrottleManager = ThrottleManager(),
          eventTapManager: EventTapManaging? = nil) {
-        self.effectCoordinator = effectCoordinator
+        // Initialize non-lazy stored properties first
         self.throttleManager = throttleManager
 
         // Determine which event tap manager to use
@@ -85,6 +86,11 @@ class EventHandler: ObservableObject {
             self.isLocked = false
         }
         self.lastKeyString = lastKeyString
+        
+        // Allow dependency injection for testing while defaulting to lazy initialization
+        if let effectCoordinator = effectCoordinator {
+            self.effectCoordinator = effectCoordinator
+        }
     }
 
     func setLocked(isLocked: Bool) {
