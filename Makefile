@@ -1,5 +1,6 @@
 .PHONY: deploy update clean archive export install fix-signature
 .PHONY: test-images test-quickdraw test-generate download-quickdraw generate-all-images images-main
+.PHONY: test-openimages download-openimages
 
 # Main target - build and deploy the app
 deploy: archive export install
@@ -125,3 +126,18 @@ generate-pencil:
 
 generate-simple:
 	@uv run python scripts/generate_with_nano_banana.py --style simple --model nano-banana
+
+# Test Open Images download (3 words, 5 images each)
+test-openimages:
+	@echo "🧪 Testing Open Images download (3 words, 5 images each)..."
+	@uv run python scripts/download_open_images_fiftyone.py \
+		--test \
+		--limit 5 \
+		--yes
+
+# Download full Open Images dataset (all vocabulary words)
+download-openimages:
+	@echo "📥 Downloading Open Images dataset (real photos)..."
+	@uv run python scripts/download_open_images_fiftyone.py \
+		--limit 10 \
+		--yes

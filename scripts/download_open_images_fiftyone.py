@@ -93,10 +93,11 @@ def main():
         return
 
     # Confirm
-    response = input("Proceed with download? (yes/no): ")
-    if response.lower() != "yes":
-        print("Cancelled.")
-        return
+    if not args.yes:
+        response = input("Proceed with download? (yes/no): ")
+        if response.lower() != "yes":
+            print("Cancelled.")
+            return
 
     # Create output directory
     args.output.mkdir(parents=True, exist_ok=True)
