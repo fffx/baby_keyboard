@@ -57,7 +57,7 @@ test-openimage:
 run-openimage: download-openimages
 
 test-gemini:
-	printf 'yes\n' | $(MAKE) --no-print-directory generate-images SAMPLE_SIZE=2 SIZE=512x512 MAX_CONCURRENT=2
+	printf 'yes\n' | $(MAKE) --no-print-directory generate-images SAMPLE_SIZE=2 MAX_CONCURRENT=2
 
 run-gemini: generate-images
 

@@ -1,5 +1,6 @@
 output*
 uv.lock
+.env
 
 .DS_Store
 /.build

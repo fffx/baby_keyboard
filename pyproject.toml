@@ -41,7 +41,7 @@ dependencies = [
 
 [dependency-groups]
 extras = [
-    "calmlib>=2.0.14",
+    "calmlib>=2.0.16",
 ]
 
 dev = [

@@ -14,12 +14,15 @@ from calmlib.llm.bulk_image_generation import (
 )
 from word_utils import sample_english_words, unique_english_words
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Friendly style presets that map to short prompt snippets
 STYLE_PRESETS = {
     "crayon": "Children's crayon drawing, bold outlines, bright colors, waxy texture",
     "doodle": "Simple hand-drawn doodle, clean black lines, minimal shading, high contrast",
     "pencil": "Soft pencil sketch, light shading, gentle graphite texture, minimal color",
-    "simple": "Flat minimal illustration, solid fills, crisp edges, toddler friendly palette",
+    "simple": "Simple cool image of the requested object",
     "watercolor": "Playful watercolor wash, soft gradients, organic textures, storybook vibe",
     "mosaic": "Pale glass mosaic, thick black outlines, soft light rays, drifting dust, moody atmosphere",
     "elvish": "Elven craftsmanship, dark emerald and gold accents, metallic shine, intricate filigree, magical glow",
