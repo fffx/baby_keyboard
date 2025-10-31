@@ -1,3 +1,7 @@
+## 2025-10-17
+- [x] l
+    - `key: c3d00386`
+    - baby image picker field - select a file
 ## 2025-10-13
 - [x] a
     - `key: cc781683`
@@ -13,6 +17,9 @@
 - [x] d
     - `key: 50b4d16b`
     - Bugfix settings window width (too narrow right now)
+- [x] o
+    - `key: 0fdc1f59`
+    - Add an input field for a second language name of a child
 ## 2025-10-12
 - [x] e
     - `key: 1c5e8a35`

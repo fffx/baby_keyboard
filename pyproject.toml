@@ -26,6 +26,7 @@ dependencies = [
     "async-lru>=2.0.5",
     "fiftyone>=1.9.0",
     "keyring>=25.6.0",
+    "litellm>=1.79.0",
     "loguru>=0.7.3",
     "numpy>=2.3.4",
     "pillow>=12.0.0",
@@ -39,9 +40,11 @@ dependencies = [
 [dependency-groups]
 extras = [
     "calmlib @ git+https://github.com/calmmage/calmlib.git",
+#    "calmlib>=2.0.14",
 ]
 
 dev = [
+    "ipython>=8"
 ]
 
 test = [

@@ -164,7 +164,7 @@ async def main():
         output_dir=output_dir,
         model=args.model,
         size="1024x1024",
-        delay=1.0
+        max_concurrent=5,
     )
 
     # Summary
