@@ -65,11 +65,9 @@ def load_words(
     if collected:
         return sorted(collected)
 
-    if use_all_defaults:
+    # Default: use all words if nothing specified
+    if use_all_defaults or sample_size <= 0:
         return unique_english_words()
-
-    if sample_size <= 0:
-        raise SystemExit("No words provided. Use --words, --words-file or set --sample-size > 0.")
 
     return sample_english_words(sample_size, seed=seed)
 
@@ -88,12 +86,17 @@ def build_prompt(word: str, style_key: str, custom_style: str | None) -> str:
     )
 
 
-def build_items(words: Iterable[str], style_key: str, custom_style: str | None) -> list[GenerationItem]:
-    """Create generation payload for calmlib."""
+def build_items(words: Iterable[str], style_key: str, custom_style: str | None, output_dir: Path) -> list[GenerationItem]:
+    """Create generation payload for calmlib, filtering out existing images."""
     items: list[GenerationItem] = []
     for word in words:
         sanitized = word.replace(" ", "_").lower()
-        filename = f"{sanitized}.png"
+        filename = f"{style_key}_{sanitized}.png"
+
+        # Skip if image already exists
+        if (output_dir / filename).exists():
+            continue
+
         items.append(
             GenerationItem(
                 prompt=build_prompt(word, style_key, custom_style),
@@ -156,8 +159,7 @@ async def main() -> None:
     )
     parser.add_argument(
         "--style",
-        default="simple",
-        help=f"Style preset name (default: simple). Options: {', '.join(sorted(STYLE_PRESETS))}",
+        help=f"Style preset name (default: all styles). Options: {', '.join(sorted(STYLE_PRESETS))}, or 'all'",
     )
     parser.add_argument(
         "--style-prompt",
@@ -166,12 +168,7 @@ async def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path(__file__).resolve().parent.parent
-        / "BabyKeyboardLock"
-        / "Resources"
-        / "FlashcardImages"
-        / "generated",
-        help="Directory to store generated images",
+        help="Directory to store generated images (default: auto-determined by style)",
     )
     parser.add_argument(
         "--model",
@@ -196,8 +193,8 @@ async def main() -> None:
     parser.add_argument(
         "--sample-size",
         type=int,
-        default=3,
-        help="Randomly sample this many default words when none are provided (default: 3)",
+        default=0,
+        help="Randomly sample this many default words when none are provided (default: 0 = all words)",
     )
     parser.add_argument(
         "--seed",
@@ -209,17 +206,66 @@ async def main() -> None:
         action="store_true",
         help="Use every default word from RandomWordList.swift (ignores --sample-size)",
     )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        help="Limit total number of images to generate across all styles",
+    )
 
     args = parser.parse_args()
 
     words = load_words(args.words, args.words_file, args.sample_size, args.all_defaults, args.seed)
-    output_dir = resolve_output_dir(args.output)
 
+    # Determine which styles to process
+    if args.style and args.style.lower() != "all":
+        styles_to_process = [args.style]
+    else:
+        styles_to_process = sorted(STYLE_PRESETS.keys())
+
+    base_dir = Path(__file__).resolve().parent.parent / "BabyKeyboardLock" / "Resources" / "FlashcardImages"
     config = BulkGenerationConfig(model=args.model)
     generator = BulkImageGenerator(config)
 
-    items = build_items(words, args.style, args.style_prompt)
-    preview(items, generator)
+    # Collect all items across all styles
+    all_items = []
+    total_skipped = 0
+
+    for style in styles_to_process:
+        if args.output:
+            output_dir = resolve_output_dir(args.output)
+        else:
+            output_dir = resolve_output_dir(base_dir / style)
+
+        items = build_items(words, style, args.style_prompt, output_dir)
+        skipped = len(words) - len(items)
+        total_skipped += skipped
+
+        # Store output_dir with items for later use
+        for item in items:
+            all_items.append((item, output_dir, style))
+
+    if total_skipped > 0:
+        print(f"\nSkipped {total_skipped} existing image(s) across all styles")
+
+    if not all_items:
+        print("\nAll images already exist. Nothing to generate.")
+        return
+
+    # Apply limit if specified
+    if args.limit and args.limit > 0:
+        original_count = len(all_items)
+        all_items = all_items[:args.limit]
+        if original_count > args.limit:
+            print(f"\nLimited to {args.limit} images (from {original_count} total)")
+
+    # Preview
+    print(f"\nPreparing to generate {len(all_items)} image(s) across {len(styles_to_process)} style(s)")
+    cost = generator.estimate_cost(len(all_items))
+    print(f"Estimated cost: ${cost:.2f}")
+    print(f"\nStyles: {', '.join(styles_to_process)}")
+    print("\nSample prompts:")
+    for item, _, _ in all_items[: min(5, len(all_items))]:
+        print(f"  - {item.word}: {item.prompt}")
 
     if args.dry_run:
         print("\nDry run complete. Run again without --dry-run to generate images.")
@@ -230,7 +276,47 @@ async def main() -> None:
         print("Cancelled.")
         return
 
-    await generate(items, output_dir, args.model, args.size, args.max_concurrent)
+    # Generate all items by style
+    total_successes = 0
+    total_failures = 0
+    total_cost = 0.0
+
+    for style in styles_to_process:
+        style_items = [(item, out_dir) for item, out_dir, s in all_items if s == style]
+        if not style_items:
+            continue
+
+        items_only = [item for item, _ in style_items]
+        output_dir = style_items[0][1]
+
+        print(f"\n{'='*60}")
+        print(f"Generating {len(items_only)} images for style: {style}")
+        print(f"{'='*60}")
+
+        results = await bulk_generate_images(
+            items=[{"prompt": it.prompt, "filename": it.filename} for it in items_only],
+            output_dir=output_dir,
+            model=args.model,
+            size=args.size,
+            max_concurrent=args.max_concurrent,
+        )
+
+        successes = sum(1 for r in results if r.success)
+        failures = len(results) - successes
+        cost = sum(getattr(r, "cost", 0.0) for r in results)
+
+        total_successes += successes
+        total_failures += failures
+        total_cost += cost
+
+        print(f"\nStyle '{style}' complete: {successes} succeeded, {failures} failed, ${cost:.2f}")
+
+    print(f"\n{'='*60}")
+    print("All styles complete")
+    print(f"  ✓ Total successes : {total_successes}")
+    if total_failures:
+        print(f"  ✗ Total failures  : {total_failures}")
+    print(f"  💲 Total cost     : ${total_cost:.2f}")
 
 
 if __name__ == "__main__":
