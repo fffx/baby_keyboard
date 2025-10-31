@@ -69,9 +69,29 @@ lane :test do
 end
 
 
+desc "Set build number to a specific value"
+lane :set_build do |options|
+  build = options[:build]
+  if build.nil?
+    UI.user_error!("Please provide a build number: fastlane set_build build:5")
+  end
+
+  increment_build_number(
+    build_number: build,
+    xcodeproj: "BabyKeyboardLock.xcodeproj"
+  )
+  show_version
+end
+
 desc "Bump build number only"
 lane :bump_build do
+  # Get current build number from main target
+  current_build = get_build_number(xcodeproj: "BabyKeyboardLock.xcodeproj").to_i
+  new_build = current_build + 1
+
+  # Set the new build number (this ensures all targets get the same value)
   increment_build_number(
+    build_number: new_build,
     xcodeproj: "BabyKeyboardLock.xcodeproj"
   )
   show_version
@@ -79,8 +99,13 @@ end
 
 desc "Show current version and build number"
 lane :show_version do
-  version = get_version_number(xcodeproj: "BabyKeyboardLock.xcodeproj")
-  build = get_build_number(xcodeproj: "BabyKeyboardLock.xcodeproj")
+  version = get_version_number(
+    xcodeproj: "BabyKeyboardLock.xcodeproj",
+    target: "BabyKeyboardLock"
+  )
+  build = get_build_number(
+    xcodeproj: "BabyKeyboardLock.xcodeproj"
+  )
   UI.success("📦 Current version: #{version} (Build #{build})")
 end
 
@@ -100,34 +125,55 @@ lane :release do |options|
     ensure_git_status_clean
   end
 
-  # Bump version: either specific version or bump type
+  # Get current version first to ensure we're working with the right target
+  current_version = get_version_number(
+    xcodeproj: "BabyKeyboardLock.xcodeproj",
+    target: "BabyKeyboardLock"
+  )
+
+  # Determine new version
+  new_version = nil
   if options[:version]
-    # Set specific version
-    increment_version_number(
-      version_number: options[:version],
-      xcodeproj: "BabyKeyboardLock.xcodeproj"
-    )
+    # Use specific version provided
+    new_version = options[:version]
   elsif options[:type]
-    # Bump by type (patch/minor/major)
-    increment_version_number(
-      bump_type: options[:type],
-      xcodeproj: "BabyKeyboardLock.xcodeproj"
-    )
+    # Calculate new version based on bump type
+    parts = current_version.split('.').map(&:to_i)
+    case options[:type]
+    when "major"
+      new_version = "#{parts[0] + 1}.0.0"
+    when "minor"
+      new_version = "#{parts[0]}.#{parts[1] + 1}.0"
+    when "patch"
+      new_version = "#{parts[0]}.#{parts[1]}.#{parts[2] + 1}"
+    else
+      UI.user_error!("Invalid bump type: #{options[:type]}. Use patch, minor, or major")
+    end
   else
     # Default to patch
-    increment_version_number(
-      bump_type: "patch",
-      xcodeproj: "BabyKeyboardLock.xcodeproj"
-    )
+    parts = current_version.split('.').map(&:to_i)
+    new_version = "#{parts[0]}.#{parts[1]}.#{parts[2] + 1}"
   end
 
+  # Set the new version
+  increment_version_number(
+    version_number: new_version,
+    xcodeproj: "BabyKeyboardLock.xcodeproj"
+  )
+
   # Always bump build number
+  current_build = get_build_number(xcodeproj: "BabyKeyboardLock.xcodeproj").to_i
+  new_build = current_build + 1
   increment_build_number(
+    build_number: new_build,
     xcodeproj: "BabyKeyboardLock.xcodeproj"
   )
 
   # Get new version
-  version = get_version_number(xcodeproj: "BabyKeyboardLock.xcodeproj")
+  version = get_version_number(
+    xcodeproj: "BabyKeyboardLock.xcodeproj",
+    target: "BabyKeyboardLock"
+  )
   build = get_build_number(xcodeproj: "BabyKeyboardLock.xcodeproj")
   tag_name = "v#{version}"
 

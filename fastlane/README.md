@@ -37,37 +37,13 @@ Build and archive macOS app
 
 
 
-### bump_patch
+### set_build
 
 ```sh
-[bundle exec] fastlane bump_patch
+[bundle exec] fastlane set_build
 ```
 
-Bump patch version (e.g., 0.2.2 → 0.2.3)
-
-### bump_minor
-
-```sh
-[bundle exec] fastlane bump_minor
-```
-
-Bump minor version (e.g., 0.2.2 → 0.3.0)
-
-### bump_major
-
-```sh
-[bundle exec] fastlane bump_major
-```
-
-Bump major version (e.g., 0.2.2 → 1.0.0)
-
-### set_version
-
-```sh
-[bundle exec] fastlane set_version
-```
-
-Set a specific version number
+Set build number to a specific value
 
 ### bump_build
 
@@ -85,14 +61,6 @@ Bump build number only
 
 Show current version and build number
 
-### build_and_bump
-
-```sh
-[bundle exec] fastlane build_and_bump
-```
-
-Build with automatic build number bump
-
 ### release
 
 ```sh
@@ -101,13 +69,17 @@ Build with automatic build number bump
 
 Release: bump version, commit, tag, and optionally push
 
-### release_version
+Usage:
 
-```sh
-[bundle exec] fastlane release_version
-```
+  fastlane release type:patch           # Bump patch (0.2.2 → 0.2.3)
 
-Release with specific version, commit, and tag
+  fastlane release type:minor           # Bump minor (0.2.2 → 0.3.0)
+
+  fastlane release type:major           # Bump major (0.2.2 → 1.0.0)
+
+  fastlane release version:1.2.3        # Set specific version
+
+  fastlane release type:patch push:true # Auto-push to remote
 
 ----
 
