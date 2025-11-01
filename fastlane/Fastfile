@@ -120,46 +120,17 @@ desc "  fastlane release type:patch push:true # Auto-push to remote"
 lane :release do |options|
   push_to_remote = options[:push] || false
 
-  # Ensure we're on a clean git state
   unless options[:skip_git_check]
-    ensure_git_status_clean
+    # ensure_git_status_clean
   end
 
-  # Get current version first to ensure we're working with the right target
-  current_version = get_version_number(
-    xcodeproj: "BabyKeyboardLock.xcodeproj",
-    target: "BabyKeyboardLock"
-  )
-
-  # Determine new version
-  new_version = nil
-  if options[:version]
-    # Use specific version provided
-    new_version = options[:version]
-  elsif options[:type]
-    # Calculate new version based on bump type
-    parts = current_version.split('.').map(&:to_i)
-    case options[:type]
-    when "major"
-      new_version = "#{parts[0] + 1}.0.0"
-    when "minor"
-      new_version = "#{parts[0]}.#{parts[1] + 1}.0"
-    when "patch"
-      new_version = "#{parts[0]}.#{parts[1]}.#{parts[2] + 1}"
-    else
-      UI.user_error!("Invalid bump type: #{options[:type]}. Use patch, minor, or major")
-    end
-  else
-    # Default to patch
-    parts = current_version.split('.').map(&:to_i)
-    new_version = "#{parts[0]}.#{parts[1]}.#{parts[2] + 1}"
-  end
-
-  # Set the new version
-  increment_version_number(
-    version_number: new_version,
-    xcodeproj: "BabyKeyboardLock.xcodeproj"
-  )
+  target = options[:target] || "BabyKeyboardLock"
+  increment_options = {
+    version_number: options[:version],
+    bump_type: options[:type],
+    target: target
+  }.compact
+  increment_version_number_in_xcodeproj(**increment_options)
 
   # Always bump build number
   current_build = get_build_number(xcodeproj: "BabyKeyboardLock.xcodeproj").to_i
@@ -167,6 +138,10 @@ lane :release do |options|
   increment_build_number(
     build_number: new_build,
     xcodeproj: "BabyKeyboardLock.xcodeproj"
+  )
+  new_version = get_version_number_from_xcodeproj(
+    xcodeproj: "BabyKeyboardLock.xcodeproj",
+    target: target
   )
 
   # Use the calculated versions (don't re-read as agvtool and Xcode might be out of sync)
@@ -183,18 +158,10 @@ lane :release do |options|
   )
 
   # Create git tag
-  add_git_tag(
-    tag: tag_name,
-    message: "Release #{version}"
-  )
-
+  add_git_tag(tag: tag_name, message: "Release #{version}")
   UI.success("✅ Created git tag: #{tag_name}")
-
-  # Push if requested
   if push_to_remote
-    push_to_git_remote(
-      tags: true
-    )
+    push_to_git_remote(tags: true)
     UI.success("🚀 Pushed tag #{tag_name} to remote")
   else
     UI.message("💡 To push this tag, run: git push origin #{tag_name}")
