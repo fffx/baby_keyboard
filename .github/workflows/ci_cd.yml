@@ -4,7 +4,10 @@ on: push
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-11, macos-12, macos-13, macos-14, macos-latest]
     steps:
       - uses: actions/checkout@v4
       - name: Switch xcode to latest-stable
@@ -38,7 +41,7 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: release-artifacts
+          name: release-artifacts-${{ matrix.os }}
           path: build/BabyKeyboardLock-${{ github.ref_name }}.zip
   release:
     runs-on: ubuntu-latest
@@ -50,7 +53,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: release-artifacts
+          name: release-artifacts-macos-latest
 
       - name: Release
         uses: softprops/action-gh-release@v2
