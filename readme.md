@@ -1,35 +1,61 @@
 # BabyKeyboard Lock
 
-Baby keyboard lock is a Macos app that can lock your keyboard, while your toddlers or kids can still have fun with it. Find more on official site https://keyboardlock.app/
+A macOS menu bar app that locks your keyboard to prevent unwanted inputs while entertaining your toddlers or kids with fun visual and audio effects.
 
-![BabyKeyboard Lock screen shot](screenshots/main.png)
+**Official Website:** https://keyboardlock.app/
 
-**Features**
+![BabyKeyboard Lock screenshot](screenshots/main.png)
 
-- Lock your keyboard to prevent unwanted inputs, including media keys and Power button
-- Configurable fun effects, confetti, read the pressed key, read a word that starts with the pressed key, more effects coming.
-- No visible window is created, so you can still read your webpage or movie as normal
-- A Menu bar only App, and you can toggle keyboard lock with a global shortcut
+## Features
 
-**TODO**
-
-- ~~show window on launch~~
-- ~~hide docker icon, only need menu bar~~
-- ~~https://developer.apple.com/documentation/uikit/creating-custom-symbol-images-for-your-app~~
-- Adding more effects
-- whitelist / Blacklist by key codes
-- Temporary lock by holding Fn ?
-- Accessibility improvement
-- Notarizing https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution
-- Unit test
+- **Keyboard Lock**: Prevents unwanted inputs, including media keys and the Power button
+- **Fun Effects**: Configurable effects including confetti animations, spoken key names, and words starting with the pressed key
+- **Non-Intrusive**: No visible window - continue watching videos or reading webpages normally
+- **Menu Bar App**: Clean interface accessible from the menu bar with global shortcut toggle
 
 
-**Credits**
+## FAQ
 
-- Sound effects are downloaded from https://freesound.org/
-- This app is inspired by https://github.com/kfv/keylock/
+### Malicious Software Warning
+
+If you see "Apple can't check app for malicious software," this is because the app is not yet notarized with Apple. See the following guides to allow the app to run:
+
+- [Latest macOS](https://support.apple.com/en-gb/guide/mac-help/mchleab3a043/mac)
+- [macOS 15](https://support.apple.com/en-gb/guide/mac-help/mchleab3a043/15.0/mac/15.0)
+- [macOS 14](https://support.apple.com/en-gb/guide/mac-help/mchleab3a043/14.0/mac/14.0)
+
+For more details, see [issue #4](https://github.com/fffx/baby_keyboard/issues/4).
+
+### Privacy
+
+The app is released with GitHub CI for transparency. You can review the source code and compile it yourself if desired.
 
 
-**Buy me a Coffee**
 
-Just in case you wana buy me a coffee: https://paypal.me/fangxing204
+## TODO
+
+- [x] Show window on launch
+- [x] Hide dock icon (menu bar only)
+- [x] Custom symbol images
+- [ ] Additional effects
+- [ ] Whitelist/blacklist by key codes
+- [ ] Temporary lock by holding Fn key
+- [ ] Accessibility improvements
+- [ ] Notarization ([Apple docs](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution))
+- [ ] Unit test coverage
+
+
+
+## Credits
+
+- Sound effects from [Freesound.org](https://freesound.org/)
+- Inspired by [keylock](https://github.com/kfv/keylock/)
+
+
+## Support
+
+If you find this app useful, consider [buying me a coffee](https://paypal.me/fangxing204) ☕
+
+## License
+
+See [LICENSE](LICENSE) file for details.
