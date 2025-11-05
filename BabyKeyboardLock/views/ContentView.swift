@@ -125,6 +125,12 @@ struct ContentView: View {
             .toggleStyle(CheckboxToggleStyle())
             // .frame(maxWidth: .infinity, alignment: .leading)
 
+            Toggle(isOn: $eventHandler.hotCornerEnabled) {
+                Text("Toggle lock with top-right corner")
+            }
+            .toggleStyle(CheckboxToggleStyle())
+            // .frame(maxWidth: .infinity, alignment: .leading)
+
             Spacer()
             Text("unlock_shortcut_hint")
                 .font(.footnote)

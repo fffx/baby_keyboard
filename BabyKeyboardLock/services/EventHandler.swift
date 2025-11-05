@@ -19,6 +19,8 @@ class EventHandler: ObservableObject {
     private var eventLoopStarted = false
     private var eventTap : CFMachPort?
     private var permissionCheckWorkItem: DispatchWorkItem?
+    private let hotCornerService: HotCornerService
+    private var lockedViaHotCorner = false
 
     @Published var selectedLockEffect: LockEffect = .none
     @Published var selectedTranslationLanguage: TranslationLanguage = .none {
@@ -35,6 +37,12 @@ class EventHandler: ObservableObject {
     }
     @Published var accessibilityPermissionGranted = false
     @Published var lastKeyString: String = "a" // fix onReceive won't work as expected for first key press
+    @Published var hotCornerEnabled: Bool = UserDefaults.standard.bool(forKey: "hotCornerEnabled") {
+        didSet {
+            UserDefaults.standard.set(hotCornerEnabled, forKey: "hotCornerEnabled")
+            updateHotCornerService()
+        }
+    }
 
     static let shared = EventHandler()
 
@@ -70,6 +78,7 @@ class EventHandler: ObservableObject {
          eventTapManager: EventTapManaging? = nil) {
         // Initialize non-lazy stored properties first
         self.throttleManager = throttleManager
+        self.hotCornerService = HotCornerService()
 
         // Determine which event tap manager to use
         let isTestMode = Self.isRunningTestsOrPreview
@@ -93,12 +102,41 @@ class EventHandler: ObservableObject {
         }
     }
 
-    func setLocked(isLocked: Bool) {
+    func setLocked(isLocked: Bool, viaHotCorner: Bool = false) {
+        let wasLocked = self.isLocked
+        let wasLockedViaHotCorner = self.lockedViaHotCorner
+        
         if (isLocked && accessibilityPermissionGranted) {
             self.isLocked = true
-            startEventLoop()
+            self.lockedViaHotCorner = viaHotCorner
+            
+            debugLog("setLocked: isLocked=\(isLocked), viaHotCorner=\(viaHotCorner), wasLocked=\(wasLocked), wasLockedViaHotCorner=\(wasLockedViaHotCorner)")
+            
+            // Restart event tap if hot corner state changed or we're locking via hot corner
+            if viaHotCorner && (!wasLocked || !wasLockedViaHotCorner) {
+                if eventTap != nil {
+                    eventTapManager.enableTap(eventTap, enable: false)
+                    debugLog("Disabling old event tap to include mouse events")
+                }
+                setupEventTap()
+                if !eventLoopStarted {
+                    startEventLoop()
+                }
+            } else {
+                startEventLoop()
+            }
         } else {
             self.isLocked = false
+            self.lockedViaHotCorner = false
+            
+            debugLog("setLocked: unlocking, wasLockedViaHotCorner=\(wasLockedViaHotCorner)")
+            
+            // Restart event tap to remove mouse events if was locked via hot corner
+            if wasLockedViaHotCorner && eventTap != nil {
+                eventTapManager.enableTap(eventTap, enable: false)
+                debugLog("Restarting event tap to remove mouse events")
+                setupEventTap()
+            }
         }
     }
 
@@ -132,7 +170,6 @@ class EventHandler: ObservableObject {
         // Schedule the next check
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: workItem)
     }
-
     func run() {
         // Skip permission checks in test or preview environment
         if Self.isRunningTestsOrPreview {
@@ -148,16 +185,21 @@ class EventHandler: ObservableObject {
             self.isLocked = false
             debugLog("Please grant accessibility permissions in System Preferences")
         }
+        
+        // Initialize hot corner service
+        updateHotCornerService()
     }
 
     func stop(){
         isLocked = false
+        lockedViaHotCorner = false
 
         // Cancel any pending permission checks to prevent memory leaks
         permissionCheckWorkItem?.cancel()
         permissionCheckWorkItem = nil
 
         eventTapManager.stopRunLoop()
+        hotCornerService.stop()
     }
 
     deinit {
@@ -170,6 +212,22 @@ class EventHandler: ObservableObject {
             // CFMachPort is auto-released in ARC
         }
         eventTap = nil
+        hotCornerService.stop()
+    }
+    
+    private func updateHotCornerService() {
+        if hotCornerEnabled {
+            hotCornerService.start { [weak self] in
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    let newState = !self.isLocked
+                    debugLog("Hot corner triggered, toggling keyboard lock to: \(newState)")
+                    self.setLocked(isLocked: newState, viaHotCorner: true)
+                }
+            }
+        } else {
+            hotCornerService.stop()
+        }
     }
 
     func startEventLoop() {
@@ -186,11 +244,28 @@ class EventHandler: ObservableObject {
     }
 
     private func setupEventTap() {
-        let eventMask = CGEventMask(
-            (1 << CGEventType.keyDown.rawValue) |
-            (1 << CGEventType.keyUp.rawValue) |
-            (1 << 14) // search and voice key
-        )
+        let keyboardMask: UInt32 = (1 << CGEventType.keyDown.rawValue) |
+                                    (1 << CGEventType.keyUp.rawValue) |
+                                    (1 << 14) // search and voice key
+        
+        var eventMask = CGEventMask(keyboardMask)
+        
+        // Add mouse events if locked via hot corner
+        if lockedViaHotCorner {
+            let m1: UInt32 = (1 << CGEventType.leftMouseDown.rawValue)
+            let m2: UInt32 = (1 << CGEventType.leftMouseUp.rawValue)
+            let m3: UInt32 = (1 << CGEventType.rightMouseDown.rawValue)
+            let m4: UInt32 = (1 << CGEventType.rightMouseUp.rawValue)
+            let m5: UInt32 = (1 << CGEventType.otherMouseDown.rawValue)
+            let m6: UInt32 = (1 << CGEventType.otherMouseUp.rawValue)
+            let m7: UInt32 = (1 << CGEventType.leftMouseDragged.rawValue)
+            let m8: UInt32 = (1 << CGEventType.rightMouseDragged.rawValue)
+            let m9: UInt32 = (1 << CGEventType.otherMouseDragged.rawValue)
+            let mouseMask = m1 | m2 | m3 | m4 | m5 | m6 | m7 | m8 | m9
+            eventMask |= CGEventMask(mouseMask)
+        }
+        
+        debugLog("Setting up event tap with mask: \(eventMask), lockedViaHotCorner: \(lockedViaHotCorner)")
 
         eventTap = eventTapManager.createEventTap(
             tap: .cghidEventTap,
@@ -229,6 +304,20 @@ class EventHandler: ObservableObject {
             debugLog("Event tap disabled, attempting to re-enable...")
             eventTapManager.enableTap(eventTap, enable: true)
             return Unmanaged.passUnretained(event)
+        }
+        
+        // Handle mouse events when locked via hot corner
+        if lockedViaHotCorner && isLocked {
+            switch type {
+            case .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp, .otherMouseDown, .otherMouseUp, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged:
+                debugLog("Mouse event BLOCKED: \(type.rawValue), lockedViaHotCorner: \(lockedViaHotCorner), isLocked: \(isLocked)")
+                return nil
+            default:
+                break
+            }
+        } else if type.rawValue >= 1 && type.rawValue <= 7 {
+            // Log any mouse events that aren't being blocked
+            debugLog("Mouse event NOT blocked: \(type.rawValue), lockedViaHotCorner: \(lockedViaHotCorner), isLocked: \(isLocked)")
         }
 
         debugLog("--- keyup/down: \(type == .keyDown || type == .keyUp), keyboardEventKeyboardType: \(event.getIntegerValueField(.keyboardEventKeyboardType))")
@@ -325,4 +414,3 @@ func globalKeyEventHandler(
     let mySelf = Unmanaged<EventHandler>.fromOpaque(refcon).takeUnretainedValue()
     return mySelf.handleKeyEvent(proxy: proxy, type: type, event: event)
 }
-

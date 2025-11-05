@@ -37,22 +37,16 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		20141CAA2D0F52E500D0ED5D /* BabyKeyboardLock */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = BabyKeyboardLock;
 			sourceTree = "<group>";
 		};
 		20141CBC2D0F52E700D0ED5D /* BabyKeyboardLockTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = BabyKeyboardLockTests;
 			sourceTree = "<group>";
 		};
 		20141CC62D0F52E700D0ED5D /* BabyKeyboardLockUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = BabyKeyboardLockUITests;
 			sourceTree = "<group>";
 		};
