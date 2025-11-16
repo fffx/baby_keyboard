@@ -131,6 +131,12 @@ struct ContentView: View {
             .toggleStyle(CheckboxToggleStyle())
             // .frame(maxWidth: .infinity, alignment: .leading)
 
+            Text("When locked with hot corner, mouse clicks are locked as well")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, -10)
+
             Spacer()
             Text("unlock_shortcut_hint")
                 .font(.footnote)
