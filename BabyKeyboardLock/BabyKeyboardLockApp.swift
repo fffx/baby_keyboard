@@ -38,7 +38,8 @@ struct BabyKeyboardLockApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
     private var popover: NSPopover!
-    private var cancellables = Set<AnyCancellable>() // Add this property
+    private var cancellables = Set<AnyCancellable>()
+    private var cursorOverlayService: CursorOverlayService?
     @MainActor func applicationDidFinishLaunching(_ notification: Notification) {
 //        NSApplication.shared.setActivationPolicy(.regular)
 //        NSApplication.shared.activate(ignoringOtherApps: true)
@@ -76,6 +77,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.showPopover()
             EventHandler.shared.run()
         }
+        
+        // Initialize cursor overlay service for mouse lock indicator
+        cursorOverlayService = CursorOverlayService.shared
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

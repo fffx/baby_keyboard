@@ -20,7 +20,7 @@ class EventHandler: ObservableObject {
     private var eventTap : CFMachPort?
     private var permissionCheckWorkItem: DispatchWorkItem?
     private let hotCornerService: HotCornerService
-    private var lockedViaHotCorner = false
+    @Published var lockedViaHotCorner = false
 
     @Published var selectedLockEffect: LockEffect = .none
     @Published var selectedTranslationLanguage: TranslationLanguage = .none {
