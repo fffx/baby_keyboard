@@ -79,7 +79,7 @@ struct AnimationView: View {
                     .background(Color.clear)
                 .buttonStyle(PlainButtonStyle())
                 .confettiCannon(
-                    counter: $counter,
+                    trigger: $counter,
                     // confettis: [.text("💩")],
                     num: Int.random(in: 15...40),
                     confettiSize: 15,

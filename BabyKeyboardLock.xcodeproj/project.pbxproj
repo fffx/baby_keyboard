@@ -611,7 +611,7 @@
 			repositoryURL = "https://github.com/simibac/ConfettiSwiftUI.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.0;
+				minimumVersion = 3.0.0;
 			};
 		};
 		20F6F4C02D154FCE006FEC81 /* XCRemoteSwiftPackageReference "Sauce" */ = {
