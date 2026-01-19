@@ -77,7 +77,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.showPopover()
             EventHandler.shared.run()
         }
-        
+
         // Initialize cursor overlay service for mouse lock indicator
         cursorOverlayService = CursorOverlayService.shared
     }

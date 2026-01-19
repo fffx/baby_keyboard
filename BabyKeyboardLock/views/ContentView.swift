@@ -126,7 +126,7 @@ struct ContentView: View {
             // .frame(maxWidth: .infinity, alignment: .leading)
 
             Toggle(isOn: $eventHandler.hotCornerEnabled) {
-                Text("Toggle lock with top-right corner")
+                Text("Lock with top-right hotcorner")
             }
             .toggleStyle(CheckboxToggleStyle())
             // .frame(maxWidth: .infinity, alignment: .leading)
