@@ -10,7 +10,7 @@ jobs:
       - name: Switch xcode to latest-stable
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: 26.0.1
       - uses: mxcl/xcodebuild@v3
         with:
           code-sign-certificate: ${{ secrets.CERTIFICATE_BASE64 }}
