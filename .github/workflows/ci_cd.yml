@@ -21,6 +21,13 @@ jobs:
           upload-logs: always
           warnings-as-errors: true
           configuration: release
+      - name: List installed certificates (debug)
+        run: |
+          echo "=== All codesigning identities ==="
+          security find-identity -v -p codesigning
+          echo ""
+          echo "=== Keychains in search list ==="
+          security list-keychains
       - name: Setup Ruby and fastlane
         uses: ruby/setup-ruby@v1
         with:
