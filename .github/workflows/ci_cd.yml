@@ -53,6 +53,19 @@ jobs:
             exit 1
           fi
           
+          # Show certificate details (expiry, subject, etc)
+          echo ""
+          echo "=== Certificate details ==="
+          openssl pkcs12 -in $CERT_PATH -passin pass:"$CERTIFICATE_PASSPHRASE" -nokeys -clcerts | \
+            openssl x509 -noout -subject -issuer -dates -serial 2>/dev/null || echo "Could not parse certificate"
+          
+          # Download and install Apple WWDR intermediate certificates
+          echo "Installing Apple WWDR intermediate certificates..."
+          curl -sL https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer -o $RUNNER_TEMP/AppleWWDRCAG3.cer
+          curl -sL https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer -o $RUNNER_TEMP/DeveloperIDG2CA.cer
+          security import $RUNNER_TEMP/AppleWWDRCAG3.cer -k $KEYCHAIN_PATH -T /usr/bin/codesign
+          security import $RUNNER_TEMP/DeveloperIDG2CA.cer -k $KEYCHAIN_PATH -T /usr/bin/codesign || true
+          
           # Import certificate
           echo "Importing certificate..."
           security import $CERT_PATH \
