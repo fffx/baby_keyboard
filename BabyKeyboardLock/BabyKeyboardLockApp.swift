@@ -47,7 +47,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let statusButton = statusItem.button {
-            statusButton.image = NSImage(named: EventHandler.shared.isLocked ? "keyboard.locked" : "keyboard.unlocked")
+            let imageName = EventHandler.shared.isLocked ? "keyboard.locked" : "keyboard.unlocked"
+            if let image = NSImage(named: imageName) {
+                image.isTemplate = true
+                statusButton.image = image
+            }
             statusButton.image?.accessibilityDescription = Bundle.applicationName
             statusButton.sendAction(on: [.leftMouseUp, .rightMouseUp])
             statusButton.target = self
@@ -58,7 +62,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         EventHandler.shared.$isLocked
             .sink { [weak self] isLocked in
                 if let statusButton = self?.statusItem.button {
-                    statusButton.image = NSImage(named: isLocked ? "keyboard.locked" : "keyboard.unlocked")
+                    let imageName = isLocked ? "keyboard.locked" : "keyboard.unlocked"
+                    if let image = NSImage(named: imageName) {
+                        image.isTemplate = true
+                        statusButton.image = image
+                    }
                 }
             }
             .store(in: &cancellables)
