@@ -10,7 +10,7 @@ jobs:
       - name: Switch xcode to latest-stable
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 26.0.1
+          xcode-version: latest-stable
       - uses: mxcl/xcodebuild@v3
         with:
           code-sign-certificate: ${{ secrets.CERTIFICATE_BASE64 }}
@@ -19,6 +19,7 @@ jobs:
           action: none
           verbosity: xcpretty
           upload-logs: always
+          warnings-as-errors: true
           configuration: release
       - name: Setup Ruby and fastlane
         uses: ruby/setup-ruby@v1
