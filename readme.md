@@ -9,6 +9,7 @@ A macOS menu bar app that locks your keyboard to prevent unwanted inputs while e
 ## Features
 
 - **Keyboard Lock**: Prevents unwanted inputs, including media keys and the Power button
+- **Hot Corner Toggle**: Quickly lock/unlock by moving the mouse to the top-right corner of the screen
 - **Fun Effects**: Configurable effects including confetti animations, spoken key names, and words starting with the pressed key
 - **Non-Intrusive**: No visible window - continue watching videos or reading webpages normally
 - **Menu Bar App**: Clean interface accessible from the menu bar with global shortcut toggle
