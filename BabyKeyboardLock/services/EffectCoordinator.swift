@@ -83,10 +83,20 @@ class EffectCoordinator {
             return String(describing: KeyCode(rawValue: CGKeyCode(keyCode))!)
         }
 
-        return Sauce.shared.character(
-            for: Int(event.getIntegerValueField(.keyboardEventKeycode)),
-            cocoaModifiers: event.flags.toNSEventModifierFlags
-        )
+        // Sauce uses TIS APIs which must be called from the main thread
+        // The event tap callback runs on a background thread, so we need to dispatch synchronously
+        let keyCodeInt = Int(event.getIntegerValueField(.keyboardEventKeycode))
+        let modifiers = event.flags.toNSEventModifierFlags
+        
+        var result: String?
+        if Thread.isMainThread {
+            result = Sauce.shared.character(for: keyCodeInt, cocoaModifiers: modifiers)
+        } else {
+            DispatchQueue.main.sync {
+                result = Sauce.shared.character(for: keyCodeInt, cocoaModifiers: modifiers)
+            }
+        }
+        return result
     }
 }
 
