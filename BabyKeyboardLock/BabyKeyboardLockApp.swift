@@ -40,6 +40,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var popover: NSPopover!
     private var cancellables = Set<AnyCancellable>()
     private var cursorOverlayService: CursorOverlayService?
+    private var didScheduleStatusItemRefresh = false
     @MainActor func applicationDidFinishLaunching(_ notification: Notification) {
 //        NSApplication.shared.setActivationPolicy(.regular)
 //        NSApplication.shared.activate(ignoringOtherApps: true)
@@ -47,27 +48,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let statusButton = statusItem.button {
-            let imageName = EventHandler.shared.isLocked ? "keyboard.locked" : "keyboard.unlocked"
-            if let image = NSImage(named: imageName) {
-                image.isTemplate = true
-                statusButton.image = image
-            }
+            updateStatusItemIcon(isLocked: EventHandler.shared.isLocked)
             statusButton.image?.accessibilityDescription = Bundle.applicationName
             statusButton.sendAction(on: [.leftMouseUp, .rightMouseUp])
             statusButton.target = self
             statusButton.action = #selector(handleStatusBarClick)
         }
+        scheduleStatusItemRefresh()
 
         // Add observer for isLocked changes
         EventHandler.shared.$isLocked
             .sink { [weak self] isLocked in
-                if let statusButton = self?.statusItem.button {
-                    let imageName = isLocked ? "keyboard.locked" : "keyboard.unlocked"
-                    if let image = NSImage(named: imageName) {
-                        image.isTemplate = true
-                        statusButton.image = image
-                    }
-                }
+                self?.updateStatusItemIcon(isLocked: isLocked)
             }
             .store(in: &cancellables)
 
@@ -97,6 +89,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ aNotification: Notification) {
         EventHandler.shared.stop()
         debugLog("-------- applicationWillTerminate --------")
+    }
+
+    private func updateStatusItemIcon(isLocked: Bool) {
+        guard let statusButton = statusItem.button else { return }
+        let imageName = isLocked ? "keyboard.locked" : "keyboard.unlocked"
+
+        let image = NSImage(named: imageName)
+            ?? NSImage(systemSymbolName: imageName, accessibilityDescription: Bundle.applicationName)
+
+        if let image {
+            image.isTemplate = true
+            statusButton.image = image
+            statusButton.imageScaling = .scaleProportionallyDown
+            statusItem.length = NSStatusItem.squareLength
+            statusButton.title = ""
+        } else {
+            // Fallback to keep the status item visible if the image fails to load.
+            statusButton.title = "BK"
+            statusItem.length = NSStatusItem.variableLength
+        }
+    }
+
+    private func scheduleStatusItemRefresh() {
+        guard !didScheduleStatusItemRefresh else { return }
+        didScheduleStatusItemRefresh = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self else { return }
+            self.didScheduleStatusItemRefresh = false
+            self.updateStatusItemIcon(isLocked: EventHandler.shared.isLocked)
+        }
     }
 
     func showPopover(){
