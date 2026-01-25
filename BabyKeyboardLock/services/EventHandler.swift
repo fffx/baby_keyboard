@@ -193,6 +193,7 @@ class EventHandler: ObservableObject {
     func stop(){
         isLocked = false
         lockedViaHotCorner = false
+        eventLoopStarted = false
 
         // Cancel any pending permission checks to prevent memory leaks
         permissionCheckWorkItem?.cancel()
@@ -235,11 +236,14 @@ class EventHandler: ObservableObject {
         if(!accessibilityPermissionGranted) { return }
         lock.lock()
         defer { lock.unlock() }
+        if eventLoopStarted { return }
+        eventLoopStarted = true
 
-        setupEventTap() // Setup event tap to capture key events
-        DispatchQueue.main.async {
-            self.eventLoopStarted = true
-            self.eventTapManager.runLoop()  // Start the run loop to handle events in a background thread
+        // Run the event tap loop off the main thread to avoid UI stalls.
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            guard let self else { return }
+            self.setupEventTap() // Setup event tap to capture key events
+            self.eventTapManager.runLoop()  // Start the run loop on a background thread
         }
     }
 

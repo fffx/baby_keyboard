@@ -31,6 +31,7 @@ protocol EventTapManaging {
 
 /// Default implementation for production code
 class DefaultEventTapManager: EventTapManaging {
+    private var currentRunLoop: CFRunLoop?
     func createEventTap(
         tap: CGEventTapLocation,
         place: CGEventTapPlacement,
@@ -70,11 +71,14 @@ class DefaultEventTapManager: EventTapManaging {
     }
 
     func runLoop() {
+        currentRunLoop = CFRunLoopGetCurrent()
         CFRunLoopRun()
     }
 
     func stopRunLoop() {
-        CFRunLoopStop(CFRunLoopGetCurrent())
+        if let currentRunLoop {
+            CFRunLoopStop(currentRunLoop)
+        }
     }
 }
 
@@ -85,6 +89,7 @@ class MockEventTapManager: EventTapManaging {
     var isTapEnabledResult = true
     var runLoopCalled = false
     var stopRunLoopCalled = false
+    var currentRunLoop: CFRunLoop?
 
     func createEventTap(
         tap: CGEventTapLocation,
