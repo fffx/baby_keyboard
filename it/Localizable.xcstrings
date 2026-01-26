@@ -1,0 +1,16 @@
+"CrowdinId:2" = "";
+"accessibility_permission_grant_hint %@" = "Si prega di concedere i permessi di accessibilità a [%@] in:
+[Impostazioni di sistema]
+    > [Secuerity & Privacy] 
+        > [Accessibility] (scorri giù)";
+"Effect" = "Effetto";
+"Firework window" = "Finestra Fuochi D\'Artificio";
+"Lock" = "Blocca";
+"Lock Keyboard" = "Blocca Tastiera";
+"Lock keyboard on launch" = "Blocca tastiera all\'avvio";
+"LockEffect.confettiCannon" = "Confetti";
+"LockEffect.none" = "Nessuno";
+"LockEffect.speakAKeyWord" = "Parla una parola";
+"LockEffect.speakTheKey" = "Pronuncia il tasto premuto";
+"Quit %@" = "Esce Da %@";
+"unlock_shortcut_hint" = "È possibile utilizzare la scorciatoia Ctrl + Opzione + U per attivare o disattivare il blocco tastiera";

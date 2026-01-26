@@ -1,0 +1,16 @@
+"CrowdinId:2" = "";
+"accessibility_permission_grant_hint %@" = "Please grant accessibility permissions to [%@] in:
+[System Settings]
+    > [Secuerity & Privacy] 
+        > [Accessibility] (scroll down)";
+"Effect" = "Effect";
+"Firework window" = "Firework Window";
+"Lock" = "Lock";
+"Lock Keyboard" = "Lock Keyboard";
+"Lock keyboard on launch" = "Lock keyboard on launch";
+"LockEffect.confettiCannon" = "Confetti";
+"LockEffect.none" = "None";
+"LockEffect.speakAKeyWord" = "Speak a word";
+"LockEffect.speakTheKey" = "Speak the pressed key";
+"Quit %@" = "Quit %@";
+"unlock_shortcut_hint" = "You can use shortcut Ctrl + Option + U to toggle keyboard lock";

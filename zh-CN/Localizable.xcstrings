@@ -1,0 +1,16 @@
+"CrowdinId:2" = "";
+"accessibility_permission_grant_hint %@" = "请在以下位置为 [%@] 授予辅助功能权限：
+[系统设置]
+　　> [安全性与隐私]
+　　　　> [辅助功能]（向下滚动）";
+"Effect" = "效果";
+"Firework window" = "Firework Window";
+"Lock" = "锁";
+"Lock Keyboard" = "锁住键盘";
+"Lock keyboard on launch" = "启动时即锁住键盘";
+"LockEffect.confettiCannon" = "五彩纸屑";
+"LockEffect.none" = "无效果";
+"LockEffect.speakAKeyWord" = "读单词";
+"LockEffect.speakTheKey" = "读键盘";
+"Quit %@" = "退出 %@";
+"unlock_shortcut_hint" = "你可以用快捷键 Ctrl + Option + U 来切换键盘锁定";

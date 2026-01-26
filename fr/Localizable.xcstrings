@@ -1,0 +1,16 @@
+"CrowdinId:2" = "";
+"accessibility_permission_grant_hint %@" = "Veuillez accorder les permissions d\'accessibilité à [%@] dans :
+[Paramètres Système]
+    > [Sécurité & Confidentialité] 
+        > [Accessibility] (Défiler vers le bas)";
+"Effect" = "Effet";
+"Firework window" = "Fenêtre de feu d\'artifice";
+"Lock" = "Verrouiller";
+"Lock Keyboard" = "Verrouiller le clavier";
+"Lock keyboard on launch" = "Verrouiller le clavier au lancement";
+"LockEffect.confettiCannon" = "Confetti";
+"LockEffect.none" = "Aucun";
+"LockEffect.speakAKeyWord" = "Parler un mot";
+"LockEffect.speakTheKey" = "Parler la touche pressée";
+"Quit %@" = "Quitter %@";
+"unlock_shortcut_hint" = "Vous pouvez utiliser le raccourci Ctrl + Option + U pour activer/désactiver le verrouillage du clavier";

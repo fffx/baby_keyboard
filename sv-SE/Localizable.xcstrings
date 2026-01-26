@@ -1,0 +1,16 @@
+"CrowdinId:2" = "";
+"accessibility_permission_grant_hint %@" = "Vänligen ge åtkomstbehörighet till [%@] i:
+[Systeminställningar]
+    > [Sekretess och sekretess] 
+        > [Accessibility] (rulla ner)";
+"Effect" = "Effekt";
+"Firework window" = "Fyrverkeri fönster";
+"Lock" = "Lås";
+"Lock Keyboard" = "Lås tangentbord";
+"Lock keyboard on launch" = "Lås tangentbord vid uppstart";
+"LockEffect.confettiCannon" = "Confetti";
+"LockEffect.none" = "Ingen";
+"LockEffect.speakAKeyWord" = "Tala ett ord";
+"LockEffect.speakTheKey" = "Tala den tryckta tangenten";
+"Quit %@" = "Avsluta %@";
+"unlock_shortcut_hint" = "Du kan använda kortkommandot Ctrl + Alternativ + U för att växla tangentbordslås";

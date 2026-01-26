@@ -1,0 +1,16 @@
+"CrowdinId:2" = "";
+"accessibility_permission_grant_hint %@" = "Myönnä esteettömyysoikeudet kohteeseen [%@] kohteessa:
+[Järjestelmän asetukset]
+    > [Secuerity & Privacy] 
+        > [Accessibility] (vieritä alas)";
+"Effect" = "Efekti";
+"Firework window" = "Ilotulitus Ikkuna";
+"Lock" = "Lukitse";
+"Lock Keyboard" = "Lukitse Näppäimistö";
+"Lock keyboard on launch" = "Lukitse näppäimistö käynnistettäessä";
+"LockEffect.confettiCannon" = "Confetti";
+"LockEffect.none" = "Ei Mitään";
+"LockEffect.speakAKeyWord" = "Puhu sana";
+"LockEffect.speakTheKey" = "Puhu painettu avain";
+"Quit %@" = "Lopeta %@";
+"unlock_shortcut_hint" = "Voit ottaa näppäimistön lukituksen käyttöön pikakuvakkeella Ctrl + Valinta + U";
