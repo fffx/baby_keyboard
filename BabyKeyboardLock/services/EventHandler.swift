@@ -43,6 +43,11 @@ class EventHandler: ObservableObject {
             updateHotCornerService()
         }
     }
+    @Published var patatapModeEnabled: Bool = UserDefaults.standard.bool(forKey: "patatapModeEnabled") {
+        didSet {
+            UserDefaults.standard.set(patatapModeEnabled, forKey: "patatapModeEnabled")
+        }
+    }
 
     static let shared = EventHandler()
 
@@ -350,6 +355,9 @@ class EventHandler: ObservableObject {
         }
 
         if isLocked {
+            if lockedKeyPassthroughPolicy.allows(event: event, keyCode: keyCode) {
+                return Unmanaged.passUnretained(event)
+            }
 
             if type != .keyUp { return nil }
 
@@ -363,6 +371,10 @@ class EventHandler: ObservableObject {
         } else {
             return Unmanaged.passUnretained(event)
         }
+    }
+
+    private var lockedKeyPassthroughPolicy: LockedKeyPassthroughPolicy {
+        patatapModeEnabled ? .patatap : .disabled
     }
 
     func requestAccessibilityPermissions() -> Bool {

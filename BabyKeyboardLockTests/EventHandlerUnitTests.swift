@@ -1,8 +1,13 @@
 @testable import BabyKeyboardLock
+import CoreGraphics
 import Testing
 import SwiftUI
 
 struct EventHandlerUnitTests {
+    private var testProxy: CGEventTapProxy {
+        CGEventTapProxy(bitPattern: 1)!
+    }
+
     func setUp() {
         // Clear AppStorage values before each test
         UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
@@ -48,6 +53,12 @@ struct EventHandlerUnitTests {
         let handler = EventHandler(isLocked: false)
         handler.selectedLockEffect = .confettiConnon
         #expect(handler.selectedLockEffect == .confettiConnon)
+    }
+
+    @Test func testPatatapModeDefaultsToDisabled() async throws {
+        setUp()
+        let handler = EventHandler(isLocked: false)
+        #expect(!handler.patatapModeEnabled)
     }
 
     // MARK: - Event Tap Tests
@@ -127,5 +138,53 @@ struct EventHandlerUnitTests {
         // Verify we got a mock manager (not the default one)
         let manager = handler.testEventTapManager
         #expect(manager is MockEventTapManager)
+    }
+
+    @Test func testLockedKeyboardHonorsPatatapPassthroughPolicy() async throws {
+        setUp()
+        let handler = EventHandler(isLocked: true)
+        handler.patatapModeEnabled = true
+
+        let keyDown = makeKeyboardEvent(keyCode: KeyCodeString.a, keyDown: true)
+        let keyDownResult = handler.handleKeyEvent(proxy: testProxy, type: .keyDown, event: keyDown)
+        #expect(keyDownResult != nil)
+    }
+
+    @Test func testLockedKeyboardBlocksLettersWhenPatatapModeIsDisabled() async throws {
+        setUp()
+        let handler = EventHandler(isLocked: true)
+
+        let event = makeKeyboardEvent(keyCode: KeyCodeString.a, keyDown: true)
+        let result = handler.handleKeyEvent(proxy: testProxy, type: .keyDown, event: event)
+
+        #expect(result == nil)
+    }
+
+    @Test func testUnlockShortcutStillTogglesWhileLocked() async throws {
+        setUp()
+        let mockManager = MockEventTapManager()
+        let handler = EventHandler(isLocked: true, eventTapManager: mockManager)
+        let event = makeKeyboardEvent(
+            keyCode: KeyCodeString.u,
+            keyDown: true,
+            flags: [.maskControl, .maskAlternate]
+        )
+
+        let result = handler.handleKeyEvent(proxy: testProxy, type: .keyDown, event: event)
+
+        #expect(result == nil)
+        #expect(!handler.isLocked)
+        #expect(mockManager.stopRunLoopCalled)
+    }
+
+    private func makeKeyboardEvent(
+        keyCode: UInt16,
+        keyDown: Bool,
+        flags: CGEventFlags = []
+    ) -> CGEvent {
+        let event = CGEvent(keyboardEventSource: nil, virtualKey: CGKeyCode(keyCode), keyDown: keyDown)!
+        event.flags = flags
+        event.setIntegerValueField(.keyboardEventKeyboardType, value: 40)
+        return event
     }
 }

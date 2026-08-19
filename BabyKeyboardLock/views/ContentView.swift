@@ -137,13 +137,18 @@ struct ContentView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, -10)
 
+            Toggle(isOn: $eventHandler.patatapModeEnabled) {
+                Text("Patatap mode")
+            }
+            .toggleStyle(CheckboxToggleStyle())
+
             Spacer()
             Text("unlock_shortcut_hint")
                 .font(.footnote)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding()
-        .frame(width: 300, height: 400)
+        .frame(width: 300, height: 430)
         .onChange(of: eventHandler.isLocked) { newVal in
             showOrCloseAnimationWindow(isLocked: newVal)
         }.onReceive(eventHandler.$isLocked) { newVal in
