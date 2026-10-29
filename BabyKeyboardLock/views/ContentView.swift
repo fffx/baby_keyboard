@@ -8,8 +8,6 @@
 import SwiftUI
 import AppKit
 
-
-
 struct HoverableMenuStyle: MenuStyle {
     @State private var isHovered = false
 

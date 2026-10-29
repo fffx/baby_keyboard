@@ -136,9 +136,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             adjustedBounds.origin.y -= menuBarHeight * 0.1
             popover.show(relativeTo: adjustedBounds, of: button, preferredEdge: .minY)
 
+            NSApp.activate(ignoringOtherApps: true)
             // Make the popover's window active
             if let window = popover.contentViewController?.view.window {
-                window.makeKey()
+                window.makeKeyAndOrderFront(nil)
             }
 
             startEventMonitor()
