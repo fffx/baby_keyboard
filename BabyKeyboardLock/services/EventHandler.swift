@@ -17,6 +17,7 @@ class EventHandler: ObservableObject {
     private let throttleManager: ThrottleManager
     private let eventTapManager: EventTapManaging
     private let capsLockManager: CapsLockManaging
+    private let controllerLockManager: ControllerLockManaging
     private var savedCapsLockState: Bool = false
     private var eventLoopStarted = false
     private var eventTap : CFMachPort?
@@ -81,7 +82,8 @@ class EventHandler: ObservableObject {
          effectCoordinator: EffectCoordinator? = nil,
          throttleManager: ThrottleManager = ThrottleManager(),
          eventTapManager: EventTapManaging? = nil,
-         capsLockManager: CapsLockManaging? = nil) {
+         capsLockManager: CapsLockManaging? = nil,
+         controllerLockManager: ControllerLockManaging? = nil) {
         // Initialize non-lazy stored properties first
         self.throttleManager = throttleManager
         self.hotCornerService = HotCornerService()
@@ -93,6 +95,7 @@ class EventHandler: ObservableObject {
         // Use Mocks in tests, Defaults in production
         self.eventTapManager = eventTapManager ?? (isTestMode ? MockEventTapManager() : DefaultEventTapManager())
         self.capsLockManager = capsLockManager ?? (isTestMode ? MockCapsLockManager() : DefaultCapsLockManager())
+        self.controllerLockManager = controllerLockManager ?? (isTestMode ? MockControllerLockManager() : DefaultControllerLockManager())
         self.isLocked = isLocked
 
         // Skip accessibility check if running tests or previews
@@ -212,6 +215,7 @@ class EventHandler: ObservableObject {
 
         eventTapManager.stopRunLoop()
         hotCornerService.stop()
+        controllerLockManager.unlockControllers()
     }
 
     deinit {
@@ -225,6 +229,7 @@ class EventHandler: ObservableObject {
         }
         eventTap = nil
         hotCornerService.stop()
+        controllerLockManager.unlockControllers()
     }
 
     private func updateHotCornerService() {
@@ -247,6 +252,7 @@ class EventHandler: ObservableObject {
         if savedCapsLockState {
             capsLockManager.setCapsLockState(false)
         }
+        controllerLockManager.lockControllers()
     }
 
     private func onUnlocked() {
@@ -254,6 +260,7 @@ class EventHandler: ObservableObject {
             capsLockManager.setCapsLockState(true)
             savedCapsLockState = false
         }
+        controllerLockManager.unlockControllers()
     }
 
     func startEventLoop() {
@@ -451,6 +458,11 @@ class EventHandler: ObservableObject {
     /// Exposes the caps lock manager for testing purposes
     var testCapsLockManager: CapsLockManaging {
         return capsLockManager
+    }
+
+    /// Exposes the controller lock manager for testing purposes
+    var testControllerLockManager: ControllerLockManaging {
+        return controllerLockManager
     }
 
     /// Exposes the saved caps lock state for testing purposes

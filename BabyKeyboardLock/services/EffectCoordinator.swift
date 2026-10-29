@@ -41,15 +41,19 @@ class EffectCoordinator {
     }
 
     func handle(event: CGEvent, eventType: CGEventType, selectedLockEffect: LockEffect) -> String {
-        debugLog("speaking handle ------- \(selectedLockEffect)")
         guard let str = getString(event: event, eventType: eventType) else { return "" }
-        debugLog("get key name ------- \(str)")
+        return handle(keyString: str, selectedLockEffect: selectedLockEffect)
+    }
+
+    func handle(keyString: String, selectedLockEffect: LockEffect) -> String {
+        debugLog("speaking handle ------- \(selectedLockEffect)")
+        debugLog("get key name ------- \(keyString)")
 
         switch selectedLockEffect {
         case .speakTheKey:
-            speechService.speak(str)
+            speechService.speak(keyString)
         case .speakAKeyWord:
-            let randomWord = wordService.getRandomWord(forKey: str)
+            let randomWord = wordService.getRandomWord(forKey: keyString)
             speechService.speak(randomWord)
 
             // If translation is enabled, speak the translation after a short delay
@@ -74,7 +78,7 @@ class EffectCoordinator {
             break
         }
 
-        return str
+        return keyString
     }
 
     func getString(event: CGEvent, eventType: CGEventType) -> String? {

@@ -198,4 +198,48 @@ struct EventHandlerUnitTests {
         let result = handler.handleKeyEvent(type: .flagsChanged, event: shiftEvent)
         #expect(result == nil, "Modifier key event should be swallowed when locked")
     }
+
+    // MARK: - Controller Lock Tests
+
+    @Test func testMockControllerLockManagerIsUsedInTests() async throws {
+        setUp()
+        let handler = EventHandler(isLocked: false)
+        let manager = handler.testControllerLockManager
+        #expect(manager is MockControllerLockManager)
+    }
+
+    @Test func testControllersLockedWhenAppLocked() async throws {
+        setUp()
+        let mockController = MockControllerLockManager()
+        let handler = EventHandler(isLocked: false, controllerLockManager: mockController)
+        #expect(!mockController.isLocked)
+
+        handler.isLocked = true
+        #expect(mockController.lockControllersCalled)
+        #expect(mockController.isLocked)
+    }
+
+    @Test func testControllersUnlockedWhenAppUnlocked() async throws {
+        setUp()
+        let mockController = MockControllerLockManager()
+        let handler = EventHandler(isLocked: true, controllerLockManager: mockController)
+        handler.testOnLocked()
+        #expect(mockController.isLocked)
+
+        handler.isLocked = false
+        #expect(mockController.unlockControllersCalled)
+        #expect(!mockController.isLocked)
+    }
+
+    @Test func testControllerLockReleasedOnStop() async throws {
+        setUp()
+        let mockController = MockControllerLockManager()
+        let handler = EventHandler(isLocked: false, controllerLockManager: mockController)
+        handler.isLocked = true
+        #expect(mockController.isLocked)
+
+        handler.stop()
+        #expect(mockController.unlockControllersCalled)
+        #expect(!mockController.isLocked)
+    }
 }
