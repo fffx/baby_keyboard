@@ -17,6 +17,7 @@ enum KeyCode: CGKeyCode, CaseIterable, Identifiable {
     case escape = 0x35
     case tab = 0x30
     case enter = 0x24
+    case capsLock = 0x39
 
     var id: Self {
         return self

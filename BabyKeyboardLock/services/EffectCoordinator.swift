@@ -80,7 +80,11 @@ class EffectCoordinator {
     func getString(event: CGEvent, eventType: CGEventType) -> String? {
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
         if KeyCode.allCases.contains(where: { $0.rawValue == keyCode }) {
-            return String(describing: KeyCode(rawValue: CGKeyCode(keyCode))!)
+            let key = KeyCode(rawValue: CGKeyCode(keyCode))!
+            if key == .capsLock {
+                return "caps lock"
+            }
+            return String(describing: key)
         }
 
         // Sauce uses TIS APIs which must be called from the main thread

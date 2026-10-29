@@ -16,6 +16,8 @@ class EventHandler: ObservableObject {
     lazy var effectCoordinator: EffectCoordinator = EffectCoordinator()
     private let throttleManager: ThrottleManager
     private let eventTapManager: EventTapManaging
+    private let capsLockManager: CapsLockManaging
+    private var savedCapsLockState: Bool = false
     private var eventLoopStarted = false
     private var eventTap : CFMachPort?
     private var permissionCheckWorkItem: DispatchWorkItem?
@@ -32,6 +34,9 @@ class EventHandler: ObservableObject {
         didSet {
             if isLocked {
                 startEventLoop()
+                onLocked()
+            } else {
+                onUnlocked()
             }
         }
     }
@@ -75,17 +80,19 @@ class EventHandler: ObservableObject {
     init(isLocked: Bool = true,
          effectCoordinator: EffectCoordinator? = nil,
          throttleManager: ThrottleManager = ThrottleManager(),
-         eventTapManager: EventTapManaging? = nil) {
+         eventTapManager: EventTapManaging? = nil,
+         capsLockManager: CapsLockManaging? = nil) {
         // Initialize non-lazy stored properties first
         self.throttleManager = throttleManager
         self.hotCornerService = HotCornerService()
 
-        // Determine which event tap manager to use
+        // Determine which managers to use
         let isTestMode = Self.isRunningTestsOrPreview
         debugLog("EventHandler init - Test mode: \(isTestMode)")
 
-        // Use MockEventTapManager in tests, DefaultEventTapManager in production
+        // Use Mocks in tests, Defaults in production
         self.eventTapManager = eventTapManager ?? (isTestMode ? MockEventTapManager() : DefaultEventTapManager())
+        self.capsLockManager = capsLockManager ?? (isTestMode ? MockCapsLockManager() : DefaultCapsLockManager())
         self.isLocked = isLocked
 
         // Skip accessibility check if running tests or previews
@@ -99,6 +106,10 @@ class EventHandler: ObservableObject {
         // Allow dependency injection for testing while defaulting to lazy initialization
         if let effectCoordinator = effectCoordinator {
             self.effectCoordinator = effectCoordinator
+        }
+
+        if self.isLocked && !isTestMode {
+            onLocked()
         }
     }
 
@@ -231,6 +242,20 @@ class EventHandler: ObservableObject {
         }
     }
 
+    private func onLocked() {
+        savedCapsLockState = capsLockManager.getCapsLockState()
+        if savedCapsLockState {
+            capsLockManager.setCapsLockState(false)
+        }
+    }
+
+    private func onUnlocked() {
+        if savedCapsLockState {
+            capsLockManager.setCapsLockState(true)
+            savedCapsLockState = false
+        }
+    }
+
     func startEventLoop() {
         if(eventLoopStarted) { return }
         if(!accessibilityPermissionGranted) { return }
@@ -250,6 +275,7 @@ class EventHandler: ObservableObject {
     private func setupEventTap() {
         let keyboardMask: UInt32 = (1 << CGEventType.keyDown.rawValue) |
                                     (1 << CGEventType.keyUp.rawValue) |
+                                    (1 << CGEventType.flagsChanged.rawValue) |
                                     (1 << 14) // search and voice key
 
         var eventMask = CGEventMask(keyboardMask)
@@ -298,7 +324,7 @@ class EventHandler: ObservableObject {
     }
 
     func handleKeyEvent(
-        proxy: CGEventTapProxy,
+        proxy: CGEventTapProxy? = nil,
         type: CGEventType,
         event: CGEvent
     ) -> Unmanaged<CGEvent>?{
@@ -329,6 +355,33 @@ class EventHandler: ObservableObject {
         if isLocked && event.getIntegerValueField(.keyboardEventKeyboardType) == 0 {
             return nil
         }
+
+        // Handle Caps Lock & modifier keys
+        if type == .flagsChanged {
+            let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+            if keyCode == KeyCode.capsLock.rawValue {
+                if isLocked {
+                    // Prevent Caps Lock from toggling state or lighting the LED
+                    capsLockManager.setCapsLockState(false)
+
+                    // Strip AlphaShift flag from the event
+                    event.flags.remove(.maskAlphaShift)
+
+                    if !throttleManager.isThrottled() {
+                        self.lastKeyString = effectCoordinator.handle(
+                            event: event, eventType: type, selectedLockEffect: selectedLockEffect
+                        )
+                        debugLog("capsLock pressed ------- \(lastKeyString)")
+                    }
+                    return nil
+                }
+            } else if isLocked {
+                // Swallow other modifier keys while locked so they don't leak to background apps
+                return nil
+            }
+            return Unmanaged.passUnretained(event)
+        }
+
         guard type == .keyDown || type == .keyUp else {
             return Unmanaged.passUnretained(event)
         }
@@ -393,6 +446,24 @@ class EventHandler: ObservableObject {
     /// Exposes the event tap manager for testing purposes
     var testEventTapManager: EventTapManaging {
         return eventTapManager
+    }
+
+    /// Exposes the caps lock manager for testing purposes
+    var testCapsLockManager: CapsLockManaging {
+        return capsLockManager
+    }
+
+    /// Exposes the saved caps lock state for testing purposes
+    var testSavedCapsLockState: Bool {
+        return savedCapsLockState
+    }
+
+    func testOnLocked() {
+        onLocked()
+    }
+
+    func testOnUnlocked() {
+        onUnlocked()
     }
 
     /// Allows tests to manually trigger setupEventTap without starting the run loop

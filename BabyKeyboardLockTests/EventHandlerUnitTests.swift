@@ -128,4 +128,74 @@ struct EventHandlerUnitTests {
         let manager = handler.testEventTapManager
         #expect(manager is MockEventTapManager)
     }
+
+    @Test func testMockCapsLockManagerIsUsedInTests() async throws {
+        setUp()
+        let handler = EventHandler(isLocked: false)
+        let manager = handler.testCapsLockManager
+        #expect(manager is MockCapsLockManager)
+    }
+
+    @Test func testCapsLockStateSavedAndRestoredOnLockToggle() async throws {
+        setUp()
+        let mockCapsLock = MockCapsLockManager()
+        mockCapsLock.capsLockState = true
+
+        let handler = EventHandler(isLocked: false, capsLockManager: mockCapsLock)
+        #expect(!handler.isLocked)
+
+        // Lock handler
+        handler.isLocked = true
+        #expect(mockCapsLock.getCapsLockStateCalled)
+        #expect(handler.testSavedCapsLockState == true)
+        #expect(mockCapsLock.capsLockState == false)
+
+        // Unlock handler
+        handler.isLocked = false
+        #expect(mockCapsLock.capsLockState == true)
+    }
+
+    @Test func testCapsLockKeyPressedWhileLockedSwallowsEventAndForcesCapsLockOff() async throws {
+        setUp()
+        let mockCapsLock = MockCapsLockManager()
+        let handler = EventHandler(isLocked: true, capsLockManager: mockCapsLock)
+
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: KeyCode.capsLock.rawValue, keyDown: false) else {
+            Issue.record("Failed to create CGEvent")
+            return
+        }
+        event.flags = [.maskAlphaShift]
+
+        let result = handler.handleKeyEvent(type: .flagsChanged, event: event)
+        #expect(result == nil, "Caps Lock event should be swallowed when locked")
+        #expect(mockCapsLock.setCapsLockStateCalled, "Caps lock should be forced off")
+        #expect(mockCapsLock.capsLockState == false)
+    }
+
+    @Test func testCapsLockKeyPressedWhileUnlockedPassesThrough() async throws {
+        setUp()
+        let mockCapsLock = MockCapsLockManager()
+        let handler = EventHandler(isLocked: false, capsLockManager: mockCapsLock)
+
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: KeyCode.capsLock.rawValue, keyDown: false) else {
+            Issue.record("Failed to create CGEvent")
+            return
+        }
+
+        let result = handler.handleKeyEvent(type: .flagsChanged, event: event)
+        #expect(result != nil, "Caps Lock event should pass through when unlocked")
+    }
+
+    @Test func testModifierKeysSwallowedWhileLocked() async throws {
+        setUp()
+        let handler = EventHandler(isLocked: true)
+
+        guard let shiftEvent = CGEvent(keyboardEventSource: nil, virtualKey: 0x38, keyDown: false) else {
+            Issue.record("Failed to create CGEvent")
+            return
+        }
+
+        let result = handler.handleKeyEvent(type: .flagsChanged, event: shiftEvent)
+        #expect(result == nil, "Modifier key event should be swallowed when locked")
+    }
 }
