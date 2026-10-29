@@ -26,6 +26,7 @@ struct BabyKeyboardLockApp: App {
     }
 
     init() {
+        // Apply this before the menu bar UI is created so login launches start locked.
         eventHandler.setLocked(isLocked: lockKeyboardOnLaunch)
         eventHandler.selectedLockEffect = selectedLockEffect
         eventHandler.selectedTranslationLanguage = selectedTranslationLanguage
@@ -35,12 +36,14 @@ struct BabyKeyboardLockApp: App {
 // hide from dock
 // https://stackoverflow.com/questions/70697737/hide-app-icon-from-macos-menubar-on-launch
 // https://stackoverflow.com/questions/68884499/make-swiftui-app-appear-in-the-macos-dock
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     var statusItem: NSStatusItem!
     private var popover: NSPopover!
     private var cancellables = Set<AnyCancellable>()
     private var cursorOverlayService: CursorOverlayService?
     private var didScheduleStatusItemRefresh = false
+    private(set) var eventMonitor: Any?
+
     @MainActor func applicationDidFinishLaunching(_ notification: Notification) {
 //        NSApplication.shared.setActivationPolicy(.regular)
 //        NSApplication.shared.activate(ignoringOtherApps: true)
@@ -67,6 +70,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // self.popover.contentSize = NSSize(width: 300, height: 400)
         // self.popover.appearance = NSAppearance(named: .accessibilityHighContrastVibrantLight)
         self.popover.behavior = .transient
+        self.popover.delegate = self
         let rootView = ContentView(eventHandler: EventHandler.shared)
         let nSHostingController = NSHostingController(rootView: rootView)
 
@@ -87,6 +91,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
+        stopEventMonitor()
         EventHandler.shared.stop()
         debugLog("-------- applicationWillTerminate --------")
     }
@@ -115,13 +120,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard !didScheduleStatusItemRefresh else { return }
         didScheduleStatusItemRefresh = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            guard let self else { return }
+            guard let self = self else { return }
             self.didScheduleStatusItemRefresh = false
             self.updateStatusItemIcon(isLocked: EventHandler.shared.isLocked)
         }
     }
 
-    func showPopover(){
+    func showPopover() {
         if let button = statusItem.button {
             // Get the actual menu bar height
             let menuBarHeight = NSStatusBar.system.thickness
@@ -135,6 +140,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if let window = popover.contentViewController?.view.window {
                 window.makeKey()
             }
+
+            startEventMonitor()
         }
     }
 
@@ -142,6 +149,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if popover.isShown {
             self.popover.performClose(nil)
         }
+        stopEventMonitor()
+    }
+
+    private func startEventMonitor() {
+        guard eventMonitor == nil else { return }
+        eventMonitor = NSEvent.addGlobalMonitorForEvents(
+            matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            if self.popover.isShown {
+                self.hidePopover()
+            }
+        }
+    }
+
+    private func stopEventMonitor() {
+        if let monitor = eventMonitor {
+            NSEvent.removeMonitor(monitor)
+            eventMonitor = nil
+        }
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+        stopEventMonitor()
     }
 
     @objc func handleStatusBarClick(_ sender: NSStatusBarButton? = nil) {
@@ -154,6 +185,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         switch event.type {
         case .leftMouseUp:
+            if popover.isShown {
+                hidePopover()
+            }
             EventHandler.shared.setLocked(isLocked: !EventHandler.shared.isLocked)
         case .rightMouseUp:
             if popover.isShown {

@@ -90,9 +90,27 @@ struct BabyKeyboardLockAppTests {
         // Note: We can't reliably test isShown in unit tests without full UI
     }
 
+    @MainActor
+    @Test func testPopoverEventMonitorLifecycle() async throws {
+        let delegate = AppDelegate()
+        let notification = Notification(name: NSApplication.didFinishLaunchingNotification)
+        delegate.applicationDidFinishLaunching(notification)
+
+        // Wait for initialization and initial popover presentation (scheduled after 500ms)
+        try await Task.sleep(for: .milliseconds(600))
+
+        // Hiding the popover must remove the outside-click monitor
+        delegate.hidePopover()
+        #expect(delegate.eventMonitor == nil, "Event monitor should be nil after popover is hidden")
+
+        // Showing the popover and then closing it via hidePopover or delegate callback clears monitor
+        delegate.showPopover()
+        delegate.hidePopover()
+        #expect(delegate.eventMonitor == nil, "Event monitor should be nil after hiding popover")
+    }
+
     @Test func testWindowConstants() async throws {
         #expect(AnimationWindowID == "animationTransparentWindow", "Animation window ID should match")
         #expect(MainWindowID == "main", "Main window ID should match")
     }
 }
-

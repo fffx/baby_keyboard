@@ -33,6 +33,7 @@ struct ContentView: View {
     @ObservedObject var eventHandler: EventHandler = EventHandler.shared
 
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
+    @State private var launchAtLogin = false
 
     @State var hoveringMoreButton: Bool = false
     var body: some View {
@@ -125,6 +126,18 @@ struct ContentView: View {
             .toggleStyle(CheckboxToggleStyle())
             // .frame(maxWidth: .infinity, alignment: .leading)
 
+            Toggle(isOn: $launchAtLogin) {
+                Text("Launch on startup")
+            }
+            .toggleStyle(CheckboxToggleStyle())
+            .disabled(!LaunchAtLoginService.isSupported)
+            .onChange(of: launchAtLogin) { newValue in
+                let isEnabled = LaunchAtLoginService.setEnabled(newValue)
+                if isEnabled != newValue {
+                    launchAtLogin = isEnabled
+                }
+            }
+
             Toggle(isOn: $eventHandler.hotCornerEnabled) {
                 Text("Lock with top-right hotcorner")
             }
@@ -149,6 +162,7 @@ struct ContentView: View {
         }.onReceive(eventHandler.$isLocked) { newVal in
             showOrCloseAnimationWindow(isLocked: newVal)
         }.onAppear() {
+            launchAtLogin = LaunchAtLoginService.isEnabled
             debugLog("onAppear --- ")
         }
     }
