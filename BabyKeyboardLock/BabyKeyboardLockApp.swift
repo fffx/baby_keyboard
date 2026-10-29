@@ -107,6 +107,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
 
     let keyPressAnimationKey = "keyPressShakeAnimation"
+    private(set) var recentKeyPressTimes: [CFTimeInterval] = []
+
+    func shakeIntensity(pressCount: Int) -> Double {
+        let extra = max(0, pressCount - 1)
+        // Starts at 1.0 for a single press, ramps up to 2.8x with rapid typing
+        return 1.0 + min(Double(extra) * 0.3, 1.8)
+    }
+
+    func shakeDuration(pressCount: Int) -> CFTimeInterval {
+        let extra = max(0, pressCount - 1)
+        // Starts at 0.25s for a single press, snappier down to 0.14s as speed increases
+        return max(0.14, 0.25 - Double(extra) * 0.02)
+    }
+
+    func resetKeyPressHistory() {
+        recentKeyPressTimes.removeAll()
+    }
 
     private func updateStatusItemIcon(isLocked: Bool) {
         guard let statusButton = statusItem.button else { return }
@@ -130,6 +147,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
 
         if !isLocked {
             statusButton.layer?.removeAnimation(forKey: keyPressAnimationKey)
+            recentKeyPressTimes.removeAll()
         }
     }
 
@@ -137,6 +155,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         guard EventHandler.shared.isLocked,
               let statusButton = statusItem?.button,
               let layer = statusButton.layer else { return }
+
+        let now = CACurrentMediaTime()
+        // Prune keypress timestamps older than 1.0 second
+        recentKeyPressTimes = recentKeyPressTimes.filter { now - $0 < 1.0 }
+        recentKeyPressTimes.append(now)
 
         // If this is an auto-repeat event and the animation is already running,
         // keep the current animation playing smoothly to prevent stuttering.
@@ -146,10 +169,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
 
         layer.removeAnimation(forKey: keyPressAnimationKey)
 
+        let intensity = shakeIntensity(pressCount: recentKeyPressTimes.count)
+        let duration = shakeDuration(pressCount: recentKeyPressTimes.count)
+
         let shake = CAKeyframeAnimation(keyPath: "transform.translation.x")
         shake.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        shake.duration = 0.25
-        shake.values = [0, -3.0, 3.0, -2.5, 2.5, -1.0, 1.0, 0]
+        shake.duration = duration
+        let baseValues: [Double] = [0, -3.0, 3.0, -2.5, 2.5, -1.0, 1.0, 0]
+        shake.values = baseValues.map { $0 * intensity }
         shake.keyTimes = [0.0, 0.15, 0.3, 0.5, 0.7, 0.85, 1.0]
 
         layer.add(shake, forKey: keyPressAnimationKey)

@@ -202,4 +202,69 @@ struct BabyKeyboardLockAppTests {
 
         #expect(layer.animation(forKey: "keyPressShakeAnimation") == nil, "Animation should be removed when unlocked")
     }
+
+    @MainActor
+    @Test func testShakeIntensityAndDurationScalesWithPressSpeed() async throws {
+        let delegate = AppDelegate()
+        let notification = Notification(name: NSApplication.didFinishLaunchingNotification)
+
+        EventHandler.shared.isLocked = true
+        delegate.applicationDidFinishLaunching(notification)
+        try await Task.sleep(for: .milliseconds(100))
+
+        guard let button = delegate.statusItem?.button,
+              let layer = button.layer else {
+            Issue.record("Button or layer should not be nil")
+            return
+        }
+
+        // Test math helpers
+        #expect(delegate.shakeIntensity(pressCount: 1) == 1.0)
+        #expect(delegate.shakeIntensity(pressCount: 6) >= 2.5)
+        #expect(delegate.shakeDuration(pressCount: 1) == 0.25)
+        #expect(delegate.shakeDuration(pressCount: 6) < 0.20)
+
+        // Single press -> base shake amplitude
+        delegate.resetKeyPressHistory()
+        delegate.animateStatusItemOnKeyPress(isAutorepeat: false)
+        guard let singleAnim = layer.animation(forKey: "keyPressShakeAnimation") as? CAKeyframeAnimation,
+              let singleValues = singleAnim.values as? [Double] else {
+            Issue.record("Single animation should be CAKeyframeAnimation with Double values")
+            return
+        }
+        let singleMaxAmplitude = singleValues.map { abs($0) }.max() ?? 0
+        #expect(abs(singleMaxAmplitude - 3.0) < 0.01, "Single press max amplitude should be 3.0")
+
+        // Rapid multiple presses -> stronger amplitude and shorter duration
+        for _ in 1...5 {
+            delegate.animateStatusItemOnKeyPress(isAutorepeat: false)
+        }
+
+        guard let rapidAnim = layer.animation(forKey: "keyPressShakeAnimation") as? CAKeyframeAnimation,
+              let rapidValues = rapidAnim.values as? [Double] else {
+            Issue.record("Rapid animation should be CAKeyframeAnimation with Double values")
+            return
+        }
+        let rapidMaxAmplitude = rapidValues.map { abs($0) }.max() ?? 0
+        #expect(rapidMaxAmplitude > 5.0, "Rapid typing max amplitude should be significantly stronger (> 5.0)")
+        #expect(rapidAnim.duration < singleAnim.duration, "Rapid typing duration should be faster/snappier")
+    }
+
+    @MainActor
+    @Test func testUnlockingResetsKeyPressHistory() async throws {
+        let delegate = AppDelegate()
+        let notification = Notification(name: NSApplication.didFinishLaunchingNotification)
+
+        EventHandler.shared.isLocked = true
+        delegate.applicationDidFinishLaunching(notification)
+        try await Task.sleep(for: .milliseconds(100))
+
+        delegate.animateStatusItemOnKeyPress(isAutorepeat: false)
+        delegate.animateStatusItemOnKeyPress(isAutorepeat: false)
+        #expect(!delegate.recentKeyPressTimes.isEmpty)
+
+        EventHandler.shared.isLocked = false
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(delegate.recentKeyPressTimes.isEmpty, "Unlocking should clear keypress timestamp history")
+    }
 }
