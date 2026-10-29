@@ -6,7 +6,13 @@
 //
 import SwiftUI
 
-enum LockEffect: String, CaseIterable, Identifiable{
+enum LockEffect: String, CaseIterable, Identifiable {
+    case basso = "LockEffect.basso"
+    case glass = "LockEffect.glass"
+    case ping = "LockEffect.ping"
+    case sosumi = "LockEffect.sosumi"
+    case submarine = "LockEffect.submarine"
+    case tink = "LockEffect.tink"
     case none = "LockEffect.none"
     case confettiConnon = "LockEffect.confettiCannon"
     case speakTheKey = "LockEffect.speakTheKey"
@@ -19,6 +25,25 @@ enum LockEffect: String, CaseIterable, Identifiable{
     
     var localizedString: String {
         NSLocalizedString(self.rawValue, comment: "Lock effect option")
+    }
+
+    var soundName: String? {
+        switch self {
+        case .basso:
+            return "Basso"
+        case .glass:
+            return "Glass"
+        case .ping:
+            return "Ping"
+        case .sosumi:
+            return "Sosumi"
+        case .submarine:
+            return "Submarine"
+        case .tink:
+            return "Tink"
+        default:
+            return nil
+        }
     }
 }
 
@@ -61,4 +86,3 @@ enum TranslationLanguage: String, CaseIterable, Identifiable {
         }
     }
 }
-

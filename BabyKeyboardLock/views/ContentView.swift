@@ -22,6 +22,9 @@ extension View {
 }
 
 struct ContentView: View {
+    private static let switchOnSound: NSSound? = NSSound(named: "light-switch-on")
+    private static let switchOffSound: NSSound? = NSSound(named: "light-switch-off")
+
     @State private var animationWindow: NSWindow?
     @ObservedObject var eventHandler: EventHandler = EventHandler.shared
     @ObservedObject var deviceManager: InputDeviceManager = InputDeviceManager.shared
@@ -29,6 +32,8 @@ struct ContentView: View {
     @AppStorage("lockKeyboardOnLaunch") private var lockKeyboardOnLaunch: Bool = false
     @State private var launchAtLogin = false
     @State private var showingMouseLockAlert = false
+    @State private var lastPlayedSoundLockState: Bool?
+    @State private var isLocked: Bool = EventHandler.shared.isLocked
 
     @State var hoveringMoreButton: Bool = false
     var body: some View {
@@ -65,24 +70,45 @@ struct ContentView: View {
                     }
                 }
 
-                Toggle(isOn: $eventHandler.isLocked)
-                {
-                    Label(
-                        "Lock Keyboard",
-                        image: eventHandler.isLocked ? "keyboard.locked" : "keyboard.unlocked"
-                    )
-                    .font(.title)
-                    .foregroundColor(eventHandler.accessibilityPermissionGranted ? .primary : .gray)
+                HStack(spacing: 8) {
+                    Image(isLocked ? "keyboard.locked" : "keyboard.unlocked")
+                        .font(.title)
+                        .id(isLocked)
+                        .animation(nil, value: isLocked)
+
+                    Text("Lock Keyboard")
+                        .font(.title)
+
+                    Spacer()
+
+                    Toggle("", isOn: Binding(
+                        get: { isLocked },
+                        set: { newVal in
+                            isLocked = newVal
+                            playLockSound(isLocked: newVal)
+                            eventHandler.isLocked = newVal
+                        }
+                    ))
+                    .toggleStyle(SwitchToggleStyle(tint: .red))
+                    .labelsHidden()
                 }
-                .toggleStyle(SwitchToggleStyle(tint: .red))
-                .scaledToFill()
+                .foregroundColor(eventHandler.accessibilityPermissionGranted ? .primary : .gray)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    guard eventHandler.accessibilityPermissionGranted else { return }
+                    let newVal = !isLocked
+                    isLocked = newVal
+                    playLockSound(isLocked: newVal)
+                    eventHandler.isLocked = newVal
+                }
                 .disabled(!eventHandler.accessibilityPermissionGranted)
                 .padding(.bottom, eventHandler.accessibilityPermissionGranted ? 10 : 5)
                 .onChange(of: eventHandler.isLocked) { newVal in
-                    playLockSound(isLocked: newVal)
-                }.onAppear(){
-                    if eventHandler.isLocked {
-                        playLockSound(isLocked: true)
+                    if isLocked != newVal {
+                        isLocked = newVal
+                    }
+                    if lastPlayedSoundLockState != newVal {
+                        playLockSound(isLocked: newVal)
                     }
                 }
 
@@ -218,22 +244,20 @@ struct ContentView: View {
         }
         .onChange(of: eventHandler.isLocked) { newVal in
             showOrCloseAnimationWindow(isLocked: newVal)
-        }.onReceive(eventHandler.$isLocked) { newVal in
-            showOrCloseAnimationWindow(isLocked: newVal)
-        }.onAppear() {
+        }
+        .onAppear() {
+            isLocked = eventHandler.isLocked
             launchAtLogin = LaunchAtLoginService.isEnabled
             debugLog("onAppear --- ")
         }
     }
 
     private func playLockSound(isLocked: Bool) {
-        if isLocked {
-            NSSound(named: "light-switch-on")?.play()
-        } else {
-            guard let nsSound = NSSound(named: "light-switch-off") else { return }
-
-            nsSound.play()
-        }
+        lastPlayedSoundLockState = isLocked
+        let sound = isLocked ? Self.switchOnSound : Self.switchOffSound
+        sound?.stop()
+        sound?.currentTime = 0
+        sound?.play()
     }
 
     private func showOrCloseAnimationWindow(isLocked: Bool) {

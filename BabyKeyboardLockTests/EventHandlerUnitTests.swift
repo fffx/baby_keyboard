@@ -12,7 +12,7 @@ struct EventHandlerUnitTests {
         setUp()
         let handler = EventHandler(isLocked: false)
         #expect(!handler.isLocked)
-        #expect(handler.selectedLockEffect == .none)
+        #expect(handler.selectedLockEffect == .basso)
     }
 
     @Test func testKeyboardLockToggle() async throws {
@@ -84,7 +84,8 @@ struct EventHandlerUnitTests {
         // Manually setup event tap for testing
         handler.testSetupEventTap()
 
-        // Verify createEventTap was called (but returns nil in mock)\n        #expect(mockManager.createEventTapCalled)
+        // Verify createEventTap was called (but returns nil in mock)
+        #expect(mockManager.createEventTapCalled)
         // Mock returns nil, so event tap should NOT be setup
         #expect(!handler.isEventTapSetup)
         // enableTap should not be called when eventTap is nil
@@ -316,6 +317,146 @@ struct EventHandlerUnitTests {
         #expect(result != nil, "Mouse event from unblocked device should pass through")
     }
 
+    @Test func testBlockedMouseDownPlaysBassoSoundWhenBassoEffect() async throws {
+        setUp()
+        var playedSound: String?
+        let coordinator = EffectCoordinator(
+            soundPlayer: { sound in
+                playedSound = sound
+            }
+        )
+        let mockDeviceManager = MockInputDeviceManager()
+        mockDeviceManager.isDeviceBlockedHandler = { _, _ in true }
+
+        let handler = EventHandler(
+            isLocked: true,
+            effectCoordinator: coordinator,
+            inputDeviceManager: mockDeviceManager
+        )
+        handler.selectedLockEffect = .basso
+
+        guard let event = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: .zero, mouseButton: .left) else {
+            Issue.record("Failed to create mouse CGEvent")
+            return
+        }
+
+        let result = handler.handleKeyEvent(type: .leftMouseDown, event: event)
+        #expect(result == nil, "Mouse event from blocked device should be swallowed")
+        #expect(playedSound == "Basso", "Blocked mouse click should play Basso sound when Basso effect is selected")
+    }
+
+    @Test func testBlockedMouseDownDoesNotPlaySoundWhenNoneEffect() async throws {
+        setUp()
+        var playedSound: String?
+        let coordinator = EffectCoordinator(
+            soundPlayer: { sound in
+                playedSound = sound
+            }
+        )
+        let mockDeviceManager = MockInputDeviceManager()
+        mockDeviceManager.isDeviceBlockedHandler = { _, _ in true }
+
+        let handler = EventHandler(
+            isLocked: true,
+            effectCoordinator: coordinator,
+            inputDeviceManager: mockDeviceManager
+        )
+        handler.selectedLockEffect = .none
+
+        guard let event = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: .zero, mouseButton: .left) else {
+            Issue.record("Failed to create mouse CGEvent")
+            return
+        }
+
+        let result = handler.handleKeyEvent(type: .leftMouseDown, event: event)
+        #expect(result == nil, "Mouse event from blocked device should be swallowed")
+        #expect(playedSound == nil, "Blocked mouse click should not play sound when None effect is selected")
+    }
+
+    @Test func testBlockedMouseDownDoesNotPlaySoundWhenConfettiEffect() async throws {
+        setUp()
+        var playedSound: String?
+        let coordinator = EffectCoordinator(
+            soundPlayer: { sound in
+                playedSound = sound
+            }
+        )
+        let mockDeviceManager = MockInputDeviceManager()
+        mockDeviceManager.isDeviceBlockedHandler = { _, _ in true }
+
+        let handler = EventHandler(
+            isLocked: true,
+            effectCoordinator: coordinator,
+            inputDeviceManager: mockDeviceManager
+        )
+        handler.selectedLockEffect = .confettiConnon
+
+        guard let event = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: .zero, mouseButton: .left) else {
+            Issue.record("Failed to create mouse CGEvent")
+            return
+        }
+
+        let result = handler.handleKeyEvent(type: .leftMouseDown, event: event)
+        #expect(result == nil, "Mouse event from blocked device should be swallowed")
+        #expect(playedSound == nil, "Blocked mouse click should not play sound when non-sound effect is selected")
+    }
+
+    @Test func testBlockedKeyReleasePlaysBassoSoundWhenBassoEffect() async throws {
+        setUp()
+        var playedSound: String?
+        let coordinator = EffectCoordinator(
+            soundPlayer: { sound in
+                playedSound = sound
+            }
+        )
+        let mockDeviceManager = MockInputDeviceManager()
+        mockDeviceManager.isDeviceBlockedHandler = { _, _ in true }
+
+        let handler = EventHandler(
+            isLocked: true,
+            effectCoordinator: coordinator,
+            inputDeviceManager: mockDeviceManager
+        )
+        handler.selectedLockEffect = .basso
+
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false) else {
+            Issue.record("Failed to create key CGEvent")
+            return
+        }
+
+        let result = handler.handleKeyEvent(type: .keyUp, event: event)
+        #expect(result == nil, "Key event from blocked device should be swallowed")
+        #expect(playedSound == "Basso", "Blocked key release should play Basso sound when Basso effect is selected")
+    }
+
+    @Test func testBlockedKeyReleaseDoesNotPlaySoundWhenNoneEffect() async throws {
+        setUp()
+        var playedSound: String?
+        let coordinator = EffectCoordinator(
+            soundPlayer: { sound in
+                playedSound = sound
+            }
+        )
+        let mockDeviceManager = MockInputDeviceManager()
+        mockDeviceManager.isDeviceBlockedHandler = { _, _ in true }
+
+        let handler = EventHandler(
+            isLocked: true,
+            effectCoordinator: coordinator,
+            inputDeviceManager: mockDeviceManager
+        )
+        handler.selectedLockEffect = .none
+
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false) else {
+            Issue.record("Failed to create key CGEvent")
+            return
+        }
+
+        let result = handler.handleKeyEvent(type: .keyUp, event: event)
+        #expect(result == nil, "Key event from blocked device should be swallowed")
+        #expect(playedSound == nil, "Blocked key release should not play sound when None effect is selected")
+    }
+
     @Test func testUnlockShortcutWorksEvenIfDeviceBlocked() async throws {
         setUp()
         let mockDeviceManager = MockInputDeviceManager()
@@ -351,6 +492,7 @@ struct EventHandlerUnitTests {
 
     // MARK: - Key Pressed Notification Tests
 
+    @MainActor
     @Test func testKeyPressWhileLockedTriggersNotification() async throws {
         setUp()
         let handler = EventHandler(isLocked: true)
@@ -371,11 +513,12 @@ struct EventHandlerUnitTests {
         #expect(result == nil, "Key event should be swallowed when locked")
 
         // Wait briefly for main queue dispatch
-        try await Task.sleep(for: .milliseconds(50))
+        try await Task.sleep(for: .milliseconds(100))
         #expect(notificationReceived, "Should trigger key press notification when locked")
         #expect(!receivedAutorepeat, "Initial key press should not be flagged as autorepeat")
     }
 
+    @MainActor
     @Test func testKeyPressWithAutorepeatTriggersNotificationWithAutorepeatFlag() async throws {
         setUp()
         let handler = EventHandler(isLocked: true)
@@ -396,11 +539,12 @@ struct EventHandlerUnitTests {
         let result = handler.handleKeyEvent(type: .keyDown, event: event)
         #expect(result == nil)
 
-        try await Task.sleep(for: .milliseconds(50))
+        try await Task.sleep(for: .milliseconds(100))
         #expect(notificationReceived)
         #expect(receivedAutorepeat, "Autorepeat key press should be flagged as autorepeat")
     }
 
+    @MainActor
     @Test func testKeyPressWhileUnlockedDoesNotTriggerNotification() async throws {
         setUp()
         let handler = EventHandler(isLocked: false)
@@ -418,10 +562,11 @@ struct EventHandlerUnitTests {
         let result = handler.handleKeyEvent(type: .keyDown, event: event)
         #expect(result != nil, "Key event should pass through when unlocked")
 
-        try await Task.sleep(for: .milliseconds(50))
+        try await Task.sleep(for: .milliseconds(100))
         #expect(!notificationReceived, "Should NOT trigger key press notification when unlocked")
     }
 
+    @MainActor
     @Test func testCapsLockKeyPressWhileLockedTriggersNotification() async throws {
         setUp()
         let mockCapsLock = MockCapsLockManager()
@@ -442,7 +587,7 @@ struct EventHandlerUnitTests {
         let result = handler.handleKeyEvent(type: .flagsChanged, event: event)
         #expect(result == nil)
 
-        try await Task.sleep(for: .milliseconds(50))
+        try await Task.sleep(for: .milliseconds(100))
         #expect(notificationReceived, "Caps lock while locked should trigger key press notification")
     }
 }

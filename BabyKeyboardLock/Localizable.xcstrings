@@ -1,635 +1,759 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
+  "sourceLanguage": "en",
+  "strings": {
+    "": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ""
           }
         }
       }
     },
-    "%@ %@ (Build %@), All rights reserved" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ %2$@ (Build %3$@), All rights reserved"
+    "%@ %@ (Build %@), All rights reserved": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ %2$@ (Build %3$@), All rights reserved"
           }
         }
       }
     },
-    "About" : {
-
-    },
-    "accessibility_permission_grant_hint %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bitte erteilen Sie [%@] Zugriffsberechtigungen unter:\n[Systemeinstellungen]\n    > [Sicherheit & Datenschutz]\n        > [Barrierefreiheit] (nach unten scrollen)"
+    "About": {},
+    "accessibility_permission_grant_hint %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitte erteilen Sie [%@] Zugriffsberechtigungen unter:\n[Systemeinstellungen]\n    > [Sicherheit & Datenschutz]\n        > [Barrierefreiheit] (nach unten scrollen)"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Please grant accessibility permissions to [%@] in:\n[System Settings]\n    > [Secuerity & Privacy] \n        > [Accessibility] (scroll down)"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please grant accessibility permissions to [%@] in:\n[System Settings]\n    > [Secuerity & Privacy] \n        > [Accessibility] (scroll down)"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "请在以下位置为 [%@] 授予辅助功能权限：\n[系统设置]\n　　> [安全性与隐私]\n　　　　> [辅助功能]（向下滚动）"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请在以下位置为 [%@] 授予辅助功能权限：\n[系统设置]\n　　> [安全性与隐私]\n　　　　> [辅助功能]（向下滚动）"
           }
         }
       }
     },
-    "Effect" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Effekt"
+    "Effect": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effekt"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Effect"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effect"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "效果"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "效果"
           }
         }
       }
     },
-    "Firework window" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Feuerwerksfenster"
+    "Firework window": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feuerwerksfenster"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Firework Window"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firework Window"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Firework Window"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firework Window"
           }
         }
       }
     },
-    "For more information please visit our website" : {
-
-    },
-    "https://keyboardlock.app" : {
-
-    },
-    "Input Devices to Block" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Zu sperrende Eingabegeräte"
+    "For more information please visit our website": {},
+    "https://keyboardlock.app": {},
+    "Input Devices to Block": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Zu sperrende Eingabegeräte"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Input Devices to Block"
+        "en": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Input Devices to Block"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "选择锁定的输入设备"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "选择锁定的输入设备"
           }
         }
       }
     },
-    "Launch on startup" : {
-
-    },
-    "Lock" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sperren"
+    "Launch on startup": {},
+    "Lock": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sperren"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lock"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "锁"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "锁"
           }
         }
       }
     },
-    "Lock Keyboard" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tastatur sperren"
+    "Lock Keyboard": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tastatur sperren"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lock Keyboard"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock Keyboard"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "锁住键盘"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "锁住键盘"
           }
         }
       }
     },
-    "Lock keyboard on launch" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tastatur beim Start sperren"
+    "Lock keyboard on launch": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tastatur beim Start sperren"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lock keyboard on launch"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock keyboard on launch"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "启动时即锁住键盘"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "启动时即锁住键盘"
           }
         }
       }
     },
-    "Lock with top-right hotcorner" : {
-
-    },
-    "LockEffect.confettiCannon" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Konfetti"
+    "Lock with top-right hotcorner": {},
+    "LockEffect.confettiCannon": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konfetti"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confetti"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confetti"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "五彩纸屑"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "五彩纸屑"
           }
         }
       }
     },
-    "LockEffect.none" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine"
+    "LockEffect.none": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "None"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "None"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无效果"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无效果"
           }
         }
       }
     },
-    "LockEffect.speakAKeyWord" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein Wort sprechen"
+    "LockEffect.speakAKeyWord": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Wort sprechen"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Speak a word"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speak a word"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "读单词"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "读单词"
           }
         }
       }
     },
-    "LockEffect.speakTheKey" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die gedrückte Taste sprechen"
+    "LockEffect.speakTheKey": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die gedrückte Taste sprechen"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Speak the pressed key"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speak the pressed key"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "读键盘"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "读键盘"
           }
         }
       }
     },
-    "mouse_lock_alert_message" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn Maus oder Trackpad gesperrt sind, drücken Sie Strg + Option + U (⌃⌥U) auf der Tastatur, um zu entsperren."
+    "mouse_lock_alert_message": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wenn Maus oder Trackpad gesperrt sind, drücken Sie Strg + Option + U (⌃⌥U) auf der Tastatur, um zu entsperren."
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When your mouse or trackpad is locked, press Ctrl + Option + U (⌃⌥U) on your keyboard to unlock."
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When your mouse or trackpad is locked, press Ctrl + Option + U (⌃⌥U) on your keyboard to unlock."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "锁定鼠标或触控板后，请使用键盘快捷键 Ctrl + Option + U (⌃⌥U) 进行解锁。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "锁定鼠标或触控板后，请使用键盘快捷键 Ctrl + Option + U (⌃⌥U) 进行解锁。"
           }
         }
       }
     },
-    "mouse_lock_alert_title" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maus / Trackpad sperren"
+    "mouse_lock_alert_title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maus / Trackpad sperren"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lock Mouse / Trackpad"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock Mouse / Trackpad"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "锁定鼠标 / 触控板"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "锁定鼠标 / 触控板"
           }
         }
       }
     },
-    "mouse_locked_shortcut_hint" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maus / Trackpad gesperrt: Strg + Option + U zum Entsperren verwenden"
+    "mouse_locked_shortcut_hint": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maus / Trackpad gesperrt: Strg + Option + U zum Entsperren verwenden"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mouse / trackpad locked: Use Ctrl + Option + U to unlock"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mouse / trackpad locked: Use Ctrl + Option + U to unlock"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "鼠标 / 触控板已锁定：按 Ctrl + Option + U 即可解锁"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "鼠标 / 触控板已锁定：按 Ctrl + Option + U 即可解锁"
           }
         }
       }
     },
-    "No input devices detected" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "Keine Eingabegeräte erkannt"
+    "No input devices detected": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "Keine Eingabegeräte erkannt"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "No input devices detected"
+        "en": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "No input devices detected"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "未检测到输入设备"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "machine_translated",
+            "value": "未检测到输入设备"
           }
         }
       }
     },
-    "OK" : {
-
-    },
-    "Quit %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ beenden\n"
+    "OK": {},
+    "Quit %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ beenden\n"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quit %@"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit %@"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "退出 %@"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退出 %@"
           }
         }
       }
     },
-    "Translation" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Übersetzung"
+    "Translation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Übersetzung"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Translation"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Translation"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "翻译"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻译"
           }
         }
       }
     },
-    "TranslationLanguage.chinese" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chinesisch"
+    "TranslationLanguage.chinese": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chinesisch"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chinese"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chinese"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "中文"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "中文"
           }
         }
       }
     },
-    "TranslationLanguage.french" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Französisch"
+    "TranslationLanguage.french": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Französisch"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "French"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "French"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "法语"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "法语"
           }
         }
       }
     },
-    "TranslationLanguage.german" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deutsch"
+    "TranslationLanguage.german": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deutsch"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "German"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "German"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "德语"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "德语"
           }
         }
       }
     },
-    "TranslationLanguage.italian" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Italienisch"
+    "TranslationLanguage.italian": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Italienisch"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Italian"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Italian"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "意大利语"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "意大利语"
           }
         }
       }
     },
-    "TranslationLanguage.japanese" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Japanisch"
+    "TranslationLanguage.japanese": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Japanisch"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Japanese"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Japanese"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日语"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日语"
           }
         }
       }
     },
-    "TranslationLanguage.none" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Übersetzung"
+    "TranslationLanguage.none": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Übersetzung"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No translation"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No translation"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "不翻译"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不翻译"
           }
         }
       }
     },
-    "TranslationLanguage.russian" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Russisch"
+    "TranslationLanguage.russian": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Russisch"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Russian"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Russian"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "俄语"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "俄语"
           }
         }
       }
     },
-    "TranslationLanguage.spanish" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spanisch"
+    "TranslationLanguage.spanish": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spanisch"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spanish"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spanish"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "西班牙语"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "西班牙语"
           }
         }
       }
     },
-    "unlock_shortcut_hint" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sie können die Tastenkombination Strg + Wahltaste + U verwenden, um die Tastatursperre umzuschalten."
+    "unlock_shortcut_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sie können die Tastenkombination Strg + Wahltaste + U verwenden, um die Tastatursperre umzuschalten."
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can use shortcut Ctrl + Option + U to toggle keyboard lock"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can use shortcut Ctrl + Option + U to toggle keyboard lock"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你可以用快捷键 Ctrl + Option + U 来切换键盘锁定"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你可以用快捷键 Ctrl + Option + U 来切换键盘锁定"
           }
         }
       }
     },
-    "When locked with hot corner, mouse clicks are locked as well" : {
-
+    "When locked with hot corner, mouse clicks are locked as well": {},
+    "LockEffect.basso": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basso"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basso"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basso"
+          }
+        }
+      }
+    },
+    "LockEffect.glass": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glass"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glass"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glass"
+          }
+        }
+      }
+    },
+    "LockEffect.ping": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ping"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ping"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ping"
+          }
+        }
+      }
+    },
+    "LockEffect.sosumi": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sosumi"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sosumi"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sosumi"
+          }
+        }
+      }
+    },
+    "LockEffect.submarine": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Submarine"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Submarine"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Submarine"
+          }
+        }
+      }
+    },
+    "LockEffect.tink": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tink"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tink"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tink"
+          }
+        }
+      }
     }
   },
-  "version" : "1.3"
+  "version": "1.3"
 }

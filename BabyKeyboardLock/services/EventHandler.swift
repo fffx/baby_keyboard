@@ -27,7 +27,7 @@ class EventHandler: ObservableObject {
     private let hotCornerService: HotCornerService
     @Published var lockedViaHotCorner = false
 
-    @Published var selectedLockEffect: LockEffect = .none
+    @Published var selectedLockEffect: LockEffect = .basso
     @Published var selectedTranslationLanguage: TranslationLanguage = .none {
         didSet {
             effectCoordinator.translationLanguage = selectedTranslationLanguage
@@ -60,12 +60,18 @@ class EventHandler: ObservableObject {
     #endif
 
     func notifyKeyPressed(isAutorepeat: Bool = false) {
-        DispatchQueue.main.async { [weak self] in
+        let action = { [weak self] in
             guard let self = self else { return }
             self.keyPressedWhileLockedSubject.send(isAutorepeat)
             #if DEBUG
             self.onKeyPressedWhileLocked?(isAutorepeat)
             #endif
+        }
+
+        if Thread.isMainThread {
+            action()
+        } else {
+            DispatchQueue.main.async(execute: action)
         }
     }
 
@@ -333,6 +339,16 @@ class EventHandler: ObservableObject {
         eventTapManager.enableTap(eventTap, enable: true)
     }
 
+    private func updateLastKeyString(_ keyString: String) {
+        if Thread.isMainThread {
+            self.lastKeyString = keyString
+        } else {
+            DispatchQueue.main.async {
+                self.lastKeyString = keyString
+            }
+        }
+    }
+
     func handleKeyEvent(
         proxy: CGEventTapProxy? = nil,
         type: CGEventType,
@@ -373,8 +389,13 @@ class EventHandler: ObservableObject {
 
         // Handle mouse events when locked
         switch type {
-        case .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp,
-             .otherMouseDown, .otherMouseUp, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged:
+        case .leftMouseDown, .rightMouseDown, .otherMouseDown:
+            debugLog("Mouse event BLOCKED: \(type.rawValue), lockedViaHotCorner: \(lockedViaHotCorner), isLocked: \(isLocked)")
+            if let soundName = selectedLockEffect.soundName, !throttleManager.isThrottled() {
+                effectCoordinator.playSound(named: soundName)
+            }
+            return nil
+        case .leftMouseUp, .rightMouseUp, .otherMouseUp, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged:
             debugLog("Mouse event BLOCKED: \(type.rawValue), lockedViaHotCorner: \(lockedViaHotCorner), isLocked: \(isLocked)")
             return nil
         default:
@@ -400,10 +421,11 @@ class EventHandler: ObservableObject {
                 event.flags.remove(.maskAlphaShift)
 
                 if !throttleManager.isThrottled() {
-                    self.lastKeyString = effectCoordinator.handle(
+                    let keyString = effectCoordinator.handle(
                         event: event, eventType: type, selectedLockEffect: selectedLockEffect
                     )
-                    debugLog("capsLock pressed ------- \(lastKeyString)")
+                    updateLastKeyString(keyString)
+                    debugLog("capsLock pressed ------- \(keyString)")
                 }
                 notifyKeyPressed(isAutorepeat: false)
                 return nil
@@ -427,10 +449,11 @@ class EventHandler: ObservableObject {
 
         if throttleManager.isThrottled() { return nil }
 
-        self.lastKeyString = effectCoordinator.handle(
+        let keyString = effectCoordinator.handle(
             event: event, eventType: type, selectedLockEffect: selectedLockEffect
         )
-        debugLog("keyup------- \(lastKeyString), str: \(lastKeyString)")
+        updateLastKeyString(keyString)
+        debugLog("keyup------- \(keyString), str: \(keyString)")
         return nil
     }
 
@@ -445,44 +468,50 @@ class EventHandler: ObservableObject {
         return trusted
     }
 
-    #if DEBUG
-    // MARK: - Test Helpers
-    // These methods are only available in DEBUG builds for testing purposes
-
-    /// Returns whether the event tap has been set up
-    var isEventTapSetup: Bool {
-        return eventTap != nil
+    private func getSenderID(from event: CGEvent) -> UInt64 {
+        // CGEventGetIntegerValueField with 114 retrieves kCGEventSourceUnixProcessID / sender registry ID
+        // Note: Field 114 is undocumented CoreGraphics constant for event sender ID
+        let senderID = UInt64(bitPattern: event.getIntegerValueField(CGEventField(rawValue: 114)!))
+        return senderID
     }
 
-    /// Exposes the event tap for testing purposes
+    #if DEBUG
+    /// Allows tests to inspect the internal event tap pointer
     var testEventTap: CFMachPort? {
         return eventTap
     }
 
-    /// Exposes the event tap manager for testing purposes
+    /// Exposes eventTapManager for testing verification
     var testEventTapManager: EventTapManaging {
         return eventTapManager
     }
 
-    /// Exposes the caps lock manager for testing purposes
+    /// Exposes capsLockManager for testing verification
     var testCapsLockManager: CapsLockManaging {
         return capsLockManager
     }
 
-    /// Exposes the controller lock manager for testing purposes
+    /// Exposes controllerLockManager for testing verification
     var testControllerLockManager: ControllerLockManaging {
         return controllerLockManager
     }
 
-    /// Exposes the saved caps lock state for testing purposes
+    /// Exposes savedCapsLockState for testing verification
     var testSavedCapsLockState: Bool {
         return savedCapsLockState
     }
 
+    /// Exposes isEventTapSetup for testing
+    var isEventTapSetup: Bool {
+        return eventTap != nil
+    }
+
+    /// Allows tests to manually trigger onLocked
     func testOnLocked() {
         onLocked()
     }
 
+    /// Allows tests to manually trigger onUnlocked
     func testOnUnlocked() {
         onUnlocked()
     }
@@ -503,6 +532,11 @@ class EventHandler: ObservableObject {
     /// Exposes inputDeviceManager for testing verification
     var testInputDeviceManager: InputDeviceManaging {
         return inputDeviceManager
+    }
+
+    /// Exposes effectCoordinator for testing verification
+    var testEffectCoordinator: EffectCoordinator {
+        return effectCoordinator
     }
     #endif
 }

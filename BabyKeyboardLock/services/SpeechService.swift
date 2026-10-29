@@ -17,7 +17,7 @@ class SpeechService {
     }
 
     func speak(_ text: String, language: String? = nil) {
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .userInitiated).async {
             // Stop any ongoing speech to prevent queue buildup
             if self.synthesizer.isSpeaking {
                 _ = self.synthesizer.stopSpeaking(at: .immediate)
@@ -50,15 +50,12 @@ class SpeechService {
                 matchingVoices = allVoices.filter { $0.language.lowercased().hasPrefix(languagePrefix) }
             }
 
-            let selectedVoice = matchingVoices.first { $0.identifier.contains("siri") }
-                ?? matchingVoices.first
-                ?? AVSpeechSynthesisVoice(language: languageCode)
-                ?? AVSpeechSynthesisVoice(language: "en-US")
-
-            if let selectedVoice = selectedVoice {
-                voiceCache[languageCode] = selectedVoice
+            // Fallback to default voice if no match
+            let voice = matchingVoices.first ?? AVSpeechSynthesisVoice(language: languageCode)
+            if let voice = voice {
+                voiceCache[languageCode] = voice
+                utterance.voice = voice
             }
-            utterance.voice = selectedVoice
         }
 
         return utterance

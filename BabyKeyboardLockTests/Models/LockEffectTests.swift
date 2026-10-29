@@ -14,7 +14,13 @@ struct LockEffectTests {
     @Test func testAllLockEffectCases() async throws {
         let allCases = LockEffect.allCases
 
-        #expect(allCases.count == 4, "Should have exactly 4 lock effect cases")
+        #expect(allCases.count == 10, "Should have exactly 10 lock effect cases")
+        #expect(allCases.contains(.basso), "Should contain basso effect")
+        #expect(allCases.contains(.glass), "Should contain glass effect")
+        #expect(allCases.contains(.ping), "Should contain ping effect")
+        #expect(allCases.contains(.sosumi), "Should contain sosumi effect")
+        #expect(allCases.contains(.submarine), "Should contain submarine effect")
+        #expect(allCases.contains(.tink), "Should contain tink effect")
         #expect(allCases.contains(.none), "Should contain none effect")
         #expect(allCases.contains(.confettiConnon), "Should contain confetti cannon effect")
         #expect(allCases.contains(.speakTheKey), "Should contain speak the key effect")
@@ -22,10 +28,29 @@ struct LockEffectTests {
     }
 
     @Test func testLockEffectRawValues() async throws {
+        #expect(LockEffect.basso.rawValue == "LockEffect.basso")
+        #expect(LockEffect.glass.rawValue == "LockEffect.glass")
+        #expect(LockEffect.ping.rawValue == "LockEffect.ping")
+        #expect(LockEffect.sosumi.rawValue == "LockEffect.sosumi")
+        #expect(LockEffect.submarine.rawValue == "LockEffect.submarine")
+        #expect(LockEffect.tink.rawValue == "LockEffect.tink")
         #expect(LockEffect.none.rawValue == "LockEffect.none")
         #expect(LockEffect.confettiConnon.rawValue == "LockEffect.confettiCannon")
         #expect(LockEffect.speakTheKey.rawValue == "LockEffect.speakTheKey")
         #expect(LockEffect.speakAKeyWord.rawValue == "LockEffect.speakAKeyWord")
+    }
+
+    @Test func testLockEffectSoundNames() async throws {
+        #expect(LockEffect.basso.soundName == "Basso")
+        #expect(LockEffect.glass.soundName == "Glass")
+        #expect(LockEffect.ping.soundName == "Ping")
+        #expect(LockEffect.sosumi.soundName == "Sosumi")
+        #expect(LockEffect.submarine.soundName == "Submarine")
+        #expect(LockEffect.tink.soundName == "Tink")
+        #expect(LockEffect.none.soundName == nil)
+        #expect(LockEffect.confettiConnon.soundName == nil)
+        #expect(LockEffect.speakTheKey.soundName == nil)
+        #expect(LockEffect.speakAKeyWord.soundName == nil)
     }
 
     @Test func testLockEffectIdentifiable() async throws {
@@ -95,4 +120,3 @@ struct TranslationLanguageTests {
         }
     }
 }
-

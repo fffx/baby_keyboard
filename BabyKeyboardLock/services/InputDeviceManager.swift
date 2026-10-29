@@ -17,6 +17,8 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
     private var isMonitoring = false
     private let queue = DispatchQueue(label: "com.babykeyboardlock.inputdevicemanager", qos: .userInitiated)
     private var scheduledRefreshWorkItem: DispatchWorkItem?
+    private var senderIDCache: [UInt64: String] = [:]
+    private let cacheLock = NSLock()
 
     var onDeviceBlockStateChanged: (() -> Void)?
 
@@ -132,6 +134,9 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
             guard let self = self else { return }
             guard let deviceSet = IOHIDManagerCopyDevices(manager) as? Set<IOHIDDevice> else {
                 DispatchQueue.main.async {
+                    self.cacheLock.lock()
+                    self.senderIDCache.removeAll()
+                    self.cacheLock.unlock()
                     if self.devices.isEmpty {
                         self.devices = []
                     }
@@ -225,6 +230,9 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
             }
 
             DispatchQueue.main.async {
+                self.cacheLock.lock()
+                self.senderIDCache.removeAll()
+                self.cacheLock.unlock()
                 self.devices = sortedDevices
                 self.onDeviceBlockStateChanged?()
             }
@@ -296,10 +304,20 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
     }
 
     private func resolveDevice(for senderID: UInt64, matching expectedType: InputDeviceType) -> InputDevice? {
+        cacheLock.lock()
+        if let cachedID = senderIDCache[senderID] {
+            cacheLock.unlock()
+            return devices.first(where: { $0.id == cachedID })
+        }
+        cacheLock.unlock()
+
         let matchingDevices = devices.filter { $0.type == expectedType }
 
         // Fast path: search already associated registryEntryIDs
         if let match = matchingDevices.first(where: { $0.registryEntryIDs.contains(senderID) }) {
+            cacheLock.lock()
+            senderIDCache[senderID] = match.id
+            cacheLock.unlock()
             return match
         }
 
@@ -318,8 +336,7 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
         let pid = (IORegistryEntryCreateCFProperty(service, kIOHIDProductIDKey as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? NSNumber)?.intValue
         let name = IORegistryEntryCreateCFProperty(service, kIOHIDProductKey as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? String
 
-        if let matchIndex = devices.firstIndex(where: { dev in
-            guard dev.type == expectedType else { return false }
+        if let match = matchingDevices.first(where: { dev in
             if let vid = vid, let pid = pid, dev.vendorID == vid && dev.productID == pid {
                 return true
             }
@@ -328,9 +345,11 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
             }
             return false
         }) {
-            // Cache this senderID for future fast lookups
-            devices[matchIndex].registryEntryIDs.insert(senderID)
-            return devices[matchIndex]
+            // Cache this senderID for future fast lookups without mutating @Published devices
+            cacheLock.lock()
+            senderIDCache[senderID] = match.id
+            cacheLock.unlock()
+            return match
         }
 
         return nil
@@ -361,39 +380,28 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
             }
         }
 
-        // For composite devices containing both keyboard and trackpad/mouse (e.g. Apple Internal),
-        // do not guess based on substring matching when usagePage is non-standard
-        if lower.contains("keyboard") && (lower.contains("trackpad") || lower.contains("mouse")) {
-            return nil
-        }
-
-        if lower.contains("keyboard") {
-            return .keyboard
-        } else if lower.contains("trackpad") || lower.contains("mouse") {
-            return .mouseOrTrackpad
-        } else if lower.contains("controller") || lower.contains("gamepad") || lower.contains("joystick") {
-            return .controller
-        }
-
         return nil
     }
 
     static func formatDeviceName(rawName: String, type: InputDeviceType) -> String {
-        let name = rawName.trimmingCharacters(in: .whitespacesAndNewlines)
-        if name.isEmpty {
-            return type.displayName
-        }
-        if name == "Apple Internal Keyboard / Trackpad" {
+        let trimmed = rawName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
             switch type {
-            case .keyboard:
-                return "Apple Internal Keyboard"
-            case .mouseOrTrackpad:
-                return "Apple Internal Trackpad"
-            case .controller:
-                return name
+            case .keyboard: return "External Keyboard"
+            case .mouseOrTrackpad: return "Mouse / Trackpad"
+            case .controller: return "Game Controller"
             }
         }
-        return name
+
+        if trimmed == "Apple Internal Keyboard / Trackpad" {
+            switch type {
+            case .keyboard: return "Apple Internal Keyboard"
+            case .mouseOrTrackpad: return "Apple Internal Trackpad"
+            case .controller: return trimmed
+            }
+        }
+
+        return trimmed
     }
 
     static func computeDeviceID(
@@ -405,31 +413,16 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
         serial: String?,
         name: String
     ) -> String {
-        var components: [String] = [type.rawValue]
-        if let vid = vid, let pid = pid {
-            components.append("vid_\(vid)_pid_\(pid)")
-        } else {
-            components.append("name_\(name)")
-        }
-        if let transport = transport {
-            components.append("t_\(transport)")
-        }
-        if let locationID = locationID, locationID != 0 {
-            components.append("loc_\(locationID)")
-        }
+        var components: [String] = ["\(type.rawValue)"]
+        if let vid = vid { components.append("v\(vid)") }
+        if let pid = pid { components.append("p\(pid)") }
         if let serial = serial, !serial.isEmpty {
-            components.append("sn_\(serial)")
+            components.append("s\(serial)")
+        } else if let loc = locationID, loc != 0 {
+            components.append("l\(loc)")
+        } else {
+            components.append("n\(name.replacingOccurrences(of: " ", with: "_"))")
         }
         return components.joined(separator: "_")
-    }
-}
-
-extension InputDeviceType {
-    var sortOrder: Int {
-        switch self {
-        case .keyboard: return 0
-        case .mouseOrTrackpad: return 1
-        case .controller: return 2
-        }
     }
 }

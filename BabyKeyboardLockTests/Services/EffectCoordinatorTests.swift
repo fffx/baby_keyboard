@@ -21,8 +21,12 @@ struct EffectCoordinatorTests {
     @MainActor
     @Test func testNoneEffectReturnsKeyString() async throws {
         let mockSpeech = MockSpeechSynthesizer()
+        var playedSound: String?
         let coordinator = EffectCoordinator(
-            speechService: SpeechService(synthesizer: mockSpeech)
+            speechService: SpeechService(synthesizer: mockSpeech),
+            soundPlayer: { sound in
+                playedSound = sound
+            }
         )
 
         // Create a mock key event
@@ -33,9 +37,79 @@ struct EffectCoordinatorTests {
 
         let result = coordinator.handle(event: event, eventType: .keyUp, selectedLockEffect: .none)
 
-        // With none effect, it should just return the key string without speaking
+        // With none effect, it should just return the key string without speaking or playing sound
         #expect(!result.isEmpty, "Should return a key string")
         #expect(mockSpeech.spokenUtterances.isEmpty, "Should not speak with none effect")
+        #expect(playedSound == nil, "None effect should not play any sound")
+    }
+
+    @MainActor
+    @Test func testSoundEffectsPlayCorrespondingSounds() async throws {
+        let soundEffects: [(LockEffect, String)] = [
+            (.basso, "Basso"),
+            (.glass, "Glass"),
+            (.ping, "Ping"),
+            (.sosumi, "Sosumi"),
+            (.submarine, "Submarine"),
+            (.tink, "Tink")
+        ]
+
+        for (effect, expectedSound) in soundEffects {
+            var playedSound: String?
+            let coordinator = EffectCoordinator(
+                soundPlayer: { sound in
+                    playedSound = sound
+                }
+            )
+
+            guard let event = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false) else {
+                Issue.record("Failed to create CGEvent")
+                return
+            }
+
+            let result = coordinator.handle(event: event, eventType: .keyUp, selectedLockEffect: effect)
+            #expect(!result.isEmpty)
+            #expect(playedSound == expectedSound, "\(effect) should play \(expectedSound) sound")
+        }
+    }
+
+    @MainActor
+    @Test func testOtherEffectsDoNotPlaySound() async throws {
+        var playedSound: String?
+        let mockSpeech = MockSpeechSynthesizer()
+        let coordinator = EffectCoordinator(
+            speechService: SpeechService(synthesizer: mockSpeech),
+            soundPlayer: { sound in
+                playedSound = sound
+            }
+        )
+
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false) else {
+            Issue.record("Failed to create CGEvent")
+            return
+        }
+
+        _ = coordinator.handle(event: event, eventType: .keyUp, selectedLockEffect: .speakTheKey)
+        #expect(playedSound == nil, "speakTheKey effect should not play sound")
+
+        _ = coordinator.handle(event: event, eventType: .keyUp, selectedLockEffect: .confettiConnon)
+        #expect(playedSound == nil, "confettiConnon effect should not play sound")
+
+        _ = coordinator.handle(event: event, eventType: .keyUp, selectedLockEffect: .none)
+        #expect(playedSound == nil, "none effect should not play sound")
+    }
+
+    @MainActor
+    @Test func testPlayDefaultSoundDirectly() async throws {
+        var playedSound: String?
+        let coordinator = EffectCoordinator(
+            soundPlayer: { sound in
+                playedSound = sound
+            }
+        )
+
+        coordinator.playDefaultSound()
+        #expect(playedSound == "Basso", "playDefaultSound() should play Basso sound")
     }
 
     @MainActor
@@ -160,10 +234,7 @@ struct EffectCoordinatorTests {
     @Test func testAllLockEffects() async throws {
         let coordinator = EffectCoordinator()
 
-        // Test that all lock effect cases are handled
-        let allEffects: [LockEffect] = [.none, .confettiConnon, .speakTheKey, .speakAKeyWord]
-
-        for effect in allEffects {
+        for effect in LockEffect.allCases {
             guard let event = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false) else {
                 Issue.record("Failed to create CGEvent")
                 return
@@ -174,4 +245,3 @@ struct EffectCoordinatorTests {
         }
     }
 }
-

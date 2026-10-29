@@ -14,6 +14,14 @@ enum InputDeviceType: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
+    var sortOrder: Int {
+        switch self {
+        case .keyboard: return 0
+        case .mouseOrTrackpad: return 1
+        case .controller: return 2
+        }
+    }
+
     var displayName: String {
         switch self {
         case .keyboard:

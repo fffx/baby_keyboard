@@ -16,12 +16,19 @@ class EffectCoordinator {
     private lazy var translationService: TranslationService = TranslationService()
     private lazy var speechService: SpeechService = SpeechService()
     private var translationWorkItem: DispatchWorkItem?
+    var soundPlayer: (String) -> Void
 
     var translationLanguage: TranslationLanguage = .none
 
     init(wordService: WordService? = nil,
          translationService: TranslationService? = nil,
-         speechService: SpeechService? = nil) {
+         speechService: SpeechService? = nil,
+         soundPlayer: ((String) -> Void)? = nil) {
+        self.soundPlayer = soundPlayer ?? { soundName in
+            guard let sound = NSSound(named: NSSound.Name(soundName)) else { return }
+            sound.stop()
+            sound.play()
+        }
         // Allow dependency injection for testing while defaulting to lazy initialization
         if let wordService = wordService {
             self.wordService = wordService
@@ -40,8 +47,21 @@ class EffectCoordinator {
         translationWorkItem = nil
     }
 
+    func playSound(named soundName: String) {
+        soundPlayer(soundName)
+    }
+
+    func playDefaultSound() {
+        playSound(named: "Basso")
+    }
+
     func handle(event: CGEvent, eventType: CGEventType, selectedLockEffect: LockEffect) -> String {
-        guard let str = getString(event: event, eventType: eventType) else { return "" }
+        guard let str = getString(event: event, eventType: eventType) else {
+            if let soundName = selectedLockEffect.soundName {
+                playSound(named: soundName)
+            }
+            return ""
+        }
         return handle(keyString: str, selectedLockEffect: selectedLockEffect)
     }
 
@@ -74,6 +94,12 @@ class EffectCoordinator {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8, execute: workItem)
             }
             return randomWord
+        case .basso, .glass, .ping, .sosumi, .submarine, .tink:
+            if let soundName = selectedLockEffect.soundName {
+                playSound(named: soundName)
+            }
+        case .none:
+            break
         default:
             break
         }
@@ -107,4 +133,3 @@ class EffectCoordinator {
         return result
     }
 }
-
