@@ -97,6 +97,28 @@
     "https://keyboardlock.app" : {
 
     },
+    "Input Devices to Block" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Zu sperrende Eingabegeräte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Input Devices to Block"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "选择锁定的输入设备"
+          }
+        }
+      }
+    },
     "Launch on startup" : {
 
     },
@@ -262,6 +284,97 @@
           }
         }
       }
+    },
+    "mouse_lock_alert_message" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Maus oder Trackpad gesperrt sind, drücken Sie Strg + Option + U (⌃⌥U) auf der Tastatur, um zu entsperren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When your mouse or trackpad is locked, press Ctrl + Option + U (⌃⌥U) on your keyboard to unlock."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "锁定鼠标或触控板后，请使用键盘快捷键 Ctrl + Option + U (⌃⌥U) 进行解锁。"
+          }
+        }
+      }
+    },
+    "mouse_lock_alert_title" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maus / Trackpad sperren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock Mouse / Trackpad"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "锁定鼠标 / 触控板"
+          }
+        }
+      }
+    },
+    "mouse_locked_shortcut_hint" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maus / Trackpad gesperrt: Strg + Option + U zum Entsperren verwenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mouse / trackpad locked: Use Ctrl + Option + U to unlock"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "鼠标 / 触控板已锁定：按 Ctrl + Option + U 即可解锁"
+          }
+        }
+      }
+    },
+    "No input devices detected" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Keine Eingabegeräte erkannt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "No input devices detected"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "未检测到输入设备"
+          }
+        }
+      }
+    },
+    "OK" : {
+
     },
     "Quit %@" : {
       "localizations" : {
@@ -518,5 +631,5 @@
 
     }
   },
-  "version" : "1.1"
+  "version" : "1.3"
 }

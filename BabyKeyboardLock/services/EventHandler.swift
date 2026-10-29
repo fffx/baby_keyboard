@@ -19,6 +19,7 @@ class EventHandler: ObservableObject {
     private let eventTapManager: EventTapManaging
     private let capsLockManager: CapsLockManaging
     private let controllerLockManager: ControllerLockManaging
+    private let inputDeviceManager: InputDeviceManaging
     private var savedCapsLockState: Bool = false
     private var eventLoopStarted = false
     private var eventTap : CFMachPort?
@@ -50,7 +51,6 @@ class EventHandler: ObservableObject {
             updateHotCornerService()
         }
     }
-
 
     /// Emits `isAutorepeat: Bool` whenever a key is pressed while the keyboard is locked.
     let keyPressedWhileLockedSubject = PassthroughSubject<Bool, Never>()
@@ -102,7 +102,8 @@ class EventHandler: ObservableObject {
          throttleManager: ThrottleManager = ThrottleManager(),
          eventTapManager: EventTapManaging? = nil,
          capsLockManager: CapsLockManaging? = nil,
-         controllerLockManager: ControllerLockManaging? = nil) {
+         controllerLockManager: ControllerLockManaging? = nil,
+         inputDeviceManager: InputDeviceManaging? = nil) {
         // Initialize non-lazy stored properties first
         self.throttleManager = throttleManager
         self.hotCornerService = HotCornerService()
@@ -115,7 +116,17 @@ class EventHandler: ObservableObject {
         self.eventTapManager = eventTapManager ?? (isTestMode ? MockEventTapManager() : DefaultEventTapManager())
         self.capsLockManager = capsLockManager ?? (isTestMode ? MockCapsLockManager() : DefaultCapsLockManager())
         self.controllerLockManager = controllerLockManager ?? (isTestMode ? MockControllerLockManager() : DefaultControllerLockManager())
+        self.inputDeviceManager = inputDeviceManager ?? (isTestMode ? MockInputDeviceManager() : InputDeviceManager.shared)
         self.isLocked = isLocked
+
+        if let manager = self.inputDeviceManager as? InputDeviceManager {
+            manager.onDeviceBlockStateChanged = { [weak self] in
+                guard let self = self else { return }
+                if self.isLocked {
+                    self.controllerLockManager.lockControllers(matchingDevices: self.inputDeviceManager.devices)
+                }
+            }
+        }
 
         // Skip accessibility check if running tests or previews
         self.accessibilityPermissionGranted = isTestMode ? true : requestAccessibilityPermissions()
@@ -136,40 +147,13 @@ class EventHandler: ObservableObject {
     }
 
     func setLocked(isLocked: Bool, viaHotCorner: Bool = false) {
-        let wasLocked = self.isLocked
-        let wasLockedViaHotCorner = self.lockedViaHotCorner
-
         if (isLocked && accessibilityPermissionGranted) {
             self.isLocked = true
             self.lockedViaHotCorner = viaHotCorner
-
-            debugLog("setLocked: isLocked=\(isLocked), viaHotCorner=\(viaHotCorner), wasLocked=\(wasLocked), wasLockedViaHotCorner=\(wasLockedViaHotCorner)")
-
-            // Restart event tap if hot corner state changed or we're locking via hot corner
-            if viaHotCorner && (!wasLocked || !wasLockedViaHotCorner) {
-                if eventTap != nil {
-                    eventTapManager.enableTap(eventTap, enable: false)
-                    debugLog("Disabling old event tap to include mouse events")
-                }
-                setupEventTap()
-                if !eventLoopStarted {
-                    startEventLoop()
-                }
-            } else {
-                startEventLoop()
-            }
+            startEventLoop()
         } else {
             self.isLocked = false
             self.lockedViaHotCorner = false
-
-            debugLog("setLocked: unlocking, wasLockedViaHotCorner=\(wasLockedViaHotCorner)")
-
-            // Restart event tap to remove mouse events if was locked via hot corner
-            if wasLockedViaHotCorner && eventTap != nil {
-                eventTapManager.enableTap(eventTap, enable: false)
-                debugLog("Restarting event tap to remove mouse events")
-                setupEventTap()
-            }
         }
     }
 
@@ -271,7 +255,7 @@ class EventHandler: ObservableObject {
         if savedCapsLockState {
             capsLockManager.setCapsLockState(false)
         }
-        controllerLockManager.lockControllers()
+        controllerLockManager.lockControllers(matchingDevices: inputDeviceManager.devices)
     }
 
     private func onUnlocked() {
@@ -280,6 +264,10 @@ class EventHandler: ObservableObject {
             savedCapsLockState = false
         }
         controllerLockManager.unlockControllers()
+    }
+
+    func updateEventTapMaskIfNeeded() {
+        // Dynamic event filtering happens per-event in handleKeyEvent
     }
 
     func startEventLoop() {
@@ -292,7 +280,7 @@ class EventHandler: ObservableObject {
 
         // Run the event tap loop off the main thread to avoid UI stalls.
         DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-            guard let self else { return }
+            guard let self = self else { return }
             self.setupEventTap() // Setup event tap to capture key events
             self.eventTapManager.runLoop()  // Start the run loop on a background thread
         }
@@ -304,24 +292,20 @@ class EventHandler: ObservableObject {
                                     (1 << CGEventType.flagsChanged.rawValue) |
                                     (1 << 14) // search and voice key
 
-        var eventMask = CGEventMask(keyboardMask)
+        let m1: UInt32 = (1 << CGEventType.leftMouseDown.rawValue)
+        let m2: UInt32 = (1 << CGEventType.leftMouseUp.rawValue)
+        let m3: UInt32 = (1 << CGEventType.rightMouseDown.rawValue)
+        let m4: UInt32 = (1 << CGEventType.rightMouseUp.rawValue)
+        let m5: UInt32 = (1 << CGEventType.otherMouseDown.rawValue)
+        let m6: UInt32 = (1 << CGEventType.otherMouseUp.rawValue)
+        let m7: UInt32 = (1 << CGEventType.leftMouseDragged.rawValue)
+        let m8: UInt32 = (1 << CGEventType.rightMouseDragged.rawValue)
+        let m9: UInt32 = (1 << CGEventType.otherMouseDragged.rawValue)
+        let mouseMask = m1 | m2 | m3 | m4 | m5 | m6 | m7 | m8 | m9
 
-        // Add mouse events if locked via hot corner
-        if lockedViaHotCorner {
-            let m1: UInt32 = (1 << CGEventType.leftMouseDown.rawValue)
-            let m2: UInt32 = (1 << CGEventType.leftMouseUp.rawValue)
-            let m3: UInt32 = (1 << CGEventType.rightMouseDown.rawValue)
-            let m4: UInt32 = (1 << CGEventType.rightMouseUp.rawValue)
-            let m5: UInt32 = (1 << CGEventType.otherMouseDown.rawValue)
-            let m6: UInt32 = (1 << CGEventType.otherMouseUp.rawValue)
-            let m7: UInt32 = (1 << CGEventType.leftMouseDragged.rawValue)
-            let m8: UInt32 = (1 << CGEventType.rightMouseDragged.rawValue)
-            let m9: UInt32 = (1 << CGEventType.otherMouseDragged.rawValue)
-            let mouseMask = m1 | m2 | m3 | m4 | m5 | m6 | m7 | m8 | m9
-            eventMask |= CGEventMask(mouseMask)
-        }
+        let eventMask = CGEventMask(keyboardMask | mouseMask)
 
-        debugLog("Setting up event tap with mask: \(eventMask), lockedViaHotCorner: \(lockedViaHotCorner)")
+        debugLog("Setting up event tap with mask: \(eventMask)")
 
         eventTap = eventTapManager.createEventTap(
             tap: .cghidEventTap,
@@ -362,93 +346,92 @@ class EventHandler: ObservableObject {
             return Unmanaged.passUnretained(event)
         }
 
-        // Handle mouse events when locked via hot corner
-        if lockedViaHotCorner && isLocked {
-            switch type {
-            case .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp, .otherMouseDown, .otherMouseUp, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged:
-                debugLog("Mouse event BLOCKED: \(type.rawValue), lockedViaHotCorner: \(lockedViaHotCorner), isLocked: \(isLocked)")
-                return nil
-            default:
-                break
-            }
-        } else if type.rawValue >= 1 && type.rawValue <= 7 {
-            // Log any mouse events that aren't being blocked
-            debugLog("Mouse event NOT blocked: \(type.rawValue), lockedViaHotCorner: \(lockedViaHotCorner), isLocked: \(isLocked)")
+        // Toggle with Ctrl + Option + U (always handled regardless of which keyboard)
+        let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+        let controlFlag = event.flags.contains(.maskControl)
+        let optionFlag = event.flags.contains(.maskAlternate)
+        let eventType = type == .keyDown ? "pressed" : "released"
+
+        if optionFlag && controlFlag && keyCode == KeyCode.u.rawValue && type == .keyDown {
+            debugLog("Keyboard locked: \(isLocked)")
+            self.isLocked = isLocked ? false : true
+            eventTapManager.stopRunLoop()
+            return nil
         }
 
-        debugLog("--- keyup/down: \(type == .keyDown || type == .keyUp), keyboardEventKeyboardType: \(event.getIntegerValueField(.keyboardEventKeyboardType))")
+        guard isLocked else {
+            return Unmanaged.passUnretained(event)
+        }
+
+        // Check if the specific input device that originated this event is blocked
+        let senderID = getSenderID(from: event)
+        let shouldBlock = inputDeviceManager.isDeviceBlocked(senderID: senderID, eventType: type)
+        if !shouldBlock {
+            // This device is unchecked by the user, pass event through to system
+            return Unmanaged.passUnretained(event)
+        }
+
+        // Handle mouse events when locked
+        switch type {
+        case .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp,
+             .otherMouseDown, .otherMouseUp, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged:
+            debugLog("Mouse event BLOCKED: \(type.rawValue), lockedViaHotCorner: \(lockedViaHotCorner), isLocked: \(isLocked)")
+            return nil
+        default:
+            break
+        }
+
+        debugLog("Key Code: \0x\(String(keyCode, radix: 16)),\t" +
+                 "Control Flag: \(controlFlag),\t" +
+                 "Event Type: (\(type.rawValue)) \(eventType)")
+
         // disable media keys, power button
-        if isLocked && event.getIntegerValueField(.keyboardEventKeyboardType) == 0 {
+        if event.getIntegerValueField(.keyboardEventKeyboardType) == 0 {
             return nil
         }
 
         // Handle Caps Lock & modifier keys
         if type == .flagsChanged {
-            let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
             if keyCode == KeyCode.capsLock.rawValue {
-                if isLocked {
-                    // Prevent Caps Lock from toggling state or lighting the LED
-                    capsLockManager.setCapsLockState(false)
+                // Prevent Caps Lock from toggling state or lighting the LED
+                capsLockManager.setCapsLockState(false)
 
-                    // Strip AlphaShift flag from the event
-                    event.flags.remove(.maskAlphaShift)
+                // Strip AlphaShift flag from the event
+                event.flags.remove(.maskAlphaShift)
 
-                    if !throttleManager.isThrottled() {
-                        self.lastKeyString = effectCoordinator.handle(
-                            event: event, eventType: type, selectedLockEffect: selectedLockEffect
-                        )
-                        debugLog("capsLock pressed ------- \(lastKeyString)")
-                    }
-                    notifyKeyPressed(isAutorepeat: false)
-                    return nil
+                if !throttleManager.isThrottled() {
+                    self.lastKeyString = effectCoordinator.handle(
+                        event: event, eventType: type, selectedLockEffect: selectedLockEffect
+                    )
+                    debugLog("capsLock pressed ------- \(lastKeyString)")
                 }
-            } else if isLocked {
+                notifyKeyPressed(isAutorepeat: false)
+                return nil
+            } else {
                 // Swallow other modifier keys while locked so they don't leak to background apps
                 return nil
             }
-            return Unmanaged.passUnretained(event)
         }
 
         guard type == .keyDown || type == .keyUp else {
             return Unmanaged.passUnretained(event)
         }
 
-        let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
-        let controlFlag = event.flags.contains(.maskControl)
-        let optionFlag = event.flags.contains(.maskAlternate)
-        let eventType = type == .keyDown ? "pressed" : "released"
-        debugLog("Key Code: \0x\(String(keyCode, radix: 16)),\t" +
-                 "Control Flag: \(controlFlag),\t" +
-                 "Event Type: (\(type.rawValue)) \(eventType)")
-        // Toggle with Ctrl + Option + U
-        if optionFlag && controlFlag && keyCode == KeyCode.u.rawValue && type == .keyDown {
-            debugLog("Keyboard locked: \(isLocked)")
-            self.isLocked = isLocked ? false : true
-            eventTapManager.stopRunLoop()
-
+        if type == .keyDown {
+            let isAutorepeat = event.getIntegerValueField(.keyboardEventAutorepeat) != 0
+            notifyKeyPressed(isAutorepeat: isAutorepeat)
             return nil
         }
 
-        if isLocked {
+        if type != .keyUp { return nil }
 
-            if type == .keyDown {
-                let isAutorepeat = event.getIntegerValueField(.keyboardEventAutorepeat) != 0
-                notifyKeyPressed(isAutorepeat: isAutorepeat)
-                return nil
-            }
+        if throttleManager.isThrottled() { return nil }
 
-            if type != .keyUp { return nil }
-
-            if throttleManager.isThrottled() { return nil }
-
-            self.lastKeyString = effectCoordinator.handle(
-                event: event, eventType: type, selectedLockEffect: selectedLockEffect
-            )
-            debugLog("keyup------- \(lastKeyString), str: \(lastKeyString)")
-            return nil
-        } else {
-            return Unmanaged.passUnretained(event)
-        }
+        self.lastKeyString = effectCoordinator.handle(
+            event: event, eventType: type, selectedLockEffect: selectedLockEffect
+        )
+        debugLog("keyup------- \(lastKeyString), str: \(lastKeyString)")
+        return nil
     }
 
     func requestAccessibilityPermissions() -> Bool {
@@ -511,19 +494,32 @@ class EventHandler: ObservableObject {
 
     /// Allows tests to clear the event tap (useful for cleanup)
     func testClearEventTap() {
-        eventTapManager.enableTap(eventTap, enable: false)
-        eventTap = nil
+        if let eventTap = eventTap {
+            eventTapManager.enableTap(eventTap, enable: false)
+            self.eventTap = nil
+        }
+    }
+
+    /// Exposes inputDeviceManager for testing verification
+    var testInputDeviceManager: InputDeviceManaging {
+        return inputDeviceManager
     }
     #endif
-
 }
 
 func globalKeyEventHandler(
     proxy: CGEventTapProxy,
     type: CGEventType,
     event: CGEvent,
-    refcon: UnsafeMutableRawPointer?) -> Unmanaged<CGEvent>? {
-    guard let refcon = refcon else { return Unmanaged.passUnretained(event) }
-    let mySelf = Unmanaged<EventHandler>.fromOpaque(refcon).takeUnretainedValue()
-    return mySelf.handleKeyEvent(proxy: proxy, type: type, event: event)
+    userInfo: UnsafeMutableRawPointer?
+) -> Unmanaged<CGEvent>? {
+    guard let userInfo = userInfo else {
+        return Unmanaged.passUnretained(event)
+    }
+
+    let handler = Unmanaged<EventHandler>
+        .fromOpaque(userInfo)
+        .takeUnretainedValue()
+
+    return handler.handleKeyEvent(proxy: proxy, type: type, event: event)
 }

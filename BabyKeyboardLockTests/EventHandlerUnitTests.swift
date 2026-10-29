@@ -84,8 +84,7 @@ struct EventHandlerUnitTests {
         // Manually setup event tap for testing
         handler.testSetupEventTap()
 
-        // Verify createEventTap was called (but returns nil in mock)
-        #expect(mockManager.createEventTapCalled)
+        // Verify createEventTap was called (but returns nil in mock)\n        #expect(mockManager.createEventTapCalled)
         // Mock returns nil, so event tap should NOT be setup
         #expect(!handler.isEventTapSetup)
         // enableTap should not be called when eventTap is nil
@@ -241,6 +240,113 @@ struct EventHandlerUnitTests {
         handler.stop()
         #expect(mockController.unlockControllersCalled)
         #expect(!mockController.isLocked)
+    }
+
+    // MARK: - Input Device Filtering Tests
+
+    @Test func testMockInputDeviceManagerIsUsedInTests() async throws {
+        setUp()
+        let handler = EventHandler(isLocked: false)
+        let manager = handler.testInputDeviceManager
+        #expect(manager is MockInputDeviceManager)
+    }
+
+    @Test func testKeyboardEventFromBlockedDeviceIsSwallowed() async throws {
+        setUp()
+        let mockDeviceManager = MockInputDeviceManager()
+        mockDeviceManager.isDeviceBlockedHandler = { _, _ in true }
+
+        let handler = EventHandler(isLocked: true, inputDeviceManager: mockDeviceManager)
+
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: 0x00, keyDown: true) else {
+            Issue.record("Failed to create CGEvent")
+            return
+        }
+
+        let result = handler.handleKeyEvent(type: .keyDown, event: event)
+        #expect(result == nil, "Key event from blocked device should be swallowed")
+    }
+
+    @Test func testKeyboardEventFromUnblockedDevicePassesThrough() async throws {
+        setUp()
+        let mockDeviceManager = MockInputDeviceManager()
+        // Simulate device is NOT blocked
+        mockDeviceManager.isDeviceBlockedHandler = { _, _ in false }
+
+        let handler = EventHandler(isLocked: true, inputDeviceManager: mockDeviceManager)
+
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: 0x00, keyDown: true) else {
+            Issue.record("Failed to create CGEvent")
+            return
+        }
+
+        let result = handler.handleKeyEvent(type: .keyDown, event: event)
+        #expect(result != nil, "Key event from unblocked device should pass through")
+    }
+
+    @Test func testMouseEventFromBlockedDeviceIsSwallowed() async throws {
+        setUp()
+        let mockDeviceManager = MockInputDeviceManager()
+        mockDeviceManager.isDeviceBlockedHandler = { _, _ in true }
+
+        let handler = EventHandler(isLocked: true, inputDeviceManager: mockDeviceManager)
+
+        guard let event = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: .zero, mouseButton: .left) else {
+            Issue.record("Failed to create mouse CGEvent")
+            return
+        }
+
+        let result = handler.handleKeyEvent(type: .leftMouseDown, event: event)
+        #expect(result == nil, "Mouse event from blocked device should be swallowed")
+    }
+
+    @Test func testMouseEventFromUnblockedDevicePassesThrough() async throws {
+        setUp()
+        let mockDeviceManager = MockInputDeviceManager()
+        mockDeviceManager.isDeviceBlockedHandler = { _, _ in false }
+
+        let handler = EventHandler(isLocked: true, inputDeviceManager: mockDeviceManager)
+
+        guard let event = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: .zero, mouseButton: .left) else {
+            Issue.record("Failed to create mouse CGEvent")
+            return
+        }
+
+        let result = handler.handleKeyEvent(type: .leftMouseDown, event: event)
+        #expect(result != nil, "Mouse event from unblocked device should pass through")
+    }
+
+    @Test func testUnlockShortcutWorksEvenIfDeviceBlocked() async throws {
+        setUp()
+        let mockDeviceManager = MockInputDeviceManager()
+        mockDeviceManager.isDeviceBlockedHandler = { _, _ in true }
+
+        let handler = EventHandler(isLocked: true, inputDeviceManager: mockDeviceManager)
+
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: KeyCode.u.rawValue, keyDown: true) else {
+            Issue.record("Failed to create CGEvent")
+            return
+        }
+        event.flags = [.maskControl, .maskAlternate]
+
+        let result = handler.handleKeyEvent(type: .keyDown, event: event)
+        #expect(result == nil)
+        #expect(handler.isLocked == false, "Unlock shortcut should unlock regardless of device blocking state")
+    }
+
+    @Test func testControllersLockedWithDeviceList() async throws {
+        setUp()
+        let mockController = MockControllerLockManager()
+        let mockDeviceManager = MockInputDeviceManager()
+        let controllerDevice = InputDevice(id: "ctrl_1", name: "Gamepad", type: .controller, isBlocked: true)
+        mockDeviceManager.devices = [controllerDevice]
+
+        let handler = EventHandler(isLocked: false, controllerLockManager: mockController, inputDeviceManager: mockDeviceManager)
+        handler.isLocked = true
+
+        #expect(mockController.lockControllersCalled)
+        #expect(mockController.lastLockedDevices.count == 1)
+        #expect(mockController.isLocked == true)
     }
 
     // MARK: - Key Pressed Notification Tests
