@@ -4,7 +4,7 @@ A macOS menu bar app that locks your keyboard to prevent unwanted inputs while e
 
 **Official Website:** https://keyboardlock.app/
 
-![BabyKeyboard Lock screenshot](screenshots/main.png)
+![BabyKeyboard Lock screenshot](screenshots/main.jpeg)
 
 ## Features
 
