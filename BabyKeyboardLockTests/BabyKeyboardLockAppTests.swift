@@ -10,6 +10,7 @@ import SwiftUI
 import AppKit
 @testable import BabyKeyboardLock
 
+@Suite(.serialized)
 struct BabyKeyboardLockAppTests {
 
     @MainActor
@@ -112,5 +113,93 @@ struct BabyKeyboardLockAppTests {
     @Test func testWindowConstants() async throws {
         #expect(AnimationWindowID == "animationTransparentWindow", "Animation window ID should match")
         #expect(MainWindowID == "main", "Main window ID should match")
+    }
+
+    @MainActor
+    @Test func testAnimateStatusItemOnKeyPressWhenLocked() async throws {
+        let delegate = AppDelegate()
+        let notification = Notification(name: NSApplication.didFinishLaunchingNotification)
+
+        EventHandler.shared.isLocked = true
+        delegate.applicationDidFinishLaunching(notification)
+        try await Task.sleep(for: .milliseconds(100))
+
+        guard let button = delegate.statusItem?.button,
+              let layer = button.layer else {
+            Issue.record("Button or layer should not be nil")
+            return
+        }
+
+        delegate.animateStatusItemOnKeyPress(isAutorepeat: false)
+        #expect(layer.animation(forKey: "keyPressShakeAnimation") != nil, "Shake animation should be attached to layer")
+    }
+
+    @MainActor
+    @Test func testAnimateStatusItemOnKeyPressWhenUnlocked() async throws {
+        let delegate = AppDelegate()
+        let notification = Notification(name: NSApplication.didFinishLaunchingNotification)
+
+        EventHandler.shared.isLocked = false
+        delegate.applicationDidFinishLaunching(notification)
+        try await Task.sleep(for: .milliseconds(100))
+
+        guard let button = delegate.statusItem?.button,
+              let layer = button.layer else {
+            Issue.record("Button or layer should not be nil")
+            return
+        }
+
+        delegate.animateStatusItemOnKeyPress(isAutorepeat: false)
+        #expect(layer.animation(forKey: "keyPressShakeAnimation") == nil, "Shake animation should not run when unlocked")
+    }
+
+    @MainActor
+    @Test func testAutorepeatDoesNotInterruptExistingAnimation() async throws {
+        let delegate = AppDelegate()
+        let notification = Notification(name: NSApplication.didFinishLaunchingNotification)
+
+        EventHandler.shared.isLocked = true
+        delegate.applicationDidFinishLaunching(notification)
+        try await Task.sleep(for: .milliseconds(100))
+
+        guard let button = delegate.statusItem?.button,
+              let layer = button.layer else {
+            Issue.record("Button or layer should not be nil")
+            return
+        }
+
+        delegate.animateStatusItemOnKeyPress(isAutorepeat: false)
+        let initialAnimation = layer.animation(forKey: "keyPressShakeAnimation")
+        #expect(initialAnimation != nil)
+
+        // An autorepeat should not replace the existing running animation
+        delegate.animateStatusItemOnKeyPress(isAutorepeat: true)
+        let currentAnimation = layer.animation(forKey: "keyPressShakeAnimation")
+        #expect(currentAnimation === initialAnimation, "Autorepeat should keep existing animation playing")
+    }
+
+    @MainActor
+    @Test func testUnlockingClearsRunningAnimation() async throws {
+        let delegate = AppDelegate()
+        let notification = Notification(name: NSApplication.didFinishLaunchingNotification)
+
+        EventHandler.shared.isLocked = true
+        delegate.applicationDidFinishLaunching(notification)
+        try await Task.sleep(for: .milliseconds(100))
+
+        guard let button = delegate.statusItem?.button,
+              let layer = button.layer else {
+            Issue.record("Button or layer should not be nil")
+            return
+        }
+
+        delegate.animateStatusItemOnKeyPress(isAutorepeat: false)
+        #expect(layer.animation(forKey: "keyPressShakeAnimation") != nil)
+
+        // Unlocking the keyboard should remove the running animation
+        EventHandler.shared.isLocked = false
+        try await Task.sleep(for: .milliseconds(100))
+
+        #expect(layer.animation(forKey: "keyPressShakeAnimation") == nil, "Animation should be removed when unlocked")
     }
 }

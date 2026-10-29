@@ -242,4 +242,101 @@ struct EventHandlerUnitTests {
         #expect(mockController.unlockControllersCalled)
         #expect(!mockController.isLocked)
     }
+
+    // MARK: - Key Pressed Notification Tests
+
+    @Test func testKeyPressWhileLockedTriggersNotification() async throws {
+        setUp()
+        let handler = EventHandler(isLocked: true)
+
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: 0x00, keyDown: true) else {
+            Issue.record("Failed to create CGEvent")
+            return
+        }
+
+        var notificationReceived = false
+        var receivedAutorepeat = true
+        handler.onKeyPressedWhileLocked = { isAutorepeat in
+            notificationReceived = true
+            receivedAutorepeat = isAutorepeat
+        }
+
+        let result = handler.handleKeyEvent(type: .keyDown, event: event)
+        #expect(result == nil, "Key event should be swallowed when locked")
+
+        // Wait briefly for main queue dispatch
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(notificationReceived, "Should trigger key press notification when locked")
+        #expect(!receivedAutorepeat, "Initial key press should not be flagged as autorepeat")
+    }
+
+    @Test func testKeyPressWithAutorepeatTriggersNotificationWithAutorepeatFlag() async throws {
+        setUp()
+        let handler = EventHandler(isLocked: true)
+
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: 0x00, keyDown: true) else {
+            Issue.record("Failed to create CGEvent")
+            return
+        }
+        event.setIntegerValueField(.keyboardEventAutorepeat, value: 1)
+
+        var notificationReceived = false
+        var receivedAutorepeat = false
+        handler.onKeyPressedWhileLocked = { isAutorepeat in
+            notificationReceived = true
+            receivedAutorepeat = isAutorepeat
+        }
+
+        let result = handler.handleKeyEvent(type: .keyDown, event: event)
+        #expect(result == nil)
+
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(notificationReceived)
+        #expect(receivedAutorepeat, "Autorepeat key press should be flagged as autorepeat")
+    }
+
+    @Test func testKeyPressWhileUnlockedDoesNotTriggerNotification() async throws {
+        setUp()
+        let handler = EventHandler(isLocked: false)
+
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: 0x00, keyDown: true) else {
+            Issue.record("Failed to create CGEvent")
+            return
+        }
+
+        var notificationReceived = false
+        handler.onKeyPressedWhileLocked = { _ in
+            notificationReceived = true
+        }
+
+        let result = handler.handleKeyEvent(type: .keyDown, event: event)
+        #expect(result != nil, "Key event should pass through when unlocked")
+
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(!notificationReceived, "Should NOT trigger key press notification when unlocked")
+    }
+
+    @Test func testCapsLockKeyPressWhileLockedTriggersNotification() async throws {
+        setUp()
+        let mockCapsLock = MockCapsLockManager()
+        let handler = EventHandler(isLocked: true, capsLockManager: mockCapsLock)
+
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: KeyCode.capsLock.rawValue, keyDown: false) else {
+            Issue.record("Failed to create CGEvent")
+            return
+        }
+        event.flags = [.maskAlphaShift]
+
+        var notificationReceived = false
+        handler.onKeyPressedWhileLocked = { isAutorepeat in
+            notificationReceived = true
+            #expect(!isAutorepeat)
+        }
+
+        let result = handler.handleKeyEvent(type: .flagsChanged, event: event)
+        #expect(result == nil)
+
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(notificationReceived, "Caps lock while locked should trigger key press notification")
+    }
 }

@@ -9,6 +9,7 @@ import Foundation
 import CoreGraphics
 import AppKit
 import ApplicationServices
+import Combine
 
 class EventHandler: ObservableObject {
     private let lock = NSLock()
@@ -47,6 +48,24 @@ class EventHandler: ObservableObject {
         didSet {
             UserDefaults.standard.set(hotCornerEnabled, forKey: "hotCornerEnabled")
             updateHotCornerService()
+        }
+    }
+
+
+    /// Emits `isAutorepeat: Bool` whenever a key is pressed while the keyboard is locked.
+    let keyPressedWhileLockedSubject = PassthroughSubject<Bool, Never>()
+
+    #if DEBUG
+    var onKeyPressedWhileLocked: ((Bool) -> Void)?
+    #endif
+
+    func notifyKeyPressed(isAutorepeat: Bool = false) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.keyPressedWhileLockedSubject.send(isAutorepeat)
+            #if DEBUG
+            self.onKeyPressedWhileLocked?(isAutorepeat)
+            #endif
         }
     }
 
@@ -380,6 +399,7 @@ class EventHandler: ObservableObject {
                         )
                         debugLog("capsLock pressed ------- \(lastKeyString)")
                     }
+                    notifyKeyPressed(isAutorepeat: false)
                     return nil
                 }
             } else if isLocked {
@@ -410,6 +430,12 @@ class EventHandler: ObservableObject {
         }
 
         if isLocked {
+
+            if type == .keyDown {
+                let isAutorepeat = event.getIntegerValueField(.keyboardEventAutorepeat) != 0
+                notifyKeyPressed(isAutorepeat: isAutorepeat)
+                return nil
+            }
 
             if type != .keyUp { return nil }
 

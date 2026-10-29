@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import QuartzCore
 
 let AnimationWindowID = "animationTransparentWindow"
 let MainWindowID = "main"
@@ -51,6 +52,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let statusButton = statusItem.button {
+            statusButton.wantsLayer = true
             updateStatusItemIcon(isLocked: EventHandler.shared.isLocked)
             statusButton.image?.accessibilityDescription = Bundle.applicationName
             statusButton.sendAction(on: [.leftMouseUp, .rightMouseUp])
@@ -63,6 +65,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         EventHandler.shared.$isLocked
             .sink { [weak self] isLocked in
                 self?.updateStatusItemIcon(isLocked: isLocked)
+            }
+            .store(in: &cancellables)
+
+        // Add observer for key pressed while locked to animate status bar icon
+        EventHandler.shared.keyPressedWhileLockedSubject
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isAutorepeat in
+                self?.animateStatusItemOnKeyPress(isAutorepeat: isAutorepeat)
             }
             .store(in: &cancellables)
 
@@ -96,8 +106,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         debugLog("-------- applicationWillTerminate --------")
     }
 
+    let keyPressAnimationKey = "keyPressShakeAnimation"
+
     private func updateStatusItemIcon(isLocked: Bool) {
         guard let statusButton = statusItem.button else { return }
+        statusButton.wantsLayer = true
         let imageName = isLocked ? "keyboard.locked" : "keyboard.unlocked"
 
         let image = NSImage(named: imageName)
@@ -114,6 +127,32 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             statusButton.title = "BK"
             statusItem.length = NSStatusItem.variableLength
         }
+
+        if !isLocked {
+            statusButton.layer?.removeAnimation(forKey: keyPressAnimationKey)
+        }
+    }
+
+    func animateStatusItemOnKeyPress(isAutorepeat: Bool = false) {
+        guard EventHandler.shared.isLocked,
+              let statusButton = statusItem?.button,
+              let layer = statusButton.layer else { return }
+
+        // If this is an auto-repeat event and the animation is already running,
+        // keep the current animation playing smoothly to prevent stuttering.
+        if isAutorepeat && layer.animation(forKey: keyPressAnimationKey) != nil {
+            return
+        }
+
+        layer.removeAnimation(forKey: keyPressAnimationKey)
+
+        let shake = CAKeyframeAnimation(keyPath: "transform.translation.x")
+        shake.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        shake.duration = 0.25
+        shake.values = [0, -3.0, 3.0, -2.5, 2.5, -1.0, 1.0, 0]
+        shake.keyTimes = [0.0, 0.15, 0.3, 0.5, 0.7, 0.85, 1.0]
+
+        layer.add(shake, forKey: keyPressAnimationKey)
     }
 
     private func scheduleStatusItemRefresh() {
