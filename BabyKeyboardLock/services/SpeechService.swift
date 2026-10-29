@@ -35,18 +35,26 @@ class SpeechService {
     private func createUtterance(for str: String, language: String? = nil) -> AVSpeechUtterance {
         let utterance = AVSpeechUtterance(string: str)
 
-        let languageCode = language ?? Locale.preferredLanguages[0]
+        let languageCode = language ?? Locale.preferredLanguages.first ?? "en-US"
 
         // Cache voices to ensure consistent voice selection across calls
         if let cachedVoice = voiceCache[languageCode] {
             utterance.voice = cachedVoice
         } else {
-            // https://stackoverflow.com/questions/37512621/avspeechsynthesizer-change-voice
-            let allVoices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
-                guard languageCode == voice.language else { return false}
-                return true
+            let allVoices = AVSpeechSynthesisVoice.speechVoices()
+            var matchingVoices = allVoices.filter { $0.language == languageCode }
+
+            // Fallback to language prefix (e.g. "en" for "en-FI") if exact locale tag not found
+            if matchingVoices.isEmpty {
+                let languagePrefix = languageCode.prefix(2).lowercased()
+                matchingVoices = allVoices.filter { $0.language.lowercased().hasPrefix(languagePrefix) }
             }
-            let selectedVoice = allVoices.first {voice in voice.identifier.contains("siri") } ?? allVoices.first
+
+            let selectedVoice = matchingVoices.first { $0.identifier.contains("siri") }
+                ?? matchingVoices.first
+                ?? AVSpeechSynthesisVoice(language: languageCode)
+                ?? AVSpeechSynthesisVoice(language: "en-US")
+
             if let selectedVoice = selectedVoice {
                 voiceCache[languageCode] = selectedVoice
             }
@@ -56,4 +64,3 @@ class SpeechService {
         return utterance
     }
 }
-

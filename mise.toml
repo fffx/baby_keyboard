@@ -1,0 +1,25 @@
+[tasks.test]
+description = "Run tests"
+run = "xcodebuild test -scheme BabyKeyboardLock -destination 'platform=macOS'"
+
+[tasks.build]
+description = "Build and archive macOS app, then zip for release"
+run = """
+mkdir -p build
+xcodebuild archive \
+  -scheme BabyKeyboardLock \
+  -configuration Release \
+  -destination 'generic/platform=macOS' \
+  -archivePath build/BabyKeyboardLock.xcarchive
+
+ditto -c -k --keepParent \
+  build/BabyKeyboardLock.xcarchive/Products/Applications/BabyKeyboardLock.app \
+  "build/BabyKeyboardLock-${GITHUB_REF_NAME:-latest}.zip"
+"""
+
+[tasks.clean]
+description = "Clean build artifacts"
+run = """
+xcodebuild clean -scheme BabyKeyboardLock
+rm -rf build/
+"""

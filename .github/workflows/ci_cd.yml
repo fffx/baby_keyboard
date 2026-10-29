@@ -1,7 +1,6 @@
 name: App build
 on: push
 
-
 jobs:
   build:
     runs-on: macos-latest
@@ -20,21 +19,14 @@ jobs:
           verbosity: xcpretty
           upload-logs: always
           configuration: release
-      - name: Setup Ruby and fastlane
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.4.5
-          bundler-cache: true
-      - name: Install dependencies
-        run: bundle install
+      - name: Setup mise
+        uses: jdx/mise-action@v2
       - name: Run tests
-        env:
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-        run: bundle exec fastlane test
+        run: mise run test
       - name: Build and archive macOS app
         env:
           GITHUB_REF_NAME: ${{ github.ref_name }}
-        run: bundle exec fastlane build
+        run: mise run build
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
