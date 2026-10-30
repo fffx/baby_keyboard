@@ -171,13 +171,21 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
                     continue
                 }
 
-                // Determine registry entry ID of this specific HID device
+                // Determine registry entry ID of this specific HID device and its parent service
                 var registryIDs = Set<UInt64>()
                 let service = IOHIDDeviceGetService(dev)
                 if service != MACH_PORT_NULL {
                     var entryID: UInt64 = 0
                     if IORegistryEntryGetRegistryEntryID(service, &entryID) == KERN_SUCCESS && entryID != 0 {
                         registryIDs.insert(entryID)
+                    }
+                    var parent: io_registry_entry_t = 0
+                    if IORegistryEntryGetParentEntry(service, kIOServicePlane, &parent) == KERN_SUCCESS && parent != MACH_PORT_NULL {
+                        var parentID: UInt64 = 0
+                        if IORegistryEntryGetRegistryEntryID(parent, &parentID) == KERN_SUCCESS && parentID != 0 {
+                            registryIDs.insert(parentID)
+                        }
+                        IOObjectRelease(parent)
                     }
                 }
 
@@ -332,9 +340,18 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
         guard service != MACH_PORT_NULL else { return nil }
         defer { IOObjectRelease(service) }
 
-        let vid = (IORegistryEntryCreateCFProperty(service, kIOHIDVendorIDKey as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? NSNumber)?.intValue
-        let pid = (IORegistryEntryCreateCFProperty(service, kIOHIDProductIDKey as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? NSNumber)?.intValue
-        let name = IORegistryEntryCreateCFProperty(service, kIOHIDProductKey as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? String
+        var vid = (IORegistryEntryCreateCFProperty(service, kIOHIDVendorIDKey as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? NSNumber)?.intValue
+        if vid == nil {
+            vid = (IORegistryEntrySearchCFProperty(service, kIOServicePlane, kIOHIDVendorIDKey as CFString, kCFAllocatorDefault, IOOptionBits(kIORegistryIterateRecursively | kIORegistryIterateParents)) as? NSNumber)?.intValue
+        }
+        var pid = (IORegistryEntryCreateCFProperty(service, kIOHIDProductIDKey as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? NSNumber)?.intValue
+        if pid == nil {
+            pid = (IORegistryEntrySearchCFProperty(service, kIOServicePlane, kIOHIDProductIDKey as CFString, kCFAllocatorDefault, IOOptionBits(kIORegistryIterateRecursively | kIORegistryIterateParents)) as? NSNumber)?.intValue
+        }
+        var name = IORegistryEntryCreateCFProperty(service, kIOHIDProductKey as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? String
+        if name == nil {
+            name = IORegistryEntrySearchCFProperty(service, kIOServicePlane, kIOHIDProductKey as CFString, kCFAllocatorDefault, IOOptionBits(kIORegistryIterateRecursively | kIORegistryIterateParents)) as? String
+        }
 
         if let match = matchingDevices.first(where: { dev in
             if let vid = vid, let pid = pid, dev.vendorID == vid && dev.productID == pid {
@@ -374,10 +391,10 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
             default:
                 break
             }
-        } else if usagePage == 0x0D /* Digitizer */ {
-            if usage == 0x05 /* TouchPad */ || usage == 0x04 /* TouchScreen */ {
-                return .mouseOrTrackpad
-            }
+        }
+
+        if usagePage == 0x0D /* Digitizer */ && usage == 0x05 /* TouchPad */ {
+            return .mouseOrTrackpad
         }
 
         return nil

@@ -22,8 +22,9 @@ func getSenderID(from event: CGEvent) -> UInt64 {
     guard let hidEvent = CGEventCopyIOHIDEvent(event) else {
         return 0
     }
-    // CGEventCopyIOHIDEvent returns an unmanaged or retained reference depending on OS version;
-    // in CoreGraphics C SPI it returns a reference. We obtain the sender ID:
+    defer {
+        _ = Unmanaged<AnyObject>.fromOpaque(hidEvent).takeRetainedValue()
+    }
     let senderID = IOHIDEventGetSenderID(hidEvent)
     return senderID
 }

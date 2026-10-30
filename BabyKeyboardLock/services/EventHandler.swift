@@ -468,13 +468,6 @@ class EventHandler: ObservableObject {
         return trusted
     }
 
-    private func getSenderID(from event: CGEvent) -> UInt64 {
-        // CGEventGetIntegerValueField with 114 retrieves kCGEventSourceUnixProcessID / sender registry ID
-        // Note: Field 114 is undocumented CoreGraphics constant for event sender ID
-        let senderID = UInt64(bitPattern: event.getIntegerValueField(CGEventField(rawValue: 114)!))
-        return senderID
-    }
-
     #if DEBUG
     /// Allows tests to inspect the internal event tap pointer
     var testEventTap: CFMachPort? {

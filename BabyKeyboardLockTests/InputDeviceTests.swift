@@ -178,4 +178,71 @@ struct InputDeviceTests {
         #expect(mock.isAnyKeyboardBlocked == false)
         #expect(mock.isDeviceBlocked(senderID: 1001, eventType: .keyDown) == false)
     }
+
+    @Test func testInputDeviceManagerRealInstanceDeviceSelectiveBlocking() async throws {
+        let manager = InputDeviceManager(autoStart: false)
+        let internalKeyboard = InputDevice(
+            id: "internal_kb",
+            name: "Apple Internal Keyboard",
+            type: .keyboard,
+            isBlocked: true,
+            registryEntryIDs: [10001, 10002]
+        )
+        let externalKeyboard = InputDevice(
+            id: "external_kb",
+            name: "Keyboard K380",
+            type: .keyboard,
+            isBlocked: false,
+            registryEntryIDs: [20001, 20002]
+        )
+        let trackpad = InputDevice(
+            id: "internal_tp",
+            name: "Apple Internal Trackpad",
+            type: .mouseOrTrackpad,
+            isBlocked: true,
+            registryEntryIDs: [30001]
+        )
+        let magicMouse = InputDevice(
+            id: "external_mouse",
+            name: "Magic Mouse",
+            type: .mouseOrTrackpad,
+            isBlocked: false,
+            registryEntryIDs: [40001]
+        )
+
+        manager.devices = [internalKeyboard, externalKeyboard, trackpad, magicMouse]
+
+        // Internal keyboard is blocked
+        #expect(manager.isDeviceBlocked(senderID: 10001, eventType: .keyDown) == true)
+        #expect(manager.isDeviceBlocked(senderID: 10002, eventType: .keyUp) == true)
+
+        // External keyboard is unchecked/unblocked -> must NOT be blocked
+        #expect(manager.isDeviceBlocked(senderID: 20001, eventType: .keyDown) == false)
+        #expect(manager.isDeviceBlocked(senderID: 20002, eventType: .keyUp) == false)
+
+        // Trackpad is blocked
+        #expect(manager.isDeviceBlocked(senderID: 30001, eventType: .leftMouseDown) == true)
+
+        // Magic mouse is unblocked -> must NOT be blocked
+        #expect(manager.isDeviceBlocked(senderID: 40001, eventType: .leftMouseDown) == false)
+
+        // Unknown device falls back to isAnyKeyboardBlocked / isAnyMouseBlocked
+        #expect(manager.isDeviceBlocked(senderID: 99999, eventType: .keyDown) == true)
+        #expect(manager.isDeviceBlocked(senderID: 99999, eventType: .leftMouseDown) == true)
+    }
+
+    @Test func testIOHIDEventBridgeGetSenderIDWithSyntheticEvent() async throws {
+        // Create a synthetic event
+        guard let source = CGEventSource(stateID: .combinedSessionState) else {
+            return
+        }
+        guard let event = CGEvent(keyboardEventSource: source, virtualKey: 0x00, keyDown: true) else {
+            return
+        }
+
+        // Calling getSenderID should not crash or leak
+        let senderID = getSenderID(from: event)
+        // Synthetic events do not originate from an IOKit HID device, so senderID should be 0
+        #expect(senderID == 0)
+    }
 }
