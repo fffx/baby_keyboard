@@ -101,8 +101,11 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
         IOHIDManagerRegisterDeviceRemovalCallback(manager, removalCallback, refCon)
 
         IOHIDManagerScheduleWithRunLoop(manager, CFRunLoopGetMain(), CFRunLoopMode.commonModes.rawValue)
-        let openRet = IOHIDManagerOpen(manager, IOOptionBits(kIOHIDOptionsTypeNone))
-        debugLog("InputDeviceManager: IOHIDManagerOpen result: \(openRet)")
+        // Note: We intentionally do NOT call IOHIDManagerOpen here.
+        // Calling IOHIDManagerOpen on keyboard/mouse usage pages causes macOS to demand
+        // "Input Monitoring" permission (kTCCServiceListenEvent).
+        // Enumerating devices with IOHIDManagerCopyDevices and receiving hot-plug/removal callbacks
+        // does not require opening the manager, so only Accessibility permission is needed.
 
         refreshDevices()
     }
@@ -114,7 +117,6 @@ class InputDeviceManager: ObservableObject, InputDeviceManaging {
         scheduledRefreshWorkItem = nil
 
         IOHIDManagerUnscheduleFromRunLoop(manager, CFRunLoopGetMain(), CFRunLoopMode.commonModes.rawValue)
-        IOHIDManagerClose(manager, IOOptionBits(kIOHIDOptionsTypeNone))
         self.hidManager = nil
     }
 
