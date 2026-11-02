@@ -11,18 +11,29 @@ import Foundation
 class SpeechService {
     private let synthesizer: SpeechSynthesizing
     private var voiceCache: [String: AVSpeechSynthesisVoice] = [:]
+    private let queue: DispatchQueue?
 
-    init(synthesizer: SpeechSynthesizing = AVSpeechSynthesizer()) {
+    init(
+        synthesizer: SpeechSynthesizing = AVSpeechSynthesizer(),
+        queue: DispatchQueue? = DispatchQueue.global(qos: .userInitiated)
+    ) {
         self.synthesizer = synthesizer
+        self.queue = queue
     }
 
     func speak(_ text: String, language: String? = nil) {
-        DispatchQueue.global(qos: .userInitiated).async {
+        let work = {
             // Stop any ongoing speech to prevent queue buildup
             if self.synthesizer.isSpeaking {
                 _ = self.synthesizer.stopSpeaking(at: .immediate)
             }
             self.synthesizer.speak(self.createUtterance(for: text, language: language))
+        }
+
+        if let queue = queue {
+            queue.async(execute: work)
+        } else {
+            work()
         }
     }
 

@@ -5,6 +5,7 @@
 //  Created by Fangxing Xiong on 20.12.2024.
 //
 
+import Foundation
 import Testing
 @testable import BabyKeyboardLock
 
@@ -27,25 +28,27 @@ struct ThrottleManagerTests {
         #expect(isThrottled, "Immediate second call should be throttled")
     }
 
-    @Test func testCallAfterIntervalNotThrottled() async throws {
-        let manager = ThrottleManager(throttleInterval: 0.1)
+    @Test func testCallAfterIntervalNotThrottled() {
+        var currentTime = Date()
+        let manager = ThrottleManager(throttleInterval: 0.1, dateProvider: { currentTime })
 
         _ = manager.isThrottled() // First call
-        try await Task.sleep(for: .milliseconds(150)) // Wait longer than interval
+        currentTime = currentTime.addingTimeInterval(0.15) // Advance past interval
         let isThrottled = manager.isThrottled() // Second call after interval
 
         #expect(!isThrottled, "Call after interval should not be throttled")
     }
 
-    @Test func testCustomThrottleInterval() async throws {
-        let manager = ThrottleManager(throttleInterval: 0.2)
+    @Test func testCustomThrottleInterval() {
+        var currentTime = Date()
+        let manager = ThrottleManager(throttleInterval: 0.2, dateProvider: { currentTime })
 
         _ = manager.isThrottled()
-        try await Task.sleep(for: .milliseconds(100))
+        currentTime = currentTime.addingTimeInterval(0.1) // 100ms elapsed (< 200ms)
         let isThrottled1 = manager.isThrottled()
         #expect(isThrottled1, "Should be throttled before interval")
 
-        try await Task.sleep(for: .milliseconds(150))
+        currentTime = currentTime.addingTimeInterval(0.15) // 250ms total elapsed (> 200ms)
         let isThrottled2 = manager.isThrottled()
         #expect(!isThrottled2, "Should not be throttled after interval")
     }

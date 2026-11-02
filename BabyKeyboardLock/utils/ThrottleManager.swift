@@ -10,13 +10,15 @@ import Foundation
 class ThrottleManager {
     private var lastEventTime: Date?
     private let throttleInterval: TimeInterval
+    private let dateProvider: () -> Date
 
-    init(throttleInterval: TimeInterval = 1.0) {
+    init(throttleInterval: TimeInterval = 1.0, dateProvider: @escaping () -> Date = Date.init) {
         self.throttleInterval = throttleInterval
+        self.dateProvider = dateProvider
     }
 
     func isThrottled() -> Bool {
-        let now = Date()
+        let now = dateProvider()
 
         guard let lastEventTime = lastEventTime else {
             // First call - not throttled

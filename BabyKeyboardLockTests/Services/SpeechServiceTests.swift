@@ -10,53 +10,44 @@ import Testing
 
 struct SpeechServiceTests {
 
-    @Test func testSpeakCallsSynthesizer() async throws {
+    @Test func testSpeakCallsSynthesizer() {
         let mockSynthesizer = MockSpeechSynthesizer()
-        let service = SpeechService(synthesizer: mockSynthesizer)
+        let service = SpeechService(synthesizer: mockSynthesizer, queue: nil)
 
         service.speak("hello")
-
-        // Wait a bit for async operation on background queue
-        try await Task.sleep(for: .milliseconds(500))
 
         #expect(mockSynthesizer.spokenUtterances.count > 0)
         #expect(mockSynthesizer.spokenUtterances.first?.speechString == "hello")
     }
 
-    @Test func testStopSpeakingWhenAlreadySpeaking() async throws {
+    @Test func testStopSpeakingWhenAlreadySpeaking() {
         let mockSynthesizer = MockSpeechSynthesizer()
         mockSynthesizer.isSpeaking = true
-        let service = SpeechService(synthesizer: mockSynthesizer)
+        let service = SpeechService(synthesizer: mockSynthesizer, queue: nil)
 
         service.speak("test")
-
-        // Wait a bit for async operation on background queue
-        try await Task.sleep(for: .milliseconds(500))
 
         #expect(mockSynthesizer.stopSpeakingCalled)
     }
 
-    @Test func testStopSpeaking() async throws {
+    @Test func testStopSpeaking() {
         let mockSynthesizer = MockSpeechSynthesizer()
         mockSynthesizer.isSpeaking = true
-        let service = SpeechService(synthesizer: mockSynthesizer)
+        let service = SpeechService(synthesizer: mockSynthesizer, queue: nil)
 
         service.stopSpeaking()
 
         #expect(mockSynthesizer.stopSpeakingCalled)
     }
 
-    @Test func testVoiceConsistencyAcrossMultipleCalls() async throws {
+    @Test func testVoiceConsistencyAcrossMultipleCalls() {
         let mockSynthesizer = MockSpeechSynthesizer()
-        let service = SpeechService(synthesizer: mockSynthesizer)
+        let service = SpeechService(synthesizer: mockSynthesizer, queue: nil)
 
         // Speak multiple times with the same language
         service.speak("apple")
-        try await Task.sleep(for: .milliseconds(600))
         service.speak("banana")
-        try await Task.sleep(for: .milliseconds(600))
         service.speak("cherry")
-        try await Task.sleep(for: .milliseconds(600))
 
         // All utterances should use the same voice for the same language
         #expect(mockSynthesizer.spokenUtterances.count == 3)
@@ -75,21 +66,18 @@ struct SpeechServiceTests {
         }
     }
 
-    @Test func testVoiceCachingForDifferentLanguages() async throws {
+    @Test func testVoiceCachingForDifferentLanguages() {
         let mockSynthesizer = MockSpeechSynthesizer()
-        let service = SpeechService(synthesizer: mockSynthesizer)
+        let service = SpeechService(synthesizer: mockSynthesizer, queue: nil)
 
         // Speak in English
         service.speak("hello", language: "en-US")
-        try await Task.sleep(for: .milliseconds(600))
 
         // Speak in French
         service.speak("bonjour", language: "fr-FR")
-        try await Task.sleep(for: .milliseconds(600))
 
         // Speak in English again - should use cached voice
         service.speak("goodbye", language: "en-US")
-        try await Task.sleep(for: .milliseconds(600))
 
         #expect(mockSynthesizer.spokenUtterances.count == 3)
 
@@ -99,6 +87,32 @@ struct SpeechServiceTests {
             let thirdVoice = mockSynthesizer.spokenUtterances[2].voice
             #expect(firstVoice?.identifier == thirdVoice?.identifier, "English voice should be consistent across calls")
         }
+    }
+
+    @Test func testSpeakDispatchesAsynchronouslyByDefault() async throws {
+        let mockSynthesizer = MockSpeechSynthesizer()
+        let service = SpeechService(synthesizer: mockSynthesizer)
+
+        let spoken = await withCheckedContinuation { continuation in
+            var resumed = false
+            mockSynthesizer.onSpeak = { _ in
+                if !resumed {
+                    resumed = true
+                    continuation.resume(returning: true)
+                }
+            }
+            service.speak("async test")
+            Task {
+                try? await Task.sleep(for: .seconds(3))
+                if !resumed {
+                    resumed = true
+                    continuation.resume(returning: false)
+                }
+            }
+        }
+
+        #expect(spoken, "Speech should be performed on the background queue")
+        #expect(mockSynthesizer.spokenUtterances.first?.speechString == "async test")
     }
 }
 
