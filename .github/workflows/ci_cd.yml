@@ -1,9 +1,18 @@
 name: App build
-on: push
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name for release (e.g. v0.4.0). If empty, auto-detects from tag or project version.'
+        required: false
+        type: string
 
 jobs:
   build:
     runs-on: macos-latest
+    outputs:
+      tag: ${{ steps.determine_tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
       - name: Switch xcode to latest-stable
@@ -23,18 +32,30 @@ jobs:
         uses: jdx/mise-action@v2
       - name: Run tests
         run: mise run test
+      - name: Determine Release Tag
+        id: determine_tag
+        run: |
+          if [ -n "${{ inputs.tag_name }}" ]; then
+            TAG="${{ inputs.tag_name }}"
+          elif [ "${{ github.ref_type }}" = "tag" ]; then
+            TAG="${{ github.ref_name }}"
+          else
+            VERSION=$(grep -m1 "MARKETING_VERSION" BabyKeyboardLock.xcodeproj/project.pbxproj | tr -d ';\t ' | cut -d'=' -f2)
+            TAG="v${VERSION}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
       - name: Build and archive macOS app
         env:
-          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_REF_NAME: ${{ steps.determine_tag.outputs.tag }}
         run: mise run build
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: release-artifacts
-          path: build/BabyKeyboardLock-${{ github.ref_name }}.zip
+          path: build/BabyKeyboardLock-${{ steps.determine_tag.outputs.tag }}.zip
   release:
     runs-on: ubuntu-latest
-    if: github.ref_type == 'tag'
+    if: github.event_name == 'workflow_dispatch'
     needs: build
     permissions:
       contents: write
@@ -47,4 +68,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: BabyKeyboardLock-${{ github.ref_name }}.zip
+          tag_name: ${{ needs.build.outputs.tag }}
+          name: ${{ needs.build.outputs.tag }}
+          files: BabyKeyboardLock-${{ needs.build.outputs.tag }}.zip
+          generate_release_notes: true
