@@ -42,6 +42,12 @@ struct ContentView: View {
                 HStack {
                     Spacer() // push the button to right
                     Menu() {
+                        Button("Check for Updates...") {
+                            UpdateManager.shared.checkForUpdates(userInitiated: true)
+                        }
+
+                        Divider()
+
                         Button("About") {
                             AboutView().openInWindow(id: "About", sender: self, focus: true)
                         }

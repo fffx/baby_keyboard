@@ -9,6 +9,8 @@ import SwiftUI
 
 
 struct AboutView: View {
+    @ObservedObject var updateManager = UpdateManager.shared
+
     var body: some View {
         VStack {
             HStack(alignment: .firstTextBaseline) {
@@ -19,6 +21,12 @@ struct AboutView: View {
                 Image(nsImage: NSImage(named: "AppIcon") ?? NSImage())
             }
             Spacer()
+            HStack {
+                Button("Check for Updates...") {
+                    updateManager.checkForUpdates(userInitiated: true)
+                }
+                Spacer()
+            }
             HStack(alignment: .firstTextBaseline) {
                 Text("For more information please visit our website")
                 Link("https://keyboardlock.app", destination: URL(string: "https://keyboardlock.app")!)
