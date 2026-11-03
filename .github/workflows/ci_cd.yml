@@ -20,17 +20,45 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      - uses: mxcl/xcodebuild@v3
-        with:
-          code-sign-certificate: ${{ secrets.CERTIFICATE_BASE64 }}
-          code-sign-certificate-passphrase: ${{ secrets.CERTIFICATE_PASSPHRASE}}
-          scheme: BabyKeyboardLock
-          action: none
-          verbosity: xcpretty
-          upload-logs: always
-          configuration: release
+      - name: Setup Headless Code Signing Keychain
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.CERTIFICATE_PASSPHRASE }}
+          KEYCHAIN_PASSWORD: ${{ secrets.CERTIFICATE_PASSPHRASE }}
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+
+          echo "$BUILD_CERTIFICATE_BASE64" | base64 --decode > "$CERTIFICATE_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          security import "$CERTIFICATE_PATH" \
+            -P "$P12_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12 \
+            -k "$KEYCHAIN_PATH"
+
+          rm -f "$CERTIFICATE_PATH"
+
+          # Allow codesign without GUI password prompt in headless CI
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s \
+            -k "$KEYCHAIN_PASSWORD" \
+            "$KEYCHAIN_PATH"
+
+          CURRENT_KEYCHAINS=$(security list-keychains -d user | tr -d '"')
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $CURRENT_KEYCHAINS
+          security default-keychain -s "$KEYCHAIN_PATH"
+
       - name: Setup mise
         uses: jdx/mise-action@v2
+      - name: Run tests
+        run: mise run test
       - name: Determine Release Tag
         id: determine_tag
         run: |
@@ -52,6 +80,13 @@ jobs:
         with:
           name: release-artifacts
           path: build/BabyKeyboardLock-${{ steps.determine_tag.outputs.tag }}.zip
+      - name: Clean up Keychain
+        if: always()
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          if [ -f "$KEYCHAIN_PATH" ]; then
+            security delete-keychain "$KEYCHAIN_PATH" || true
+          fi
   release:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
