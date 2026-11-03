@@ -58,19 +58,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bitte erteilen Sie [%@] Zugriffsberechtigungen unter:\n[Systemeinstellungen]\n    > [Sicherheit & Datenschutz]\n        > [Barrierefreiheit] (nach unten scrollen)"
+            "value" : "Bitte erteilen Sie [%@] Zugriffsberechtigungen unter:\n[Systemeinstellungen]\n    > [Datenschutz & Sicherheit]\n        > [Bedienungshilfen] (oder [Gerätesteuerung und Datenzugriff])"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Please grant accessibility permissions to [%@] in:\n[System Settings]\n    > [Secuerity & Privacy] \n        > [Accessibility] (scroll down)"
+            "value" : "Please grant accessibility permissions to [%@] in:\n[System Settings]\n    > [Privacy & Security] \n        > [Accessibility] (or [Device Control and Data Access])"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请在以下位置为 [%@] 授予辅助功能权限：\n[系统设置]\n　　> [安全性与隐私]\n　　　　> [辅助功能]（向下滚动）"
+            "value" : "请在以下位置为 [%@] 授予辅助功能权限：\n[系统设置]\n　　> [隐私与安全性]\n　　　　> [辅助功能]（或 [设备控制和数据访问]）"
           }
         }
       }
