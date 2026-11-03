@@ -42,7 +42,7 @@ jobs:
           elif [ "${{ github.ref_type }}" = "tag" ]; then
             TAG="${{ github.ref_name }}"
           else
-            VERSION=$(grep -m1 "MARKETING_VERSION" BabyKeyboardLock.xcodeproj/project.pbxproj | tr -d ';\t ' | cut -d'=' -f2)
+            VERSION=$(grep -m1 "MARKETING_VERSION" BabyKeyboardLock.xcodeproj/project.pbxproj | tr -d ';\t "' | cut -d'=' -f2)
             TAG="v${VERSION}"
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
