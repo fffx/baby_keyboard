@@ -12,6 +12,7 @@ class SpeechService {
     private let synthesizer: SpeechSynthesizing
     private var voiceCache: [String: AVSpeechSynthesisVoice] = [:]
     private let queue: DispatchQueue?
+    private let lock = NSLock()
 
     init(
         synthesizer: SpeechSynthesizing = AVSpeechSynthesizer(),
@@ -43,38 +44,41 @@ class SpeechService {
         }
     }
 
-    private func createUtterance(for str: String, language: String? = nil) -> AVSpeechUtterance {
-        let utterance = AVSpeechUtterance(string: str)
+    private func cachedVoice(for languageCode: String) -> AVSpeechSynthesisVoice? {
+        lock.lock()
+        defer { lock.unlock() }
 
-        let languageCode = language ?? Locale.preferredLanguages.first ?? "en-US"
-
-        // Cache voices to ensure consistent voice selection across calls
         if let cachedVoice = voiceCache[languageCode] {
-            utterance.voice = cachedVoice
-        } else {
-            // Prefer direct voice lookup by language identifier (fast, no IPC daemon overhead)
-            if let directVoice = AVSpeechSynthesisVoice(language: languageCode) {
-                voiceCache[languageCode] = directVoice
-                utterance.voice = directVoice
-            } else {
-                let allVoices = AVSpeechSynthesisVoice.speechVoices()
-                var matchingVoices = allVoices.filter { $0.language == languageCode }
-
-                // Fallback to language prefix (e.g. "en" for "en-FI") if exact locale tag not found
-                if matchingVoices.isEmpty {
-                    let languagePrefix = languageCode.prefix(2).lowercased()
-                    matchingVoices = allVoices.filter { $0.language.lowercased().hasPrefix(languagePrefix) }
-                }
-
-                // Fallback to default voice if no match
-                let voice = matchingVoices.first ?? AVSpeechSynthesisVoice(language: languageCode)
-                if let voice = voice {
-                    voiceCache[languageCode] = voice
-                    utterance.voice = voice
-                }
-            }
+            return cachedVoice
         }
 
+        // Prefer direct voice lookup by language identifier (fast, no IPC daemon overhead)
+        if let directVoice = AVSpeechSynthesisVoice(language: languageCode) {
+            voiceCache[languageCode] = directVoice
+            return directVoice
+        }
+
+        let allVoices = AVSpeechSynthesisVoice.speechVoices()
+        var matchingVoices = allVoices.filter { $0.language == languageCode }
+
+        // Fallback to language prefix (e.g. "en" for "en-FI") if exact locale tag not found
+        if matchingVoices.isEmpty {
+            let languagePrefix = languageCode.prefix(2).lowercased()
+            matchingVoices = allVoices.filter { $0.language.lowercased().hasPrefix(languagePrefix) }
+        }
+
+        // Fallback to default voice if no match
+        let voice = matchingVoices.first ?? AVSpeechSynthesisVoice(language: languageCode)
+        if let voice = voice {
+            voiceCache[languageCode] = voice
+        }
+        return voice
+    }
+
+    private func createUtterance(for str: String, language: String? = nil) -> AVSpeechUtterance {
+        let utterance = AVSpeechUtterance(string: str)
+        let languageCode = language ?? Locale.preferredLanguages.first ?? "en-US"
+        utterance.voice = cachedVoice(for: languageCode)
         return utterance
     }
 }

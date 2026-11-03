@@ -87,13 +87,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         // nSHostingController.preferredContentSize = NSSize(width: 300, height: 300)
 
         self.popover.contentViewController = nSHostingController
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
-            self.showPopover()
-            EventHandler.shared.run()
-        }
 
-        // Initialize cursor overlay service for mouse lock indicator
-        cursorOverlayService = CursorOverlayService.shared
+        #if DEBUG
+        let isHeadlessOrTest = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil ||
+            ProcessInfo.processInfo.environment["XCTestBundlePath"] != nil ||
+            ProcessInfo.processInfo.environment["CI"] != nil ||
+            ProcessInfo.processInfo.arguments.contains(where: { $0.contains("xctest") }) ||
+            NSClassFromString("XCTest") != nil ||
+            NSClassFromString("Testing.Test") != nil
+        #else
+        let isHeadlessOrTest = ProcessInfo.processInfo.environment["CI"] != nil
+        #endif
+
+        if !isHeadlessOrTest {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
+                self.showPopover()
+                EventHandler.shared.run()
+            }
+
+            // Initialize cursor overlay service for mouse lock indicator
+            cursorOverlayService = CursorOverlayService.shared
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
