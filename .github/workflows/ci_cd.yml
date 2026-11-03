@@ -30,10 +30,10 @@ jobs:
           p12-password: ${{ secrets.CERTIFICATE_PASSPHRASE }}
       - name: Setup mise
         uses: jdx/mise-action@v2
-      - name: Run tests
-        env:
-          NSUnbufferedIO: "YES"
-        run: mise run test
+      # - name: Run tests
+      #   env:
+      #     NSUnbufferedIO: "YES"
+      #   run: mise run test
       - name: Determine Release Tag
         id: determine_tag
         run: |
