@@ -52,20 +52,26 @@ class SpeechService {
         if let cachedVoice = voiceCache[languageCode] {
             utterance.voice = cachedVoice
         } else {
-            let allVoices = AVSpeechSynthesisVoice.speechVoices()
-            var matchingVoices = allVoices.filter { $0.language == languageCode }
+            // Prefer direct voice lookup by language identifier (fast, no IPC daemon overhead)
+            if let directVoice = AVSpeechSynthesisVoice(language: languageCode) {
+                voiceCache[languageCode] = directVoice
+                utterance.voice = directVoice
+            } else {
+                let allVoices = AVSpeechSynthesisVoice.speechVoices()
+                var matchingVoices = allVoices.filter { $0.language == languageCode }
 
-            // Fallback to language prefix (e.g. "en" for "en-FI") if exact locale tag not found
-            if matchingVoices.isEmpty {
-                let languagePrefix = languageCode.prefix(2).lowercased()
-                matchingVoices = allVoices.filter { $0.language.lowercased().hasPrefix(languagePrefix) }
-            }
+                // Fallback to language prefix (e.g. "en" for "en-FI") if exact locale tag not found
+                if matchingVoices.isEmpty {
+                    let languagePrefix = languageCode.prefix(2).lowercased()
+                    matchingVoices = allVoices.filter { $0.language.lowercased().hasPrefix(languagePrefix) }
+                }
 
-            // Fallback to default voice if no match
-            let voice = matchingVoices.first ?? AVSpeechSynthesisVoice(language: languageCode)
-            if let voice = voice {
-                voiceCache[languageCode] = voice
-                utterance.voice = voice
+                // Fallback to default voice if no match
+                let voice = matchingVoices.first ?? AVSpeechSynthesisVoice(language: languageCode)
+                if let voice = voice {
+                    voiceCache[languageCode] = voice
+                    utterance.voice = voice
+                }
             }
         }
 

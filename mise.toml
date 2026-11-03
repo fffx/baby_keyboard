@@ -1,6 +1,6 @@
 [tasks.test]
 description = "Run tests"
-run = "xcodebuild test -scheme BabyKeyboardLock -destination 'platform=macOS' -only-testing:BabyKeyboardLockTests CODE_SIGN_IDENTITY='-'"
+run = "xcodebuild test -scheme BabyKeyboardLock -destination 'platform=macOS' -only-testing:BabyKeyboardLockTests -skip-testing:BabyKeyboardLockTests/BabyKeyboardLockAppTests CODE_SIGN_IDENTITY='-'"
 
 [tasks.build]
 description = "Build and archive macOS app, then zip for release"

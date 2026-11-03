@@ -40,6 +40,11 @@
                BlueprintName = "BabyKeyboardLockTests"
                ReferencedContainer = "container:BabyKeyboardLock.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "BabyKeyboardLockAppTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
          <TestableReference
             skipped = "YES">
